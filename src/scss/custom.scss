@@ -23,6 +23,11 @@ body {
     color: aqua;
  }
 
+
+.accordion-custom {
+    --bs-accordion-border-color: pink;
+}
+
 $list-group-active-color: blue;
 $list-group-active-border-color:blue;
 

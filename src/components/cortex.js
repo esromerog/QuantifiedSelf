@@ -446,10 +446,11 @@ export default CortexComp;
 function CortexComp({oldData, handleValue, changeIntervalRef}) {
     clearInterval(changeIntervalRef.current);
     changeIntervalRef.current = setInterval(() => {
-        let newData=oldData;
+        let newData=Object.assign({}, oldData);
         newData["Alpha"]=Math.round(Math.random()*10);
         newData["Beta"]=Math.round(Math.random()*100);
         handleValue(newData);
+        console.log(newData);
     }, 500);
 }
 

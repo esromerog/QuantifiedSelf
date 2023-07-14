@@ -45,6 +45,7 @@ const rawVisParameters=[
 
 // Pasar visParameters a DataCard
 const deviceDataDefault={
+  Manual: 0,
   Alpha: 20,
   Beta: 21,
 }
@@ -101,13 +102,13 @@ function App() {
             </li>
           </ul>
           <div className="tab-content" id="myTabContent">
-            <div className="tab-pane fade show active" role="tabpanel" tabIndex="0" id="sources">
+            <div className="tab-pane show active" role="tabpanel" tabIndex="0" id="sources">
               <RenderDevices 
               data={data} 
               deviceStates={deviceStates} 
               handleDeviceStates={handleDeviceStates}/>
             </div>
-            <div className="tab-pane fade" role="tabpanel" tabIndex="0" id="data-streams">
+            <div className="tab-pane" role="tabpanel" tabIndex="0" id="data-streams">
               <DataManagement deviceStream={deviceStream} updateValues={UpdateValues} visParameters={visParameters}/>
             </div>
           </div>
@@ -121,7 +122,7 @@ function App() {
             <li key={name}>Device: {name} - {state?"Active":"Not connected"}</li>
             )}
           </ul>
-          {/*<CortexComp handleValue={handleValue} oldData={deviceStream} changeIntervalRef={changeIntervalRef}/>*/}
+          <CortexComp handleValue={handleValue} oldData={deviceStream} changeIntervalRef={changeIntervalRef}/>
       </div>
     </div>
   </div>

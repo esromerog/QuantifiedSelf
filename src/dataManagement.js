@@ -48,14 +48,13 @@ function DataManualSlider ({parameter, subparameter, updateValues, sources, chan
 function DataConnection ({selection, changeSelection, subparameter, parameter, updateValues, sources}) {
 
     const source=sources[selection];
-    useEffect(()=>updateValues(parameter,subparameter.name, source), []);
-    console.log("Am I being rendered?");
+    useEffect(()=>updateValues(parameter,subparameter.name, source), [source]);
 
     return (
         <div className="row justify-content-start">
         <div className="col-5">
             <div className="input-group">
-                <input type="text" className="form-control" id="valorManualInput" value={selection+" value: "+source} disabled readOnly></input>
+                <input type="text" className="form-control" id="valorManualInput" value={selection+" value: "+subparameter.value} disabled readOnly></input>
                 <label className="visually-hidden" htmlFor="valorManualInput">{subparameter.value}</label>
                 <button type="button" className="btn btn-outline-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false"></button>
                 <ul className="dropdown-menu">
@@ -73,16 +72,23 @@ function DataConnection ({selection, changeSelection, subparameter, parameter, u
 }
 
 
-function ParameterManager ({subparameter, sources, updateValues, parameter}) {
+function ParameterManager ({subparameter, sources, updateValues, parameter, defineAutoParameter}) {
 
     const [manual, setManual]=useState(true)
     const [selection, setSelection]=useState("");
 
+
     function changeSelection(option) {
-        console.log("Change?")
         setSelection(option);
-        (option==="Manual")?setManual(true):setManual(false);
+        if (option==="Manual") {
+            setManual(true);
+            defineAutoParameter(false);
+        } else {
+            setManual(false);
+            defineAutoParameter(true);
+        }
     }
+
 
     return (
     <li className="list-group-item py-4 container" key={subparameter.name}>
@@ -96,7 +102,7 @@ function ParameterManager ({subparameter, sources, updateValues, parameter}) {
 }
 
 function DataCard({visParameter, updateValues, sources}) {
-
+    const [hasAuto, setHasAuto]=useState(false);
     let subparameters;
 
     if (Array.isArray(visParameter.value)) {
@@ -105,10 +111,10 @@ function DataCard({visParameter, updateValues, sources}) {
         subparameters=[visParameter];
     }
 
-    const mapeo=subparameters?.map((param)=><ParameterManager parameter={visParameter.name} subparameter={param} sources={sources} updateValues={updateValues} key={param.name} />);
+    const mapeo=subparameters?.map((param)=><ParameterManager parameter={visParameter.name} subparameter={param} sources={sources} updateValues={updateValues} key={param.name} defineAutoParameter={setHasAuto}/>);
     // Pasar visParameters a DataCardManager
     return (
-    <div className="accordion-item" key={visParameter.name}>
+    <div className={hasAuto?"accordion-item accordion-custom":"accordion-item"} key={visParameter.name}>
         <h2 className="accordion-header">
             <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target={'#'+visParameter.name} aria-expanded="false" aria-controls="collapseTwo">
             {visParameter.name}
@@ -127,10 +133,8 @@ function DataCard({visParameter, updateValues, sources}) {
 
 export default function DataManagement({deviceStream, updateValues, visParameters}) {
 
-    deviceStream.Manual=0;
 
-    const sources=deviceStream;
-    const dataCards = visParameters?.map((parameter)=>(<DataCard visParameter={parameter} sources={sources} updateValues={updateValues} key={parameter.name} />));
+    const dataCards = visParameters?.map((parameter)=>(<DataCard visParameter={parameter} sources={deviceStream} updateValues={updateValues} key={parameter.name} />));
 
     return (
         <div className="accordion mt-3">
