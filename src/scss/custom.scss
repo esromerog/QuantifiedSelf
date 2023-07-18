@@ -2,7 +2,7 @@
 
 
 
-$primary: pink;
+$primary: blue;
 $enable-negative-margins: true;
 
 body {
@@ -25,10 +25,13 @@ body {
 
 
 .accordion-custom {
-    --bs-accordion-border-color: pink;
+    --bs-accordion-border-color: blue;
+    --bs-accordion-btn-color: blue;
 }
 
-$list-group-active-color: blue;
+
+
+$list-group-active-color: white;
 $list-group-active-border-color:blue;
 
 @import 'bootstrap/scss/functions';

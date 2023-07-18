@@ -1,8 +1,20 @@
 import React, { useState, useEffect } from 'react'
 
 
-function DataManualSlider ({parameter, subparameter, updateValues, sources, changeSelection}) {
+function getDataStreamKeys(dataStreamObject) {
+    console.log(dataStreamObject);
+    const returnItems=[];
+    for (const valor in dataStreamObject) {
+        for (const datos in dataStreamObject[valor]) {
+            returnItems.push(valor+" "+datos);
+        }
+    }
+    return returnItems;
+}
 
+function DataManualSlider ({parameter, subparameter, updateValues, sources, changeSelection}) {
+    const claves=getDataStreamKeys(sources);
+    claves.push("Manual");
     const valor=subparameter.value;
 
     const min=0;
@@ -22,20 +34,22 @@ function DataManualSlider ({parameter, subparameter, updateValues, sources, chan
         updateValues(parameter, subparameter.name,formValue);
         e.target.value=formValue;
     }
-
     return (
     <div className="row justify-content-start">
         <div className="col-3">
             <div className="input-group">
-                <input type="text" className="form-control" id="valorManualInput" placeholder={valor} value={valor} onChange={handleFormChange}></input>
+                <div className="form-floating">
+                    <input type="text" className="form-control" id="valorManualInput" placeholder={valor} value={valor} onChange={handleFormChange}></input>
+                    <label htmlFor="valorManualInput">Value</label>
+                </div>
                 <label className="visually-hidden" htmlFor="valorManualInput">{valor}</label>
                 <button type="button" className="btn btn-outline-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false"></button>
                 <ul className="dropdown-menu">
-                        {sources.map((option)=>
-                        <li key={option}><button type="button" 
-                        className="dropdown-item" 
-                        onClick={()=>changeSelection(option)}
-                        >{option}</button></li>)}
+                        {claves.map((option)=>
+                            <li key={option}><button type="button" 
+                            className="dropdown-item" 
+                            onClick={()=>changeSelection(option)}
+                            >{option}</button></li>)}
                     </ul>
             </div>
         </div>
@@ -46,23 +60,33 @@ function DataManualSlider ({parameter, subparameter, updateValues, sources, chan
 
 
 function DataConnection ({selection, changeSelection, subparameter, parameter, updateValues, sources}) {
+    const select=selection.split(" ");
+    let source;
 
-    const source=sources[selection];
+    try {
+        source=sources[select[0]][select[1]];
+    } catch (error) {
+        source=subparameter.value;
+    }
+
     useEffect(()=>updateValues(parameter,subparameter.name, source), [source]);
-
+    const claves=getDataStreamKeys(sources);
+    claves.push("Manual");
     return (
         <div className="row justify-content-start">
         <div className="col-5">
             <div className="input-group">
-                <input type="text" className="form-control" id="valorManualInput" value={selection+" value: "+subparameter.value} disabled readOnly></input>
-                <label className="visually-hidden" htmlFor="valorManualInput">{subparameter.value}</label>
+                <div className="form-floating">
+                <input type="text" className="form-control" id="valorManualInput" value={subparameter.value} readOnly></input>
+                <label htmlFor="valorManualInput">{selection}</label>
+                </div>
                 <button type="button" className="btn btn-outline-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false"></button>
                 <ul className="dropdown-menu">
-                    {Object.keys(sources).map((source)=>
-                    <li key={source}><button type="button" 
-                    className="dropdown-item" 
-                    onClick={()=>changeSelection(source)}
-                    >{source}</button></li>)}
+                        {claves.map((option)=>
+                            <li key={option}><button type="button" 
+                            className="dropdown-item" 
+                            onClick={()=>changeSelection(option)}
+                            >{option}</button></li>)}
                 </ul>
             </div>
         </div>
@@ -76,10 +100,9 @@ function ParameterManager ({subparameter, sources, updateValues, parameter, defi
 
     const [manual, setManual]=useState(true)
     const [selection, setSelection]=useState("");
-
+    const select=selection.split(" ");
 
     function changeSelection(option) {
-        setSelection(option);
         if (option==="Manual") {
             setManual(true);
             defineAutoParameter(false);
@@ -87,14 +110,16 @@ function ParameterManager ({subparameter, sources, updateValues, parameter, defi
             setManual(false);
             defineAutoParameter(true);
         }
+        setSelection(option);
     }
 
+    useEffect(()=>{if (!sources.hasOwnProperty(select[0])) {setManual(true);}}, [sources]);
 
     return (
     <li className="list-group-item py-4 container" key={subparameter.name}>
         <h6>{subparameter.name}</h6>
         {manual?
-        <DataManualSlider parameter={parameter} subparameter={subparameter} updateValues={updateValues} sources={Object.keys(sources)} changeSelection={changeSelection}/>:
+        <DataManualSlider parameter={parameter} subparameter={subparameter} updateValues={updateValues} sources={sources} changeSelection={changeSelection}/>:
         <DataConnection parameter={parameter} subparameter={subparameter} updateValues={updateValues} sources={sources} selection={selection} changeSelection={changeSelection} />
         }
     </li>
@@ -131,14 +156,17 @@ function DataCard({visParameter, updateValues, sources}) {
     );
 }
 
+
 export default function DataManagement({deviceStream, updateValues, visParameters}) {
 
 
     const dataCards = visParameters?.map((parameter)=>(<DataCard visParameter={parameter} sources={deviceStream} updateValues={updateValues} key={parameter.name} />));
 
     return (
-        <div className="accordion mt-3">
-            {dataCards}
+        <div>
+            <div className="accordion mt-3">
+                {dataCards}
+            </div>
         </div>
     );
 }

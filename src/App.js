@@ -1,36 +1,36 @@
 import "./App.scss";
-import React, { useState } from 'react';
-import RenderDevices, { DeviceCard } from './devices';
-import Expand from './expandable';
+import React, { useEffect, useState } from 'react';
+import RenderDevices from './devices';
 import './dataManagement';
 import DataManagement from "./dataManagement";
 import Sun from './components/sun';
-import CortexComp from './components/cortex'
+import CortexComp from './components/cortex';
+import AvailableDataInformation from "./availableData";
 
-const eegDevices = [
-  {
-    heading: "Muse",
-    content: <DeviceCard content="Easy-to-use bluetooth muse EEG headset"/>,
-  },
-  {
-    heading: "Emotiv",
-    content: <DeviceCard content="Emotiv EEG headset"/>,
-  }
-];
 
-const data = [
+
+// Pasar visParameters a DataCard
+
+const devices = [
 {
-  heading: 'EEG Devices',
-  icon: "bi bi-plug",
-  content: <Expand data={eegDevices} key="EEG"/>,
+  heading: 'Muse',
+  data: [
+    {name: "Alpha", description: "I'll write this later"},
+    {name: "Beta", description: "Maybe I'll also write this later"},
+  ]
 },
+
 {
   heading: 'Camera',
-  content: <DeviceCard content="Camera on your device"/>,
+  data: [
+    {name: "RGB"}
+  ]
 },
 {
   heading: 'Microphone',
-  content: <DeviceCard content="Your own device's microphone"/>,
+  data: [
+    {name: "Left Channel"}
+  ]
 },
 ];
 
@@ -43,27 +43,24 @@ const rawVisParameters=[
 ];
 
 
-// Pasar visParameters a DataCard
-const deviceDataDefault={
-  Manual: 0,
-  Alpha: 20,
-  Beta: 21,
-}
+
 
 function App() {
 
+  // Used for testing purposes
   const changeIntervalRef = React.useRef(null);
 
   const [visParameters, setVisParameters]=useState(rawVisParameters);
 
-  const [deviceStream, setDeviceStream]=useState(deviceDataDefault);
+  const [deviceStream, setDeviceStream]=useState({});
 
+  
   function handleValue(val) {
     setDeviceStream(val);
   }
 
   function UpdateValues(name1, name2, newValue) {
-      setVisParameters(prevData => {
+    setVisParameters(prevData => {
           const newData=[...prevData];
           if (name2!==name1) {
               newData.find(x => x.name===name1).value.find(x => x.name===name2).value=newValue;
@@ -74,7 +71,7 @@ function App() {
       })
   }
 
-  const [deviceStates, setDeviceStates]=useState(data.reduce((acc, obj)=> {
+  const [deviceStates, setDeviceStates]=useState(devices.reduce((acc, obj)=> {
     const deviceName=obj.heading;
     acc[deviceName]=false;
     return acc
@@ -83,9 +80,30 @@ function App() {
   function handleDeviceStates(deviceName) {
     const nextDevices={...deviceStates};
     nextDevices[deviceName]=!nextDevices[deviceName];
+
+    console.log(deviceStream);
+    const newDataStream=Object.assign({}, deviceStream)
+    
+    // Add new device to streaming array
+    if (nextDevices[deviceName]) {
+      const deviceSelected=devices.find(x=>x.heading===deviceName);
+      newDataStream[deviceSelected.heading]=deviceSelected.data.reduce((acc, datos)=>{acc[datos.name]=0; return acc}, {});
+    } else { // Remove device from streaming array
+      delete newDataStream[deviceName];
+    }
+
+    setDeviceStream(newDataStream);
     setDeviceStates(nextDevices);
   }
 
+  function selectedStreams() {
+    if(deviceStates["Muse"]) {
+      return (<CortexComp handleValue={handleValue} oldData={deviceStream} changeIntervalRef={changeIntervalRef}/>);
+    } else {
+      clearInterval(changeIntervalRef.current);
+      return null;
+    }
+  }
 
   return (
   <div className="container ms-5 me-5">
@@ -104,11 +122,13 @@ function App() {
           <div className="tab-content" id="myTabContent">
             <div className="tab-pane show active" role="tabpanel" tabIndex="0" id="sources">
               <RenderDevices 
-              data={data} 
+              data={devices} 
               deviceStates={deviceStates} 
               handleDeviceStates={handleDeviceStates}/>
             </div>
             <div className="tab-pane" role="tabpanel" tabIndex="0" id="data-streams">
+              {/* The active devices will be shown/programmed here*/}
+              <AvailableDataInformation source={deviceStates} popupInfo={devices}/>
               <DataManagement deviceStream={deviceStream} updateValues={UpdateValues} visParameters={visParameters}/>
             </div>
           </div>
@@ -116,13 +136,13 @@ function App() {
       </div>
       <div className="col mt-2">
         <h4 className="text-left">Visualization</h4>
-        <Sun value={visParameters[1].value}/>
+        {/*<Sun value={visParameters[1].value}>*/}
         <ul>
             {Object.entries(deviceStates).map(([name, state])=>
             <li key={name}>Device: {name} - {state?"Active":"Not connected"}</li>
             )}
           </ul>
-          <CortexComp handleValue={handleValue} oldData={deviceStream} changeIntervalRef={changeIntervalRef}/>
+          {selectedStreams()}
       </div>
     </div>
   </div>
