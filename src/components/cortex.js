@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 function computePower(arr, returnRelative) {
   /**
@@ -413,16 +413,35 @@ class Cortex {
 
   }
 
-/*
-function CortexComp({handleValue}) {
-   class CortexPower extends Cortex {
-    manipulate(parsedData) {
-      let power = parsedData['pow'];
-      let receivingValue = computePower(power,true)[0]  //theta is 0; alpha is 1
-      handleValue(receivingValue);
+let instance;
+
+class CortexPower extends Cortex {
+    
+    constructor(user, socketUrl, oldData, handleValue) {
+        super(user, socketUrl);
+        this.oldData=oldData;
+        this.handleValue=handleValue;
+        if (instance) {
+            throw new Error("You can only create one instance!");
+          }
+        instance = this;
     }
-  }
-  
+
+    manipulate(parsedData) {
+        let power = parsedData['pow'];
+        let receivingValue = computePower(power,true)[1]  //theta is 0; alpha is 1
+        let newData=(Object.assign({}, this.oldData));
+        console.log(receivingValue);
+        newData["Muse"]["Alpha"]=receivingValue;
+        newData["Muse"]["Beta"]=0;
+        this.handleValue(newData);
+    }
+
+}
+
+function CortexComp({oldData, handleValue}) {
+    let failText="";
+
   let socketUrl = 'wss://localhost:6868'
     // this key does not inquire for EEG raw data
   let user = {
@@ -431,18 +450,21 @@ function CortexComp({handleValue}) {
       "clientSecret":"s5Ham3dnkkAVHjI88d64WVcZ8UUn5jJ0zi3DfbT4FAOIJgyQtZZ8HORc8VZInMqx1oJgMu9HNQzZwoGSqap9g7KSuFQN5fjSUpex9NtjVAUUfQqfC3FHG0PVvW0yZxyp",
       "debit":100
   }
-  const c = new CortexPower(user, socketUrl)  
-  c.sub(['pow','eeg'])
+  const c = new CortexPower(user, socketUrl, oldData, handleValue);
+
+  try {
+    c.sub(['pow','eeg']);
+  } catch (e) {
+    failText=e.message;
+  }
   
-  return (<div >
-				<h1>cortex component</h1>
-			  </div>)
+
 }
 
 export default CortexComp;
 
-*/
 
+/*
 function CortexComp({oldData, handleValue, changeIntervalRef}) {
     clearInterval(changeIntervalRef.current);
     changeIntervalRef.current = setInterval(() => {
@@ -454,3 +476,4 @@ function CortexComp({oldData, handleValue, changeIntervalRef}) {
 }
 
 export default CortexComp;
+*/

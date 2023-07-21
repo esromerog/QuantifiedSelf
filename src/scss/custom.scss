@@ -2,16 +2,26 @@
 
 
 
-$primary: blue;
+$primary: purple;
 $enable-negative-margins: true;
 
 body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+
+    height  : 100%;
+    overflow: auto;
+    position: relative;
+}
+html {
+    height  : 100%;
+    overflow: hidden;
+    position: relative;
+    background-color: white;
 }
 
 .vertical-spacing {
-    margin-top: 30vh;
+    margin-top: 25vh;
 }
 
 .card-column {
@@ -25,14 +35,14 @@ body {
 
 
 .accordion-custom {
-    --bs-accordion-border-color: blue;
-    --bs-accordion-btn-color: blue;
+    --bs-accordion-border-color: purple;
+    --bs-accordion-btn-color: purple;
 }
 
-
-
-$list-group-active-color: white;
-$list-group-active-border-color:blue;
+$accordion-button-active-bg: white;
+$list-group-active-color: purple;
+$list-group-active-border-color:purple;
+$list-group-active-bg: white;
 
 @import 'bootstrap/scss/functions';
 @import 'bootstrap/scss/variables';
