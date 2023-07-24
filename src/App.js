@@ -4,7 +4,7 @@ import RenderDevices from './devices';
 import './dataManagement';
 import DataManagement from "./dataManagement";
 import Sun from './components/sun';
-import CortexComp from './components/cortex';
+
 import AvailableDataInformation from "./availableData";
 
 
@@ -50,6 +50,7 @@ const rawVisParameters=[
 
 
 
+
 function App() {
 
   const devices=[...devicesRaw];
@@ -58,7 +59,11 @@ function App() {
 
   const [visParameters, setVisParameters]=useState(rawVisParameters);
 
-  const [deviceStream, setDeviceStream]=useState({});
+
+  const [deviceStream, setDeviceStream]=useState(devices.reduce((acc, deviceSelected)=>{
+    acc[deviceSelected.heading]=deviceSelected.data.reduce((acc, datos)=>{acc[datos.name]=0; return acc}, {})
+    return acc;
+  }, {}));
 
   function handleValue(val) {
     setDeviceStream(val);
@@ -87,28 +92,14 @@ function App() {
     const nextDevices={...deviceStates};
     nextDevices[deviceName]=!nextDevices[deviceName];
 
-
-    const newDataStream=Object.assign({}, deviceStream)
-    
-    // Add new device to streaming array
-    if (nextDevices[deviceName]) {
-      const deviceSelected=[...devices].find(x=>x.heading===deviceName);
-      newDataStream[deviceSelected.heading]=deviceSelected.data.reduce((acc, datos)=>{acc[datos.name]=0; return acc}, {});
-    } else { // Remove device from streaming array
-      delete newDataStream[deviceName];
-    }
-
-    setDeviceStream(newDataStream);
     setDeviceStates(nextDevices);
   }
-  
-  const [callCortex, setCallCortex]=useState();
+  /*
+  useEffect(()=>{
+    if (deviceStates["Muse"]) {
+      CortexComp(deviceStream, handleValue);
+    }}, [deviceStates["Muse"]]);*/
 
-  useEffect(()=>{if (deviceStates["Muse"]) {
-    setCallCortex(()=><CortexComp oldData={deviceStream} handleValue={handleValue} />)
-  } else { 
-    setCallCortex(null); 
-  }}, [deviceStates]);
 
   return (
   <div className="container ms-5 me-5">
@@ -155,7 +146,6 @@ function App() {
               <li key={name}>Device: {name} - {state?"Active":"Not connected"}</li>
               )}
             </ul>
-            {callCortex}
         </div>
       </div>
     </div>

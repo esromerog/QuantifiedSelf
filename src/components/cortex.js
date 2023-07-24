@@ -32,6 +32,7 @@ class Cortex {
       constructor (user, socketUrl) {
           // create socket
           this.socket = new WebSocket(socketUrl)
+          this.socketUrl=socketUrl;
           // read user infor
           this.user = user
       }
@@ -413,19 +414,16 @@ class Cortex {
 
   }
 
-let instance;
-
 class CortexPower extends Cortex {
     
     constructor(user, socketUrl, oldData, handleValue) {
         super(user, socketUrl);
         this.oldData=oldData;
         this.handleValue=handleValue;
-        if (instance) {
-            throw new Error("You can only create one instance!");
-          }
-        instance = this;
+        console.log("Built!")
     }
+
+    // Add error handling functino using parsedData to check if there's data. I could also throw a return value from the sub?
 
     manipulate(parsedData) {
         let power = parsedData['pow'];
@@ -439,29 +437,9 @@ class CortexPower extends Cortex {
 
 }
 
-function CortexComp({oldData, handleValue}) {
-    let failText="";
 
-  let socketUrl = 'wss://localhost:6868'
-    // this key does not inquire for EEG raw data
-  let user = {
-      "license":"",
-      "clientId":"BY2tKexlRKRaiVt5nbixVfj4Ip42BrVW2xUmJvmL",
-      "clientSecret":"s5Ham3dnkkAVHjI88d64WVcZ8UUn5jJ0zi3DfbT4FAOIJgyQtZZ8HORc8VZInMqx1oJgMu9HNQzZwoGSqap9g7KSuFQN5fjSUpex9NtjVAUUfQqfC3FHG0PVvW0yZxyp",
-      "debit":100
-  }
-  const c = new CortexPower(user, socketUrl, oldData, handleValue);
 
-  try {
-    c.sub(['pow','eeg']);
-  } catch (e) {
-    failText=e.message;
-  }
-  
-
-}
-
-export default CortexComp;
+export default CortexPower;
 
 
 /*
