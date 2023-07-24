@@ -5,19 +5,20 @@ import Tooltip from 'react-bootstrap/Tooltip';
 
 
 
-function getDataStreamKeys(dataStreamObject) {
+function getDataStreamKeys(dataStreamObject, deviceStates) {
     const returnItems=[];
     for (const valor in dataStreamObject) {
-        for (const datos in dataStreamObject[valor]) {
-            returnItems.push(valor+": "+datos);
+        if (deviceStates[valor]) {
+            for (const datos in dataStreamObject[valor]) {
+                returnItems.push(valor+": "+datos);
+            }
         }
     }
     return returnItems;
 }
 
-function DataManualSlider ({parameter, subparameter, updateValues, sources, changeSelection}) {
-    const claves=getDataStreamKeys(sources);
-    claves.push("Manual");
+function DataManualSlider ({parameter, subparameter, updateValues, changeSelection, claves}) {
+
     const valor=subparameter.value;
 
     const min=0;
@@ -63,7 +64,7 @@ function DataManualSlider ({parameter, subparameter, updateValues, sources, chan
 }
 
 
-function DataConnection ({selection, changeSelection, subparameter, parameter, updateValues, sources}) {
+function DataConnection ({selection, changeSelection, subparameter, parameter, updateValues, sources, claves}) {
 
     const [show, setShow] = useState(false);
     const target = useRef(null);
@@ -112,9 +113,6 @@ function DataConnection ({selection, changeSelection, subparameter, parameter, u
 
     useEffect(()=>updateValues(parameter,subparameter.name, normalizeValue(source, min, max)), [source]);
 
-
-    const claves=getDataStreamKeys(sources);
-    claves.push("Manual");
     return (
         <div className="row justify-content-start">
             <div className="col-4">
@@ -158,7 +156,10 @@ function DataConnection ({selection, changeSelection, subparameter, parameter, u
 }
 
 
-function ParameterManager ({subparameter, sources, updateValues, parameter, defineAutoParameter}) {
+function ParameterManager ({subparameter, sources, updateValues, parameter, defineAutoParameter, deviceStates}) {
+
+    const claves=getDataStreamKeys(sources, deviceStates);
+    claves.push("Manual");
 
     const [manual, setManual]=useState(true)
     const [selection, setSelection]=useState("");
@@ -184,14 +185,14 @@ function ParameterManager ({subparameter, sources, updateValues, parameter, defi
     <li className="list-group-item py-4 container" key={subparameter.name}>
         <h6>{subparameter.name}</h6>
         {manual?
-        <DataManualSlider parameter={parameter} subparameter={subparameter} updateValues={updateValues} sources={sources} changeSelection={changeSelection}/>:
-        <DataConnection parameter={parameter} subparameter={subparameter} updateValues={updateValues} sources={sources} selection={selection} changeSelection={changeSelection} />
+        <DataManualSlider parameter={parameter} subparameter={subparameter} updateValues={updateValues} changeSelection={changeSelection} claves={claves}/>:
+        <DataConnection parameter={parameter} subparameter={subparameter} updateValues={updateValues} sources={sources} selection={selection} changeSelection={changeSelection} claves={claves}/>
         }
     </li>
     )
 }
 
-function DataCard({visParameter, updateValues, sources}) {
+function DataCard({visParameter, updateValues, sources, deviceStates}) {
 
     const [hasAuto, setHasAuto]=React.useState(false);
     let subparameters;
@@ -202,7 +203,15 @@ function DataCard({visParameter, updateValues, sources}) {
         subparameters=[visParameter];
     }
 
-    const mapeo=subparameters?.map((param)=><ParameterManager parameter={visParameter.name} subparameter={param} sources={sources} updateValues={updateValues} key={param.name} defineAutoParameter={setHasAuto}/>);
+    const mapeo=subparameters?.map((param)=>
+        <ParameterManager 
+            parameter={visParameter.name}
+            subparameter={param} 
+            sources={sources} 
+            updateValues={updateValues} 
+            key={param.name} 
+            defineAutoParameter={setHasAuto}
+            deviceStates={deviceStates}/>);
     // Pasar visParameters a DataCardManager
     return (
     <div className={hasAuto?"accordion-item accordion-custom":"accordion-item"} key={visParameter.name}>
@@ -223,8 +232,14 @@ function DataCard({visParameter, updateValues, sources}) {
 }
 
 
-export default function DataManagement({deviceStream, updateValues, visParameters}) {
-    const dataCards = visParameters?.map((parameter)=>(<DataCard visParameter={parameter} sources={deviceStream} updateValues={updateValues} key={parameter.name} />));
+export default function DataManagement({deviceStream, updateValues, visParameters, deviceStates}) {
+    const dataCards = visParameters?.map((parameter)=>(
+        <DataCard 
+            visParameter={parameter} 
+            sources={deviceStream} 
+            updateValues={updateValues} 
+            key={parameter.name} 
+            deviceStates={deviceStates}/>));
     return (
         <div>
             <div className="accordion mt-3 ms-2 me-2 mb-3 custom-scroll">

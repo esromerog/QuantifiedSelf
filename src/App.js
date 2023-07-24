@@ -6,13 +6,13 @@ import DataManagement from "./dataManagement";
 import Sun from './components/sun';
 
 import AvailableDataInformation from "./availableData";
-
+import {Emotiv} from "./streamFunctions";
 
 
 
 const devicesRaw = [
 {
-  heading: 'Muse',
+  heading: 'Emotiv',
   description: 'EEG device developed by...',
   type: 'EEG device',
   data: [
@@ -91,16 +91,25 @@ function App() {
   function handleDeviceStates(deviceName) {
     const nextDevices={...deviceStates};
     nextDevices[deviceName]=!nextDevices[deviceName];
-
     setDeviceStates(nextDevices);
   }
+
+  const deviceStreamFunctions={
+    Emotiv: <Emotiv setDeviceActive={()=>handleDeviceStates("Emotiv")} deviceStates={deviceStates} deviceStream={deviceStream} handleValue={handleValue}/>,
+  };
   /*
   useEffect(()=>{
     if (deviceStates["Muse"]) {
       CortexComp(deviceStream, handleValue);
     }}, [deviceStates["Muse"]]);*/
 
-
+  const disp=()=>{
+    if (!deviceStates["Emotiv"]) {
+      return "Emotiv not connected"
+    } else {
+      return "Alpha: "+deviceStream["Emotiv"]["Alpha"]
+    }
+  };
   return (
   <div className="container ms-5 me-5">
     <div className="row">
@@ -120,9 +129,7 @@ function App() {
               <RenderDevices 
               data={[...devices]} 
               deviceStates={deviceStates} 
-              handleDeviceStates={handleDeviceStates}
-              handleValue={handleValue}
-              deviceStream={deviceStream}/>
+              deviceStreamFunctions={deviceStreamFunctions}/>
             </div>
             <div className="tab-pane" role="tabpanel" tabIndex="0" id="data-streams">
               {/* The active devices will be shown/programmed here*/}
@@ -131,7 +138,7 @@ function App() {
                 <p className='mb-2'>The devices are currently streaming the following data. Hover over a data source to learn more.</p>
                 <AvailableDataInformation source={deviceStates} popupInfo={[...devices]}/>
               </div>
-              <DataManagement deviceStream={deviceStream} updateValues={UpdateValues} visParameters={visParameters}/>
+              <DataManagement deviceStream={deviceStream} deviceStates={deviceStates} updateValues={UpdateValues} visParameters={visParameters}/>
             </div>
           </div>
         </div>
@@ -145,7 +152,8 @@ function App() {
               {Object.entries(deviceStates).map(([name, state])=>
               <li key={name}>Device: {name} - {state?"Active":"Not connected"}</li>
               )}
-            </ul>
+          </ul>
+          {disp()}
         </div>
       </div>
     </div>

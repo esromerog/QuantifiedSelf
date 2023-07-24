@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import Modal from 'react-bootstrap/Modal';
 import AvailableDataInformation from "./availableData";
-import CortexPower from './components/cortex';
 
 function DeviceButton({data, handleShow, deviceStates}) {
 return (
@@ -15,7 +14,7 @@ return (
 );
 }
 
-export default function RenderDevices({data, deviceStates, handleDeviceStates, deviceStream, handleValue}) {
+export default function RenderDevices({data, deviceStates, deviceStreamFunctions}) {
     const [activeData, setActiveData] = useState(data[1]);
 
     const [show, setShow] = useState(false);
@@ -38,54 +37,16 @@ export default function RenderDevices({data, deviceStates, handleDeviceStates, d
             {deviceButtonList}
             </ul>
         </div>
-        <ConnectionWindow show={show} handleClose={handleClose} data={activeData} setDeviceActive={()=>handleDeviceStates(activeData.heading)} deviceStates={deviceStates} deviceStream={deviceStream} handleValue={handleValue}/>
+        <ConnectionWindow show={show} handleClose={handleClose} data={activeData} streamFunction={deviceStreamFunctions[activeData.heading]}/>
     </div>
     );
 
 
 }
 
-
-function CortexComp(oldData, handleValue) {
-    let socketUrl = 'wss://localhost:6868'
-        // this key does not inquire for EEG raw data
-    let user = {
-        "license":"",
-        "clientId":"BY2tKexlRKRaiVt5nbixVfj4Ip42BrVW2xUmJvmL",
-        "clientSecret":"s5Ham3dnkkAVHjI88d64WVcZ8UUn5jJ0zi3DfbT4FAOIJgyQtZZ8HORc8VZInMqx1oJgMu9HNQzZwoGSqap9g7KSuFQN5fjSUpex9NtjVAUUfQqfC3FHG0PVvW0yZxyp",
-        "debit":100
-    }
-    const c=new CortexPower(user, socketUrl, oldData, handleValue);
-  
-    c.sub(['pow','eeg']);
-  
-}
-
-function ConnectionWindow({show, handleClose, data, setDeviceActive, deviceStates, deviceStream, handleValue}) {
-
-
-    const [texto, setTexto]=useState({text:"", type:""});
+function ConnectionWindow({show, handleClose, data, streamFunction}) {
     const source={};
     source[data.heading]=true;
-    const [disabled, setDisabled]=useState(false);
-    
-    function handleActive() {
-        const previousValue=deviceStream["Muse"]["Alpha"];
-        CortexComp(deviceStream, handleValue);
-        setTexto({text:"Attempting connection ...", type:"text-warning"});
-        setDisabled(true);
-        setTimeout(() => {
-            if (previousValue!==deviceStream["Muse"]["Alpha"]) {
-                console.log("Streaming");
-                setDeviceActive();
-                setTexto({text:"", type:""});
-            } else {
-                setTexto({text:"Unable to connect", type:"text-danger"});
-                setDisabled(false);
-            }
-        }, 2000);
-    }
-
 
     return (
     <Modal show={show} onHide={handleClose} centered size="lg">
@@ -100,12 +61,7 @@ function ConnectionWindow({show, handleClose, data, setDeviceActive, deviceState
                 <AvailableDataInformation source={source} popupInfo={[data]}/>
             </div>
         </Modal.Body>
-        <Modal.Footer className="d-flex justify-content-between">
-            <p className={texto.type}>{texto.text}</p>
-            {(!deviceStates[data.heading])?
-            (<button type="button" className="btn btn-outline-dark" onClick={handleActive} disabled={disabled}><i className="bi bi-bluetooth me-2"></i>Connect</button>):
-            (<div>Connected</div>)}
-        </Modal.Footer>
+        {streamFunction}
      </Modal>
     )
 }
