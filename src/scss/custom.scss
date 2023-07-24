@@ -2,16 +2,20 @@
 
 
 
-$primary: purple;
+$primary: #FFC107;
 $enable-negative-margins: true;
 
 body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-
+    
+    font-family: Lato,'Helvetica Neue',Arial, Helvetica, sans-serif;
+    
     height  : 100%;
     overflow: auto;
     position: relative;
+    --bs-body-color: #1A1A1A;
+    --bs-secondary-color: #666666;
 }
 html {
     height  : 100%;
@@ -35,14 +39,19 @@ html {
 
 
 .accordion-custom {
-    --bs-accordion-border-color: purple;
-    --bs-accordion-btn-color: purple;
+    --bs-accordion-border-color: #FFC107;
+    --bs-accordion-btn-color: #FFC107;
 }
 
-$accordion-button-active-bg: white;
-$list-group-active-color: purple;
-$list-group-active-border-color:purple;
-$list-group-active-bg: white;
+
+
+
+
+
+
+$list-group-active-color: #1A1A1A;
+$list-group-active-border-color:#FFC107;
+$list-group-active-bg: #FFF9E6;
 
 @import 'bootstrap/scss/functions';
 @import 'bootstrap/scss/variables';

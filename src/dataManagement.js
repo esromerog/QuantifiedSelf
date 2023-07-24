@@ -17,14 +17,21 @@ function getDataStreamKeys(dataStreamObject, deviceStates) {
     return returnItems;
 }
 
-function DataManualSlider ({parameter, subparameter, updateValues, changeSelection, claves}) {
+function DataManualSlider ({parameter, subparameter, updateValues, changeSelection, claves, activeVisParameters}) {
 
-    const valor=subparameter.value;
+    let valor;
+    
+    if (parameter===subparameter.name) {
+        valor=activeVisParameters[parameter];
+    } else {
+        valor=activeVisParameters[parameter][subparameter.name];
+    }
 
     const min=0;
-    const max=100;
+    const max=1;
     
     function handleInputChange(e) {
+        
         updateValues(parameter, subparameter.name, e.target.value);
     }
 
@@ -35,13 +42,12 @@ function DataManualSlider ({parameter, subparameter, updateValues, changeSelecti
         } else if (formValue<min) {
             formValue=min;
         }
-        formValue=formValue/100;
         updateValues(parameter, subparameter.name, formValue);
         e.target.value=formValue;
     }
     return (
     <div className="row justify-content-start">
-        <div className="col-3">
+        <div className="col-lg-3 col-md-6">
             <div className="input-group">
                 <div className="form-floating">
                     <input type="text" className="form-control" id="valorManualInput" placeholder={valor} value={valor} onChange={handleFormChange}></input>
@@ -58,7 +64,7 @@ function DataManualSlider ({parameter, subparameter, updateValues, changeSelecti
                 </ul>
             </div>
         </div>
-        <div className='col-9 align-self-center'><input type="range" className="form-range align-self-center" onChange={handleInputChange} id="customRange1" value={valor} min={min} max={max}></input></div>
+        <div className='col-lg-9 col-md-6 align-self-center'><input type="range" className="form-range align-self-center" onChange={handleInputChange} id="customRange1" value={valor} step={0.01} min={min} max={max}></input></div>
     </div>
     )
 }
@@ -156,7 +162,7 @@ function DataConnection ({selection, changeSelection, subparameter, parameter, u
 }
 
 
-function ParameterManager ({subparameter, sources, updateValues, parameter, defineAutoParameter, deviceStates}) {
+function ParameterManager ({subparameter, sources, updateValues, parameter, defineAutoParameter, deviceStates, activeVisParameters}) {
 
     const claves=getDataStreamKeys(sources, deviceStates);
     claves.push("Manual");
@@ -185,14 +191,14 @@ function ParameterManager ({subparameter, sources, updateValues, parameter, defi
     <li className="list-group-item py-4 container" key={subparameter.name}>
         <h6>{subparameter.name}</h6>
         {manual?
-        <DataManualSlider parameter={parameter} subparameter={subparameter} updateValues={updateValues} changeSelection={changeSelection} claves={claves}/>:
+        <DataManualSlider parameter={parameter} subparameter={subparameter} updateValues={updateValues} changeSelection={changeSelection} claves={claves} activeVisParameters={activeVisParameters}/>:
         <DataConnection parameter={parameter} subparameter={subparameter} updateValues={updateValues} sources={sources} selection={selection} changeSelection={changeSelection} claves={claves}/>
         }
     </li>
     )
 }
 
-function DataCard({visParameter, updateValues, sources, deviceStates}) {
+function DataCard({visParameter, updateValues, sources, deviceStates, activeVisParameters}) {
 
     const [hasAuto, setHasAuto]=React.useState(false);
     let subparameters;
@@ -211,7 +217,8 @@ function DataCard({visParameter, updateValues, sources, deviceStates}) {
             updateValues={updateValues} 
             key={param.name} 
             defineAutoParameter={setHasAuto}
-            deviceStates={deviceStates}/>);
+            deviceStates={deviceStates}
+            activeVisParameters={activeVisParameters}/>);
     // Pasar visParameters a DataCardManager
     return (
     <div className={hasAuto?"accordion-item accordion-custom":"accordion-item"} key={visParameter.name}>
@@ -232,14 +239,15 @@ function DataCard({visParameter, updateValues, sources, deviceStates}) {
 }
 
 
-export default function DataManagement({deviceStream, updateValues, visParameters, deviceStates}) {
+export default function DataManagement({deviceStream, updateValues, visParameters, deviceStates, activeVisParameters}) {
     const dataCards = visParameters?.map((parameter)=>(
         <DataCard 
             visParameter={parameter} 
             sources={deviceStream} 
             updateValues={updateValues} 
             key={parameter.name} 
-            deviceStates={deviceStates}/>));
+            deviceStates={deviceStates}
+            activeVisParameters={activeVisParameters}/>));
     return (
         <div>
             <div className="accordion mt-3 ms-2 me-2 mb-3 custom-scroll">

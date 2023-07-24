@@ -57,8 +57,16 @@ function App() {
   // Used for testing purposes
 
 
-  const [visParameters, setVisParameters]=useState(rawVisParameters);
+  const [visParameters, setVisParameters]=useState(rawVisParameters.reduce((acc, parameter)=>{
+    if (Array.isArray(parameter.value)) {
+      acc[parameter.name]=parameter.value.reduce((acc, datos)=>{acc[datos.name]=0; return acc}, {});
+    } else {
+      acc[parameter.name]=parameter.value;
+    }
+    return acc;
+  }, {}));
 
+  console.log(visParameters);
 
   const [deviceStream, setDeviceStream]=useState(devices.reduce((acc, deviceSelected)=>{
     acc[deviceSelected.heading]=deviceSelected.data.reduce((acc, datos)=>{acc[datos.name]=0; return acc}, {})
@@ -72,12 +80,8 @@ function App() {
   
   function UpdateValues(name1, name2, newValue) {
     setVisParameters(prevData => {
-          const newData=[...prevData];
-          if (name2!==name1) {
-              newData.find(x => x.name===name1).value.find(x => x.name===name2).value=newValue;
-          } else {
-              newData.find(x => x.name===name1).value=newValue;
-          }
+          let newData=Object.assign({}, prevData);
+          (name1===name2)?newData[name1]=newValue:newData[name1][name2]=newValue;
           return newData;
       })
   }
@@ -138,7 +142,7 @@ function App() {
                 <p className='mb-2'>The devices are currently streaming the following data. Hover over a data source to learn more.</p>
                 <AvailableDataInformation source={deviceStates} popupInfo={[...devices]}/>
               </div>
-              <DataManagement deviceStream={deviceStream} deviceStates={deviceStates} updateValues={UpdateValues} visParameters={visParameters}/>
+              <DataManagement deviceStream={deviceStream} deviceStates={deviceStates} updateValues={UpdateValues} visParameters={rawVisParameters} activeVisParameters={visParameters}/>
             </div>
           </div>
         </div>
@@ -147,7 +151,7 @@ function App() {
       <div className="col mt-2">
         <div className="position-fixed">
           <h4 className="text-left">Visualization</h4>
-          {/*<Sun value={visParameters[1].value}>*/}
+          <Sun value={visParameters["Size"]*3}/>
           <ul>
               {Object.entries(deviceStates).map(([name, state])=>
               <li key={name}>Device: {name} - {state?"Active":"Not connected"}</li>

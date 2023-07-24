@@ -205,8 +205,7 @@ const Sun = ({value}) => {
         }
       }
     }
-
-  
+    
     //p5 stuff
     const setup = (p5, parentRef) => {
     p5.createCanvas(400, 400).parent(parentRef);
