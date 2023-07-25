@@ -66,8 +66,6 @@ function App() {
     return acc;
   }, {}));
 
-  console.log(visParameters);
-
   const [deviceStream, setDeviceStream]=useState(devices.reduce((acc, deviceSelected)=>{
     acc[deviceSelected.heading]=deviceSelected.data.reduce((acc, datos)=>{acc[datos.name]=0; return acc}, {})
     return acc;
@@ -115,10 +113,10 @@ function App() {
     }
   };
   return (
-  <div className="container ms-5 me-5">
+  <div className="container-fluid">
     <div className="row">
-      <div className="col">
-        <div className="vertical-spacing">
+      <div className="col-5">
+        <div className="vertical-spacing ms-5 me-5">
           <h5>Data Sources</h5>
           <ul className="nav nav-underline nav-fill" id="myTab" role="tablist">
             <li className="nav-item" role="presentation">
@@ -148,16 +146,16 @@ function App() {
         </div>
       </div>
       {/*<div className="w-100 d-block"></div>*/}
-      <div className="col mt-2">
+      <div className="col-7 mt-2">
         <div className="position-fixed">
           <h4 className="text-left">Visualization</h4>
-          <Sun value={visParameters["Size"]*3}/>
           <ul>
               {Object.entries(deviceStates).map(([name, state])=>
               <li key={name}>Device: {name} - {state?"Active":"Not connected"}</li>
               )}
           </ul>
           {disp()}
+          {/*<Sun value={visParameters["Size"]*3}/>*/}
         </div>
       </div>
     </div>

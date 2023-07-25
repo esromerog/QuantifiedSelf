@@ -31,7 +31,6 @@ function DataManualSlider ({parameter, subparameter, updateValues, changeSelecti
     const max=1;
     
     function handleInputChange(e) {
-        
         updateValues(parameter, subparameter.name, e.target.value);
     }
 
@@ -81,7 +80,7 @@ function DataConnection ({selection, changeSelection, subparameter, parameter, u
     const [min, setMin]=useState(0);
     const [max, setMax]=useState(1);
 
-
+    const [disabled, setDisabled]=useState(false);
     const [formMin, setFormMin]=useState(0);
     const [formMax, setFormMax]=useState(1);
 
@@ -92,24 +91,24 @@ function DataConnection ({selection, changeSelection, subparameter, parameter, u
     }
 
     function looseFocusMin() {
-        if (parseInt(formMin)>max) {
-            setFormMin(parseInt(max)-1);
+        if (parseFloat(formMin)>max) {
+            setFormMin(parseFloat(max)-1);
         }
-        if (parseInt(formMin)===max){
-            setFormMin(parseInt(max)-1);
+        if (parseFloat(formMin)===max){
+            setFormMin(parseFloat(max)-1);
         }
         setMin(formMin);
     }
 
     function looseFocusMax() {
-        const valor=parseInt(formMax);
+        const valor=parseFloat(formMax);
         if (valor<min) {
-            setFormMax(parseInt(min)+1);
+            setFormMax(parseFloat(min)+1);
         }
         if (valor===min){
-            setFormMax(parseInt(min)+1);
+            setFormMax(parseFloat(min)+1);
         }
-        setMax(parseInt(formMax));
+        setMax(parseFloat(formMax));
     }
 
     function normalizeValue(value, minimum, maximum) {
@@ -117,7 +116,32 @@ function DataConnection ({selection, changeSelection, subparameter, parameter, u
         return normalizedValue;
     }
 
-    useEffect(()=>updateValues(parameter,subparameter.name, normalizeValue(source, min, max)), [source]);
+    const [buffer, setBuffer]=useState([false]);
+
+    async function handleAutoSet() {
+        setBuffer([])
+        setDisabled(true);
+    }
+    useEffect(()=>{
+        updateValues(parameter,subparameter.name, normalizeValue(source, min, max));
+        if (typeof buffer[0]!=='boolean') {
+            const buff=[...buffer, source];
+            setBuffer(buff);
+        }
+        if (buffer.length>20) {
+            setDisabled(false);
+
+            const minimo=Math.min(...buffer);
+            setMin(minimo);
+            setFormMin(minimo);
+    
+            const maximo=Math.max(...buffer);
+            setMax(maximo);
+            setFormMax(maximo);
+
+            setBuffer([false])
+        }
+    }, [source]);
 
     return (
         <div className="row justify-content-start">
@@ -137,7 +161,7 @@ function DataConnection ({selection, changeSelection, subparameter, parameter, u
                     </ul>
                 </div>
             </div>
-            <div className='col-5 align-self-center'>
+            <div className='col-8 align-self-center'>
                 <div className="input-group">
                     <span ref={target} className="input-group-text" onMouseEnter={()=>setShow(true)} onMouseLeave={()=>setShow(false)}>Range</span>
                     <Overlay className="custom-tooltip" target={target.current} show={show} placement="top">
@@ -148,13 +172,14 @@ function DataConnection ({selection, changeSelection, subparameter, parameter, u
                         )}
                     </Overlay>
                     <div className="form-floating">
-                        <input type="text" className="form-control" id="max" placeholder={0} value={formMin} onBlur={looseFocusMin} onChange={(e)=>{setFormMin(e.target.value)}}></input>
+                        <input type="text" className="form-control" id="max" placeholder={0} value={formMin} onBlur={looseFocusMin} readOnly={disabled} onChange={(e)=>{setFormMin(e.target.value)}}></input>
                         <label htmlFor="max">Min</label>
                     </div>
                     <div className="form-floating">
-                        <input type="text" className="form-control" id="max" placeholder={100} value={formMax} onBlur={looseFocusMax} onChange={(e)=>{setFormMax(e.target.value)}}></input>
+                        <input type="text" className="form-control" id="max" placeholder={100} value={formMax} onBlur={looseFocusMax} readOnly={disabled} onChange={(e)=>{setFormMax(e.target.value)}}></input>
                         <label htmlFor="max">Max</label>
                     </div>
+                    <button className="btn btn-primary" onClick={handleAutoSet} disabled={disabled}>Auto range</button>
                 </div>
             </div>
         </div>

@@ -30,7 +30,6 @@ export function Emotiv({setDeviceActive, deviceStates, deviceStream, handleValue
         setDisabled(true);
         setTimeout(() => {
             if (previousValue!==deviceStream["Emotiv"]["Alpha"]) {
-                console.log("Streaming");
                 setDeviceActive();
                 setTexto({text:"", type:""});
             } else {

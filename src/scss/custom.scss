@@ -43,7 +43,10 @@ html {
     --bs-accordion-btn-color: #FFC107;
 }
 
-
+.panel-resizable {
+    resize: horizontal;
+    overflow: hidden;
+}
 
 
 

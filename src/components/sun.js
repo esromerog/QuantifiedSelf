@@ -1,5 +1,7 @@
 import React from 'react';
 import Sketch from 'react-p5';
+
+
 // star variables
 var sun;
 var mountain;
@@ -205,10 +207,12 @@ const Sun = ({value}) => {
         }
       }
     }
-    
+    const canvasWidth = window.innerWidth;
+    const canvasHeight = window.innerHeight;
     //p5 stuff
     const setup = (p5, parentRef) => {
-    p5.createCanvas(400, 400).parent(parentRef);
+
+    p5.createCanvas(canvasWidth/2, canvasHeight*0.8).parent(parentRef);
     p5.background(220);
     p5.background(0, 20, 80);
 
