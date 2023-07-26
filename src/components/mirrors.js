@@ -40,7 +40,6 @@ const Mirrors = ({value, min, max}) => {
     if (!canvasRef.current) return;
 
     sculptToMinimalRenderer(canvasRef.current, shaderParkCode, () => {
-      const gl = canvasRef.current.getContext('webgl', {powerPreference: 'high-performance'});
       state.currButtonHover = state.currButtonHover * 0.999 + state.buttonHover * 0.001;
       state.currClick = state.currClick * 0.97 + state.click * 0.03;
       return {
