@@ -5,6 +5,7 @@ import './dataManagement';
 import DataManagement from "./dataManagement";
 import Sun from './components/sun';
 
+import Mirrors from './components/mirrors'
 import AvailableDataInformation from "./availableData";
 import {Emotiv} from "./streamFunctions";
 
@@ -155,6 +156,9 @@ function App() {
               )}
           </ul>
           {disp()}
+          <div>
+            <Mirrors value={5} min={0.5} max={5}/>
+          </div>
           {/*<Sun value={visParameters["Size"]*3}/>*/}
         </div>
       </div>
