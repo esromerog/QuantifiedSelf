@@ -4,8 +4,8 @@ import RenderDevices from './devices';
 import './dataManagement';
 import DataManagement from "./dataManagement";
 import Sun from './components/sun';
+import Mirrors from "./components/mirrors";
 
-import Mirrors from './components/mirrors'
 import AvailableDataInformation from "./availableData";
 import {Emotiv} from "./streamFunctions";
 
@@ -57,8 +57,9 @@ function App() {
   const devices=[...devicesRaw];
   // Used for testing purposes
 
+  
 
-  const [visParameters, setVisParameters]=useState(rawVisParameters.reduce((acc, parameter)=>{
+  const [visParameters, _setVisParameters]=useState(rawVisParameters.reduce((acc, parameter)=>{
     if (Array.isArray(parameter.value)) {
       acc[parameter.name]=parameter.value.reduce((acc, datos)=>{acc[datos.name]=0; return acc}, {});
     } else {
@@ -67,10 +68,18 @@ function App() {
     return acc;
   }, {}));
 
+  const visParametersRef=React.useRef(visParameters);
+
+  function setVisParameters(data) {
+    _setVisParameters(data);
+    visParametersRef.current=visParameters;
+  }
+
   const [deviceStream, setDeviceStream]=useState(devices.reduce((acc, deviceSelected)=>{
     acc[deviceSelected.heading]=deviceSelected.data.reduce((acc, datos)=>{acc[datos.name]=0; return acc}, {})
     return acc;
   }, {}));
+
 
   function handleValue(val) {
     setDeviceStream(val);
@@ -113,6 +122,7 @@ function App() {
       return "Alpha: "+deviceStream["Emotiv"]["Alpha"]
     }
   };
+  
   return (
   <div className="container-fluid">
     <div className="row">
@@ -147,8 +157,8 @@ function App() {
         </div>
       </div>
       {/*<div className="w-100 d-block"></div>*/}
-      <div className="col-7 mt-2">
-        <div className="position-fixed">
+      <div className="col-7 mt-2 full-height">
+        <div className="position-fixed full-height">
           <h4 className="text-left">Visualization</h4>
           <ul>
               {Object.entries(deviceStates).map(([name, state])=>
@@ -156,9 +166,7 @@ function App() {
               )}
           </ul>
           {disp()}
-          <div>
-            <Mirrors value={5} min={0.5} max={5}/>
-          </div>
+          <Mirrors value={visParametersRef}/>
           {/*<Sun value={visParameters["Size"]*3}/>*/}
         </div>
       </div>

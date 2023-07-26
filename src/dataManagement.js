@@ -46,7 +46,7 @@ function DataManualSlider ({parameter, subparameter, updateValues, changeSelecti
     }
     return (
     <div className="row justify-content-start">
-        <div className="col-lg-3 col-md-6">
+        <div className="col-xl-3 col-lg-6">
             <div className="input-group">
                 <div className="form-floating">
                     <input type="text" className="form-control" id="valorManualInput" placeholder={valor} value={valor} onChange={handleFormChange}></input>
@@ -63,7 +63,7 @@ function DataManualSlider ({parameter, subparameter, updateValues, changeSelecti
                 </ul>
             </div>
         </div>
-        <div className='col-lg-9 col-md-6 align-self-center'><input type="range" className="form-range align-self-center" onChange={handleInputChange} id="customRange1" value={valor} step={0.01} min={min} max={max}></input></div>
+        <div className='col-xl-9 col-lg-6 align-self-center'><input type="range" className="form-range align-self-center" onChange={handleInputChange} id="customRange1" value={valor} step={0.01} min={min} max={max}></input></div>
     </div>
     )
 }

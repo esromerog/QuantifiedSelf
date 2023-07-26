@@ -428,7 +428,7 @@ class CortexPower extends Cortex {
         let power = parsedData['pow'];
         let receivingValue = computePower(power,true)[1]  //theta is 0; alpha is 1
         let newData=(Object.assign({}, this.oldData));
-        //console.log(receivingValue);
+        console.log(receivingValue);
         newData["Emotiv"]["Alpha"]=receivingValue;
         newData["Emotiv"]["Beta"]=0;
         this.handleValue(newData);

@@ -1,7 +1,13 @@
-export const shaderParkCode =  `
+export const spCode = `
   setMaxIterations(8);
+
+  let q=getSpace();
+  setSpace(vec3(q.x,q.y*1.4,q.z));
+
+  let valor=input();
   let click = input();
 	let buttonHover = input();
+
   let offset = 0.5; // input(0.08, 0, 0.1);
   // this function defines color
   function fbm(p) {
@@ -14,7 +20,7 @@ export const shaderParkCode =  `
   
   let s = getRayDirection();
   //let n = sin(fbm(s+vec3(0, 0, -5*.1))*2)*.5+.75;
-  let n = (fbm(s+vec3(0, 0, -time*.1))*2)*.5+.75;
+  let n = (fbm(s+vec3(0, 0, -time*valor*.1))*2)*.5+.75;
   n = pow(n, vec3(8));
   color(n)
   let scale =.5+n.x*.05;
@@ -30,8 +36,7 @@ export const shaderParkCode =  `
 		
 		sphere(scale);
 	})()
-  blend(.4)
-  displace(mouse.x*2, mouse.y, 0)
-	
-  sphere(.2)
-`;
+  //blend(.4)
+  //displace(mouse.x*2, mouse.y, 0)
+  //sphere(.2)
+  `;
