@@ -1,13 +1,13 @@
 import "./App.scss";
 import React, { useEffect, useState } from 'react';
-import RenderDevices from './devices';
-import './dataManagement';
-import DataManagement from "./dataManagement";
-import Sun from './components/sun';
-import Mirrors from "./components/mirrors";
+import RenderDevices from './components/ui/devices/devices';
+import './components/ui/visuals/dataManagement';
+import DataManagement from "./components/ui/visuals/dataManagement";
+import Sun from './components/visuals/sun';
+import Mirrors from "./components/visuals/mirrors";
 
-import AvailableDataInformation from "./availableData";
-import {Emotiv} from "./streamFunctions";
+import AvailableDataInformation from "./components/ui/devices/availableData";
+import {Emotiv} from "./components/ui/devices/streamFunctions";
 
 
 

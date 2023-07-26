@@ -1,4 +1,4 @@
-import CortexPower from './components/cortex';
+import CortexPower from '../../utility/cortex';
 import React, {useState} from 'react';
 import Modal from 'react-bootstrap/Modal';
 
