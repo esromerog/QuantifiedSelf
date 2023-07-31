@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Sketch from 'react-p5';
-
+import P5 from 'p5';
 
 // star variables
 var sun;
@@ -207,86 +207,119 @@ const Sun = ({value}) => {
         }
       }
     }
-    const canvasWidth = window.innerWidth;
-    const canvasHeight = window.innerHeight;
-    //p5 stuff
-    const setup = (p5, parentRef) => {
+    //p stuff
+    const canvasRef=React.useRef();
 
-    p5.createCanvas(canvasWidth/2, canvasHeight*0.8).parent(parentRef);
-    p5.background(220);
-    p5.background(0, 20, 80);
+    const Sketch = (p, value) => {
+        
+        p.setup = () => {
 
-    // Create the sun
-    let centerX = p5.width / 2;
-    let centerY = p5.height / 2;
-    let distance_radius = 100;
-    let radius = 80;
+            p.createCanvas(canvasRef.current.offsetWidth, canvasRef.current.offsetHeight);
+            p.background(220);
+            p.background(0, 20, 80);
 
-    var fadingFactor = 0.8;
-    var flaresActivity = 0.2;
-    var imageWidth = Math.max(p5.width, p5.height);
-    var flaresColor = 165
+            // Create the sun
+            let centerX = p.width / 2;
+            let centerY = p.height / 2;
+            let distance_radius = 100;
+            let radius = 80;
 
-    let x = centerX;
-    let y = centerY;
-    let position = p5.createVector(x, y);
-    sun = new Star(p5,position, radius, fadingFactor, flaresActivity, flaresColor,imageWidth);
-    p5.colorMode(p5.RGB, 255, 255, 255, 360);
+            var fadingFactor = 0.8;
+            var flaresActivity = 0.2;
+            var imageWidth = Math.max(p.width, p.height);
+            var flaresColor = 165
 
-    };
+            let x = centerX;
+            let y = centerY;
+            let position = p.createVector(x, y);
+            sun = new Star(p,position, radius, fadingFactor, flaresActivity, flaresColor,imageWidth);
+            p.colorMode(p.RGB, 255, 255, 255, 360);
 
-    const draw = (p5) => {
+        };
+    
+        p.draw = () => {
 
-      // this slider specifies the normalization range
-      let val = 3;
+        // this slider specifies the normalization range
+        let val = 3;
 
-      // draw background that fades stars slowly
-      p5.background(220);
-      p5.background(0, 20, 80, 1);
+        // draw background that fades stars slowly
+        p.background(220);
+        p.background(0, 20, 80, 1);
 
-      // gradient 
-      gradient_target = p5.map(value, val, 0, 0, 1);
-      let delta_gradient = gradient_target - gradient;
-      gradient += delta_gradient * easing;
-      // day colors
-      let c1 = p5.color(255, 255, 232);  // bright yellow
-      let c2 = p5.color(200,210,255); //light blue
-      // night colors
-      let c3 = p5.color(13, 0, 51); //dark blue
-      let c4 = p5.color(191, 31, 2); // sunset red
+        // gradient 
+        gradient_target = p.map(value.current["Sun Position"]*3, val, 0, 0, 1);
+        let delta_gradient = gradient_target - gradient;
+        gradient += delta_gradient * easing;
+        // day colors
+        let c1 = p.color(255, 255, 232);  // bright yellow
+        let c2 = p.color(200,210,255); //light blue
+        // night colors
+        let c3 = p.color(13, 0, 51); //dark blue
+        let c4 = p.color(191, 31, 2); // sunset red
 
-      let c_up = p5.lerpColor(c1,c3,gradient)
-      let c_down = p5.lerpColor(c2,c4,gradient)
+        let c_up = p.lerpColor(c1,c3,gradient)
+        let c_down = p.lerpColor(c2,c4,gradient)
 
-      // draw gradient
-      for(let y=0; y<p5.height; y++){
-        let n = p5.map(y,0,p5.height,0,1);
-        let newc = p5.lerpColor(c_up,c_down,n);
-        p5.stroke(newc);
-        p5.line(0,y,p5.width, y);
-      }
+        // draw gradient
+        for(let y=0; y<p.height; y++){
+            let n = p.map(y,0,p.height,0,1);
+            let newc = p.lerpColor(c_up,c_down,n);
+            p.stroke(newc);
+            p.line(0,y,p.width, y);
+        }
 
-      
-      // update the sun
-      ytarget = p5.map(value, val, 0, 2/6*p5.height, 6/6*p5.height,true);
-      sun.setPosition(ytarget)  
-      //Update the star
-      sun.update();
-      // Paint the star
-      sun.paint();
-      
-       // draw mountains
-      // Define the colors
-      let cFurther = p5.color(172, 182, 230); // Purplish unsaturated light blue for the further mountains
-      let cCloser = p5.color(8, 17, 26); // Greeny saturated dark blue for the closer mountains
-      let cMist = p5.color(200,200,200); // White for the mist
-      // p5.background(230, 25, 90);
-      mountains(p5, cCloser, cFurther, cMist);
+        
+        // update the sun
+        ytarget = p.map(value.current["Sun Position"]*3, val, 0, 2/6*p.height, 6/6*p.height,true);
+        sun.setPosition(ytarget)  
+        //Update the star
+        //sun.update();
+        // Paint the star
+        sun.paint();
+        
+        // draw mountains
+        // Define the colors
+        let cFurther = p.color(172, 182, 230); // Purplish unsaturated light blue for the further mountains
+        let cCloser = p.color(8, 17, 26); // Greeny saturated dark blue for the closer mountains
+        let cMist = p.color(200,200,200); // White for the mist
+        // p.background(230, 25, 90);
+        mountains(p, cCloser, cFurther, cMist);
 
-    };
+        };
+
+        p.updateCanvasDimensions = () => {
+            p.createCanvas(canvasRef.current.offsetWidth, canvasRef.current.offsetHeight);
+            p.redraw();
+        }
+
+
+    }
+
+    
+    
+
+   useEffect(() => {
+
+        const Q=new P5(p=>Sketch(p, value), canvasRef.current);
+
+        function updateCanvasDimensions() {
+            Q.updateCanvasDimensions()
+        }
+
+        window.addEventListener("resize", updateCanvasDimensions, true);
+
+        // Super important cleanup function
+        return ()=>{
+            Q.noLoop();
+            window.removeEventListener("resize", updateCanvasDimensions, true);
+        }
+    }, []);
   
+
+
+
   return (
-    <Sketch setup={setup} draw={draw} />
+    <div className="full-height" ref={canvasRef}/>
   );
 };
 

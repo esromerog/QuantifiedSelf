@@ -17,6 +17,7 @@
     "react": "^18.2.0",
     "react-bootstrap": "^2.8.0",
     "react-dom": "^18.2.0",
+    "react-full-screen": "^1.1.1",
     "react-p5": "^1.3.35",
     "react-scripts": "^5.0.1",
     "shader-park-core": "^0.1.41",
@@ -30,12 +31,6 @@
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
   },
   "browserslist": {
     "production": [

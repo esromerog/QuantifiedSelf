@@ -1,5 +1,5 @@
 // @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;800&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap');
 
 
 $primary: #FFC107;
@@ -10,19 +10,21 @@ body {
     -moz-osx-font-smoothing: grayscale;
     
     font-family: Lato,'Helvetica Neue',Arial, Helvetica, sans-serif;
-    
+    width: 100%;
     height  : 100%;
-    overflow: auto;
+    overflow: hidden;
     position: relative;
     --bs-body-color: #1A1A1A;
     --bs-secondary-color: #666666;
 }
 html {
-    height  : 100%;
+    height: 100%;
+    width: 100%;
     overflow: hidden;
     position: relative;
     background-color: white;
 }
+
 
 .vertical-spacing {
     margin-top: 25vh;
@@ -38,22 +40,15 @@ html {
  }
 
 
+ .accordion-color {
+    --bs-accordion-active-bg: #F6F6F6;
+    --bs-accordion-active-color: #1A1A1A;
+ }
 .accordion-custom {
     --bs-accordion-border-color: #FFC107;
     --bs-accordion-btn-color: #FFC107;
 }
 
-.panel-resizable {
-    resize: horizontal;
-    overflow: hidden;
-}
-
-.div-canvas {
-    overflow: hidden;
-    position: fixed;
-    width: 100px;
-    height: 100px;
-}
 
 canvas {
     width: 100%;
@@ -65,15 +60,48 @@ canvas {
 }
 
 .full-height {
-    height:100%;
-
-    overflow:hidden;
+    height:99%;
     -webkit-box-sizing:border-box;
     -moz-box-sizing:border-box;
     -ms-box-sizing:border-box;
     box-sizing:border-box;
 }
 
+.disable-scrollbar::-webkit-scrollbar {
+    background: transparent; /* Chrome/Safari/Webkit */
+    width: 0px;
+}
+      
+.disable-scrollbar {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE 10+ */
+}
+
+.img-vis:hover {
+    opacity: 0.3;
+}
+
+.img-holder {
+    position: relative;
+    text-align: center;
+    color: white;
+  }
+
+
+
+.img-vis {
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    transition: opacity 0.5s ease-out;
+}
+
+.centered-over-image {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
 
 $list-group-active-color: #1A1A1A;
 $list-group-active-border-color:#FFC107;
