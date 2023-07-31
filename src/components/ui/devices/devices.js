@@ -5,7 +5,7 @@ import AvailableDataInformation from "./availableData";
 function DeviceButton({data, handleShow, deviceStates}) {
 return (
     
-    <button type="button" className={(deviceStates[data.heading])?"list-group-item list-group-item-action list-devices shadow-sm active":"list-group-item list-group-item-action list-devices shadow-sm"} onClick={()=>handleShow(data)}>
+    <button type="button" className={(deviceStates[data.heading])?"list-group-item list-group-item-action list-devices active":"list-group-item list-group-item-action list-devices"} onClick={()=>handleShow(data)}>
         <div className="d-flex w-100 justify-content-between mt-2">
         <h5 className="mb-1">{data.heading}</h5>
         <small>{data.type}</small>

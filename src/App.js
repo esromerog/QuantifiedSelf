@@ -1,13 +1,17 @@
 import "./App.scss";
-import React, { useEffect, useState } from 'react';
+import React, { forwardRef, useCallback, useEffect, useState } from 'react';
 import RenderDevices from './components/ui/devices/devices';
 import './components/ui/visuals/dataManagement';
 import DataManagement from "./components/ui/visuals/dataManagement";
 import Sun from './components/visuals/sun';
 import Mirrors from "./components/visuals/mirrors";
+import {FullScreen, useFullScreenHandle} from 'react-full-screen'
 
+
+import RenderVisualizationCards from "./components/ui/visuals/viscards";
 import AvailableDataInformation from "./components/ui/devices/availableData";
 import {Emotiv} from "./components/ui/devices/streamFunctions";
+
 
 
 
@@ -40,7 +44,8 @@ const devicesRaw = [
 },
 ];
 
-const rawVisParameters=[
+/*
+const selectedVisParams=[
   {name: "Position", value: [
       {name: "x", value: 10}, 
       {name: "y", value: 20}
@@ -48,7 +53,7 @@ const rawVisParameters=[
   {name: "Size", value: 0},
   {name: "Another", value: 0},
 ];
-
+*/
 
 
 
@@ -57,16 +62,16 @@ function App() {
   const devices=[...devicesRaw];
   // Used for testing purposes
 
+  const [selectedVisParams, setSelectedVisParams]=useState({});
+
   
 
-  const [visParameters, _setVisParameters]=useState(rawVisParameters.reduce((acc, parameter)=>{
-    if (Array.isArray(parameter.value)) {
-      acc[parameter.name]=parameter.value.reduce((acc, datos)=>{acc[datos.name]=0; return acc}, {});
-    } else {
-      acc[parameter.name]=parameter.value;
-    }
-    return acc;
-  }, {}));
+  const [visParameters, _setVisParameters]=useState({});
+
+  
+
+  //const [visParameters, _setVisParameters]=useState({});
+
 
   const visParametersRef=React.useRef(visParameters);
 
@@ -109,11 +114,13 @@ function App() {
   const deviceStreamFunctions={
     Emotiv: <Emotiv setDeviceActive={()=>handleDeviceStates("Emotiv")} deviceStates={deviceStates} deviceStream={deviceStream} handleValue={handleValue}/>,
   };
-  /*
-  useEffect(()=>{
-    if (deviceStates["Muse"]) {
-      CortexComp(deviceStream, handleValue);
-    }}, [deviceStates["Muse"]]);*/
+
+
+  const visStreamFunctions={
+    "Sun Visualization": <Sun value={visParametersRef}/>,
+    "Abstract Colors": <Mirrors value={visParametersRef}/>,
+  };
+
 
   const disp=()=>{
     if (!deviceStates["Emotiv"]) {
@@ -122,11 +129,22 @@ function App() {
       return "Alpha: "+deviceStream["Emotiv"]["Alpha"]
     }
   };
-  
+
+  const [mainMenu, setMainMenu]=useState(true);
+
+  function returnToMainMenu() {
+    setMainMenu(true);
+    setVisParameters({});
+    setSelectedVisParams({});
+  }
+
+
+  const fullScreenHandle=useFullScreenHandle();
+
   return (
-  <div className="container-fluid">
-    <div className="row">
-      <div className="col-5">
+  <div className="container-fluid h-100">
+    <div className="row h-100">
+      <div className="col-5 overflow-scroll disable-scrollbar h-100">
         <div className="vertical-spacing ms-5 me-5">
           <h5>Data Sources</h5>
           <ul className="nav nav-underline nav-fill" id="myTab" role="tablist">
@@ -151,27 +169,41 @@ function App() {
                 <p className='mb-2'>The devices are currently streaming the following data. Hover over a data source to learn more.</p>
                 <AvailableDataInformation source={deviceStates} popupInfo={[...devices]}/>
               </div>
-              <DataManagement deviceStream={deviceStream} deviceStates={deviceStates} updateValues={UpdateValues} visParameters={rawVisParameters} activeVisParameters={visParameters}/>
+              {/*(selectedVisParams)*/}
+              <DataManagement deviceStream={deviceStream} deviceStates={deviceStates} updateValues={UpdateValues} visParameters={selectedVisParams} activeVisParameters={visParameters}/>
             </div>
           </div>
         </div>
       </div>
       {/*<div className="w-100 d-block"></div>*/}
-      <div className="col-7 mt-2 full-height">
-        <div className="position-fixed full-height">
-          <h4 className="text-left">Visualization</h4>
+      <div className="col-7 mt-2 h-100 overflow-hidden">
+        <button onClick={fullScreenHandle.enter}>Full Screen</button>
+          <div className="d-flex justify-content-between">
+          <h4 className="text-left">Visualization</h4><button className="btn btn-primary" onClick={returnToMainMenu}>Back</button>
+          </div>
           <ul>
               {Object.entries(deviceStates).map(([name, state])=>
               <li key={name}>Device: {name} - {state?"Active":"Not connected"}</li>
               )}
           </ul>
           {disp()}
-          <Mirrors value={visParametersRef}/>
-          {/*<Sun value={visParameters["Size"]*3}/>*/}
-        </div>
+          <FullScreen handle={fullScreenHandle} className="h-100">
+            <div className="h-100 w-100">
+              {function renderStream() {
+                if (mainMenu) {
+                  return <RenderVisualizationCards setVisParameters={setVisParameters} setSelectedVisParams={setSelectedVisParams} setMainMenu={setMainMenu}/>;
+                } else if (!(Object.keys(visParametersRef.current).length === 0)) {
+                  return visStreamFunctions[selectedVisParams.name];
+                } else {
+                  setVisParameters(visParameters);
+                }
+              }()}
+            </div>
+          </FullScreen>  
       </div>
     </div>
   </div>
+
   );
 }
 

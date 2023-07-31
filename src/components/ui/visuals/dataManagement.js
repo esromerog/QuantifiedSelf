@@ -247,7 +247,7 @@ function DataCard({visParameter, updateValues, sources, deviceStates, activeVisP
     // Pasar visParameters a DataCardManager
     return (
     <div className={hasAuto?"accordion-item accordion-custom":"accordion-item"} key={visParameter.name}>
-        <h2 className="accordion-header">
+        <h2 className="accordion-header accordion-color">
             <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target={'#'+visParameter.name.replace(" ", "_")} aria-expanded="false" aria-controls="collapseTwo">
             {visParameter.name}
             </button>
@@ -265,7 +265,8 @@ function DataCard({visParameter, updateValues, sources, deviceStates, activeVisP
 
 
 export default function DataManagement({deviceStream, updateValues, visParameters, deviceStates, activeVisParameters}) {
-    const dataCards = visParameters?.map((parameter)=>(
+
+    const dataCards = visParameters.properties?.map((parameter)=>(
         <DataCard 
             visParameter={parameter} 
             sources={deviceStream} 
@@ -275,6 +276,7 @@ export default function DataManagement({deviceStream, updateValues, visParameter
             activeVisParameters={activeVisParameters}/>));
     return (
         <div>
+            {visParameters.name}
             <div className="accordion mt-3 ms-2 me-2 mb-3 custom-scroll">
                 {dataCards}
             </div>

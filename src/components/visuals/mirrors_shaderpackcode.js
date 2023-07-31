@@ -1,8 +1,7 @@
-export const spCode = `
-  setMaxIterations(8);
+export function spCode() {
 
-  let q=getSpace();
-  setSpace(vec3(q.x,q.y*1.4,q.z));
+  return `
+  setMaxIterations(8);
 
   let valor=input();
   let click = input();
@@ -21,6 +20,7 @@ export const spCode = `
   let s = getRayDirection();
   //let n = sin(fbm(s+vec3(0, 0, -5*.1))*2)*.5+.75;
   let n = (fbm(s+vec3(0, 0, -time*valor*.1))*2)*.5+.75;
+
   n = pow(n, vec3(8));
   color(n)
   let scale =.5+n.x*.05;
@@ -40,3 +40,4 @@ export const spCode = `
   //displace(mouse.x*2, mouse.y, 0)
   //sphere(.2)
   `;
+}
