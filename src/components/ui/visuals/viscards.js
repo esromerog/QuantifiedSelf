@@ -24,8 +24,8 @@ function ImageCard({visSource, defineVisParameters}) {
   const [showAddData, setShowAddData]=useState(false);
   return (
     <div className='col img-holder' key={visSource.name}>
-      <button className='btn w-100 h-100' onClick={()=>defineVisParameters(visSource)}><img className="img-vis rounded" src={visSource.img_name} alt={visSource.name} onMouseEnter={()=>setShowAddData(true)} onMouseLeave={()=>setShowAddData(false)}/></button>
-      {showAddData?<div className='centered-over-image' key={visSource.name}><h6 style={{color: "#1A1A1A"}}>{visSource.name}</h6></div>:null}
+      <button className='btn w-100 h-100 d-flex' onClick={()=>defineVisParameters(visSource)}><img className="img-vis rounded" src={visSource.img_name} alt={visSource.name} onMouseEnter={()=>setShowAddData(true)} onMouseLeave={()=>setShowAddData(false)}/></button>
+      {showAddData?<div className='centered-over-image image-hover-text' key={visSource.name} onMouseEnter={()=>setShowAddData(true)}><h6 className="image-hover-text">{visSource.name}</h6></div>:null}
     </div>
   )
 }
@@ -45,8 +45,8 @@ export default function RenderVisualizationCards({setVisParameters, setSelectedV
   }
   const visSources=allVisSources.map((visSource)=><ImageCard visSource={visSource} defineVisParameters={defineVisParameters} key={visSource.name}/>);
   return (
-    <div className="container text-center">
-      <div className='row row-cols-2'>
+    <div className="container-fluid">
+      <div className='row row-cols-2 w-100 h-100'>
       {visSources}
       </div>
     </div>

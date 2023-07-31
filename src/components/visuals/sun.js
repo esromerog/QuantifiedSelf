@@ -267,8 +267,7 @@ const Sun = ({value}) => {
             p.stroke(newc);
             p.line(0,y,p.width, y);
         }
-
-        
+  
         // update the sun
         ytarget = p.map(value.current["Sun Position"]*3, val, 0, 2/6*p.height, 6/6*p.height,true);
         sun.setPosition(ytarget)  
@@ -291,12 +290,7 @@ const Sun = ({value}) => {
             p.createCanvas(canvasRef.current.offsetWidth, canvasRef.current.offsetHeight);
             p.redraw();
         }
-
-
     }
-
-    
-    
 
    useEffect(() => {
 
@@ -315,11 +309,8 @@ const Sun = ({value}) => {
         }
     }, []);
   
-
-
-
   return (
-    <div className="full-height" ref={canvasRef}/>
+    <div className="h-100" ref={canvasRef}/>
   );
 };
 

@@ -115,7 +115,7 @@ const Mirrors = ({ value }) => {
     };
   }, []);
 
-  return <div className="full-height" ref={canvasRef} />
+  return <div className="h-100" ref={canvasRef} />
 };
 
 

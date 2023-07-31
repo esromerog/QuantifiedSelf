@@ -44,7 +44,7 @@ function DataCards({source, popupInfo}) {
 
     return (        
     <div className="row row-cols-auto mb-3">
-        {(showData.length!==0)?showData.map((item)=><PopupItem item={item} key={item.name}/>):<small>No available data</small>}
+        {(showData.length!==0)?showData.map((item)=><PopupItem item={item} key={item.name}/>):<small>No available data from devices</small>}
     </div>
     )
 }
