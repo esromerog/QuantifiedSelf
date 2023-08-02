@@ -1,6 +1,6 @@
 import {useState, React} from 'react'
-import sunImage from "/Users/esromerog/Desktop/Test/example2/src/imgs/sun.png"
-import circleImage from "/Users/esromerog/Desktop/Test/example2/src/imgs/round.png"
+import sunImage from "../../../imgs/sun.png"
+import circleImage from "../../../imgs/round.png"
 
 const allVisSources = [
   {
@@ -16,6 +16,15 @@ const allVisSources = [
       {name: "Delta Speed", value: 0},
     ],
     name: "Abstract Colors",
+    img_name: circleImage
+  },
+    {
+    properties: [
+      {name: "Bass source", value: 0},
+      {name: "High Pitch source", value: 0},
+      {name: "Chimes source", value: 0}
+    ],
+    name: "Audio player",
     img_name: circleImage
   }
 ]
