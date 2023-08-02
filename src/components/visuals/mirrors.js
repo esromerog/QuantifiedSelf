@@ -1,9 +1,9 @@
 import { useEffect, useRef } from "react";
 import { spCode } from "./mirrors_shaderpackcode";
 import { createSculptureWithGeometry } from 'shader-park-core';
-import { AudioListener, Audio, AudioLoader, AudioAnalyser, Clock } from 'three';
-import { Scene, BoxGeometry, SphereGeometry, Vector3, PerspectiveCamera, WebGLRenderer, Color, MeshBasicMaterial, MeshStandardMaterial, Mesh } from 'three';
+import { Scene, BoxGeometry, SphereGeometry, Vector3, PerspectiveCamera, WebGLRenderer, Color, Clock, MeshBasicMaterial, MeshStandardMaterial, Mesh } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+
 
 
 const Mirrors = ({ value }) => {
@@ -47,7 +47,7 @@ const Mirrors = ({ value }) => {
       buttonHover: state.currButtonHover,
       click: state.currClick,
       _scale: 0.5,
-      valor: map(value.current["Delta Speed"]),
+      valor: map(value.current["Speed Change"]),
     }));
 
     scene.add(mesh);
@@ -58,7 +58,8 @@ const Mirrors = ({ value }) => {
       zoomSpeed: 0.5,
       rotateSpeed: 0.5
     });
-    //controls.enabled=false;
+
+    controls.enabled=false;
 
     let onWindowResize = () => {
       camera.aspect = canvas.offsetWidth / canvas.offsetHeight;

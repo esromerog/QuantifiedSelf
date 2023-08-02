@@ -305,6 +305,7 @@ const Sun = ({value}) => {
         // Super important cleanup function
         return ()=>{
             Q.noLoop();
+            Q.remove();
             window.removeEventListener("resize", updateCanvasDimensions, true);
         }
     }, []);

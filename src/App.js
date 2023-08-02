@@ -21,8 +21,9 @@ const devicesRaw = [
     description: 'EEG device developed by...',
     type: 'EEG device',
     data: [
-      { name: "Alpha", description: "I'll write this later", type: "Continuous" },
-      { name: "Beta", description: "Maybe I'll also write this later", type: "Continuous" },
+      { name: "Alpha", description: "I'll write this later", type: "EEG Data"},
+      { name: "Beta", description: "Maybe I'll also write this later"},
+      { name: "Gyro", description: "Gyroscope data for the EMOTIV headset"}
     ]
   },
 
@@ -180,10 +181,10 @@ function App() {
           <div className={!(mainMenu)?"h-100": "vertical-center"}>
             <div className="d-flex justify-content-between align-items-center align-text-center mt-1">
               <div className="d-flex align-items-center">
-                {(mainMenu) ? null : <button className="btn btn-link" onClick={returnToMainMenu}><b><i class="bi bi-arrow-left" alt="back"></i></b></button>}
+                {(mainMenu) ? null : <button className="btn btn-link" onClick={returnToMainMenu}><b><i className="bi bi-arrow-left" alt="back"></i></b></button>}
                 <h4 className="text-left text-transition align-middle">Visualization</h4>
               </div>
-              {(mainMenu) ? null:<button className="btn btn-link align-self-center mb-1 me-3" onClick={fullScreenHandle.enter}><b><i class="bi bi-arrows-fullscreen" alt="full-screen"></i></b></button>}
+              {(mainMenu) ? null:<button className="btn btn-link align-self-center mb-1 me-3" onClick={fullScreenHandle.enter}><b><i className="bi bi-arrows-fullscreen" alt="full-screen"></i></b></button>}
             </div>
             <FullScreen handle={fullScreenHandle} className="full-width h-100">
               <div className="full-width full-height h-100">

@@ -9,9 +9,13 @@ function getDataStreamKeys(dataStreamObject, deviceStates) {
     const returnItems = [];
     for (const valor in dataStreamObject) {
         if (deviceStates[valor]) {
+            let newObj = {};
+            newObj["device"] = valor;
+            newObj["data"] = [];
             for (const datos in dataStreamObject[valor]) {
-                returnItems.push(valor + ": " + datos);
+                newObj["data"] = [...newObj["data"], datos];
             }
+            returnItems.push(newObj);
         }
     }
     return returnItems;
@@ -54,13 +58,7 @@ function DataManualSlider({ parameter, subparameter, updateValues, changeSelecti
                     </div>
                     <label className="visually-hidden" htmlFor="valorManualInput">{valor}</label>
                     <button type="button" className="btn btn-outline-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false"></button>
-                    <ul className="dropdown-menu">
-                        {claves.map((option) =>
-                            <li key={option}><button type="button"
-                                className="dropdown-item"
-                                onClick={() => changeSelection(option)}
-                            >{option}</button></li>)}
-                    </ul>
+                    <ParameterDropDown claves={claves} subparameter={subparameter} changeSelection={changeSelection} />
                 </div>
             </div>
             <div className='col-xl-9 col-lg-6 align-self-center'><input type="range" className="form-range align-self-center" onChange={handleInputChange} id="customRange1" value={valor} step={0.01} min={min} max={max}></input></div>
@@ -74,7 +72,7 @@ function DataConnection({ selection, changeSelection, subparameter, parameter, u
     const [show, setShow] = useState(false);
     const target = useRef(null);
 
-    const select = selection.split(": ");
+    const select = selection;
     let source;
 
     const [min, setMin] = useState(0);
@@ -143,6 +141,10 @@ function DataConnection({ selection, changeSelection, subparameter, parameter, u
         }
     }, [source]);
 
+    const [dropDown, setDropDown]=useState(<ParameterDropDown claves={claves} subparameter={subparameter} changeSelection={changeSelection} />);
+
+    useEffect(()=>setDropDown(<ParameterDropDown claves={claves} subparameter={subparameter} changeSelection={changeSelection} />), [])
+
     return (
         <div className="row justify-content-start">
             <div className="col-4">
@@ -152,13 +154,7 @@ function DataConnection({ selection, changeSelection, subparameter, parameter, u
                         <label htmlFor="valorManualInput">{select[1]}</label>
                     </div>
                     <button type="button" className="btn btn-outline-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false"></button>
-                    <ul className="dropdown-menu">
-                        {claves.map((option) =>
-                            <li key={option}><button type="button"
-                                className="dropdown-item"
-                                onClick={() => changeSelection(option)}
-                            >{option}</button></li>)}
-                    </ul>
+                    <ParameterDropDown claves={claves} subparameter={subparameter} changeSelection={changeSelection} />
                 </div>
             </div>
             <div className='col-8 align-self-center'>
@@ -186,15 +182,50 @@ function DataConnection({ selection, changeSelection, subparameter, parameter, u
     )
 }
 
+// Customize the format if the item has "suggested attribute"
+function ParameterDropDown({ claves, subparameter, changeSelection }) {
+
+    const suggestedClass = (option) => {
+        if ('suggested' in subparameter) {
+            return !(subparameter.suggested === option) ? "dropdown-item" : "dropdown-item text-primary";
+        } else {
+            return "dropdown-item"
+        }
+    }
+
+
+    return (
+        <ul className="dropdown-menu">
+            <li><button className="dropdown-item" onClick={()=>changeSelection("Manual")}>Manual</button></li>
+            {claves.map((option) => {
+                return (
+                    <li>
+                        <button type="button" className="dropdown-item" data-bs-toggle="dropdown-submenu" data-bs-target="#nested-dropdown" aria-expanded="false">{option.device}</button>
+                        <ul className='submenu dropdown-menu' id="nested-dropdown">
+                            {option.data.map((data) => {
+                                return (
+                                <li>
+                                    <button className={suggestedClass(data)} onClick={()=>changeSelection([option.device, data])}>
+                                        {data}
+                                    </button>
+                                </li>)
+                            })}
+                        </ul>
+                    </li>
+                )
+            })
+            }
+        </ul>)
+}
 
 function ParameterManager({ subparameter, sources, updateValues, parameter, defineAutoParameter, deviceStates, activeVisParameters }) {
 
     const claves = getDataStreamKeys(sources, deviceStates);
-    claves.push("Manual");
+    //claves.push("Manual");
 
     const [manual, setManual] = useState(true)
-    const [selection, setSelection] = useState("");
-    const select = selection.split(": ");
+    const [selection, setSelection] = useState([]);
+    const select = selection;
 
     function changeSelection(option) {
         if (option === "Manual") {
