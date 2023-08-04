@@ -1,94 +1,92 @@
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 
 import Overlay from 'react-bootstrap/Overlay';
 import Tooltip from 'react-bootstrap/Tooltip';
 
 
-
-function getDataStreamKeys(dataStreamObject, deviceStates) {
-    const returnItems = [];
-    for (const valor in dataStreamObject) {
-        if (deviceStates[valor]) {
-            let newObj = {};
-            newObj["device"] = valor;
-            newObj["data"] = [];
-            for (const datos in dataStreamObject[valor]) {
-                newObj["data"] = [...newObj["data"], datos];
-            }
-            returnItems.push(newObj);
-        }
-    }
-    return returnItems;
-}
-
-function DataManualSlider({ parameter, subparameter, updateValues, changeSelection, claves, activeVisParameters }) {
+function DataManualSlider({ parameter, subparameter, updateValues, activeVisParameters, dropDown}) {
+    // This function is the list item when it is connected not connected to a datastream
+    // It contains the logic to handle changing into manual mode, setting auto-range, and setting the value of the parameter, to the stream value.
 
     let valor;
 
-    if (parameter === subparameter.name) {
+    const subparam=(subparameter===undefined)?parameter:subparameter.name;
+
+    if (subparameter===undefined) {
         valor = activeVisParameters[parameter];
     } else {
         valor = activeVisParameters[parameter][subparameter.name];
     }
 
+    // Defines min and max of slider
     const min = 0;
     const max = 1;
 
-    function handleInputChange(e) {
-        updateValues(parameter, subparameter.name, e.target.value);
+    // Handles updating the values of the slider
+    const handleInputChange = (e) => {
+        updateValues(parameter, subparam, e.target.value);
     }
 
-    function handleFormChange(e) {
+    // Handles changing the values of the input
+    const handleFormChange = (e) => {
         let formValue = e.target.value;
         if (formValue > max) {
             formValue = max;
         } else if (formValue < min) {
             formValue = min;
         }
-        updateValues(parameter, subparameter.name, formValue);
+        updateValues(parameter, subparam, formValue);
         e.target.value = formValue;
     }
+
     return (
         <div className="row justify-content-start">
-            <div className="col-xl-3 col-lg-6">
+            <div className="col-xl-3 col-lg-4">
                 <div className="input-group">
+                    <span className="input-group-text">{(subparameter===undefined)?(null):subparameter.name}</span>
                     <div className="form-floating">
                         <input type="text" className="form-control" id="valorManualInput" placeholder={valor} value={valor} onChange={handleFormChange}></input>
                         <label htmlFor="valorManualInput">Value</label>
                     </div>
                     <label className="visually-hidden" htmlFor="valorManualInput">{valor}</label>
-                    <button type="button" className="btn btn-outline-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false"></button>
-                    <ParameterDropDown claves={claves} subparameter={subparameter} changeSelection={changeSelection} />
                 </div>
             </div>
-            <div className='col-xl-9 col-lg-6 align-self-center'><input type="range" className="form-range align-self-center" onChange={handleInputChange} id="customRange1" value={valor} step={0.01} min={min} max={max}></input></div>
+            <div className='col-xl-6 col-lg-5 align-self-center'><input type="range" className="form-range align-self-center" onChange={handleInputChange} id="customRange1" value={valor} step={0.01} min={min} max={max}></input></div>
+            <div className='col-1 align-self-center mb-2'>{dropDown}</div>
         </div>
     )
 }
 
 
-function DataConnection({ selection, changeSelection, subparameter, parameter, updateValues, sources, claves }) {
 
+function DataAutoSlider({ dataMappings, subparameter, parameter, updateValues, sources, dropDown }) {
+    // This function is the list item when it is connected to a data stream.
+    // It contains the logic to handle changing into manual mode, setting auto-range, and setting the value of the parameter, to the stream value.
+
+
+    // Logic to handle the range tooltip
     const [show, setShow] = useState(false);
     const target = useRef(null);
-
-    const select = selection;
-    let source;
-
-    const [min, setMin] = useState(0);
-    const [max, setMax] = useState(1);
-
-    const [disabled, setDisabled] = useState(false);
-    const [formMin, setFormMin] = useState(0);
-    const [formMax, setFormMax] = useState(1);
-
+    
+    // Defines which dataSource is selected
+    const select = (subparameter===undefined)?dataMappings[parameter]:dataMappings[parameter][subparameter.name];
+    let source; // Extracts the value from that dataSource
     try {
         source = sources[select[0]][select[1]];
     } catch (error) {
-        source = subparameter.value;
+        source = (subparameter===undefined)?0:subparameter.value;
     }
+    
+    // Min & Max values.
+    const [min, setMin] = useState(0); // Actual values used by the mapping
+    const [max, setMax] = useState(1);
+    const [formMin, setFormMin] = useState(0); // Values to be shown when the user edits the form
+    const [formMax, setFormMax] = useState(1);
+
+    const [disabled, setDisabled] = useState(false); // Defines if items are disabled (ex, when autoranging)
 
     function looseFocusMin() {
+        // Function to change the min value. Contains logic in case it doesn't follow rules.
         if (parseFloat(formMin) > max) {
             setFormMin(parseFloat(max) - 1);
         }
@@ -99,6 +97,7 @@ function DataConnection({ selection, changeSelection, subparameter, parameter, u
     }
 
     function looseFocusMax() {
+        // Function to change the max value. Contains logic in case it doesn't follow rules.
         const valor = parseFloat(formMax);
         if (valor < min) {
             setFormMax(parseFloat(min) + 1);
@@ -114,14 +113,22 @@ function DataConnection({ selection, changeSelection, subparameter, parameter, u
         return normalizedValue;
     }
 
-    const [buffer, setBuffer] = useState([false]);
+    const [buffer, setBuffer] = useState([false]); // Data buffer for autorange
 
+    // Gets called once autorange starts
     async function handleAutoSet() {
         setBuffer([])
         setDisabled(true);
     }
+    const subparam=(subparameter===undefined)?(parameter):subparameter.name;
+    
     useEffect(() => {
-        updateValues(parameter, subparameter.name, normalizeValue(source, min, max));
+        // Updates the values
+        updateValues(parameter, subparam, normalizeValue(source, min, max));
+    }, [source]);
+
+    useEffect(()=>{
+        // Actual autorange function.
         if (typeof buffer[0] !== 'boolean') {
             const buff = [...buffer, source];
             setBuffer(buff);
@@ -139,25 +146,23 @@ function DataConnection({ selection, changeSelection, subparameter, parameter, u
 
             setBuffer([false])
         }
-    }, [source]);
-
-    const [dropDown, setDropDown]=useState(<ParameterDropDown claves={claves} subparameter={subparameter} changeSelection={changeSelection} />);
-
-    useEffect(()=>setDropDown(<ParameterDropDown claves={claves} subparameter={subparameter} changeSelection={changeSelection} />), [])
-
+    }, [source])
+    
+    /// function to change the form value
+    const formMinChange = useCallback((e)=>{setFormMin(e.target.value)}, []);
+    const formMaxChange = useCallback((e)=>{setFormMax(e.target.value)}, []);
     return (
         <div className="row justify-content-start">
-            <div className="col-4">
+            <div className="col-3">
                 <div className="input-group">
+                    <span className="input-group-text">{(subparameter===undefined)?(null):subparameter.name}</span>
                     <div className="form-floating">
                         <input type="text" className="form-control" id="valorManualInput" value={Math.round(source * 1000) / 1000 /*subparameter.value*/} disabled></input>
                         <label htmlFor="valorManualInput">{select[1]}</label>
                     </div>
-                    <button type="button" className="btn btn-outline-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false"></button>
-                    <ParameterDropDown claves={claves} subparameter={subparameter} changeSelection={changeSelection} />
                 </div>
             </div>
-            <div className='col-8 align-self-center'>
+            <div className='col-6 align-self-center'>
                 <div className="input-group">
                     <span ref={target} className="input-group-text" onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}>Range</span>
                     <Overlay className="custom-tooltip" target={target.current} show={show} placement="top">
@@ -168,127 +173,217 @@ function DataConnection({ selection, changeSelection, subparameter, parameter, u
                         )}
                     </Overlay>
                     <div className="form-floating">
-                        <input type="text" className="form-control" id="max" placeholder={0} value={formMin} onBlur={looseFocusMin} readOnly={disabled} disabled={disabled} onChange={(e) => { setFormMin(e.target.value) }}></input>
+                        <input type="text" className="form-control" id="max" placeholder={0} value={Math.round(formMin*1000)/1000} onBlur={looseFocusMin} readOnly={disabled} disabled={disabled} onChange={formMinChange}></input>
                         <label htmlFor="max">Min</label>
                     </div>
                     <div className="form-floating">
-                        <input type="text" className="form-control" id="max" placeholder={100} value={formMax} onBlur={looseFocusMax} readOnly={disabled} disabled={disabled} onChange={(e) => { setFormMax(e.target.value) }}></input>
+                        <input type="text" className="form-control" id="max" placeholder={1} value={Math.round(formMax*1000)/1000} onBlur={looseFocusMax} readOnly={disabled} disabled={disabled} onChange={formMaxChange}></input>
                         <label htmlFor="max">Max</label>
                     </div>
-                    <button className="btn btn-primary" onClick={handleAutoSet} disabled={disabled}>Auto range</button>
+                    <button className="btn btn-primary" onClick={handleAutoSet} disabled={disabled}>Auto</button>
                 </div>
+            </div>
+            <div className='col-1 align-self-center'>
+                {dropDown}
             </div>
         </div>
     )
 }
 
-// Customize the format if the item has "suggested attribute"
-function ParameterDropDown({ claves, subparameter, changeSelection }) {
 
+function ParameterDropDown({ claves, parameter, subparameter, dataMappings, setDataMappings, displayName}) {
+
+    
     const suggestedClass = (option) => {
-        if ('suggested' in subparameter) {
-            return !(subparameter.suggested === option) ? "dropdown-item" : "dropdown-item text-primary";
+        // Checks to see if the parameter has a suggested class. If that suggested class is equal to the option, changes styling.
+        if ('suggested' in parameter) {
+            return !(parameter.suggested === option) ? "dropdown-item" : "dropdown-item text-primary";
         } else {
             return "dropdown-item"
         }
     }
 
-
-    return (
-        <ul className="dropdown-menu">
-            <li><button className="dropdown-item" onClick={()=>changeSelection("Manual")}>Manual</button></li>
-            {claves.map((option) => {
-                return (
-                    <li>
-                        <button type="button" className="dropdown-item" data-bs-toggle="dropdown-submenu" data-bs-target="#nested-dropdown" aria-expanded="false">{option.device}</button>
-                        <ul className='submenu dropdown-menu' id="nested-dropdown">
-                            {option.data.map((data) => {
-                                return (
-                                <li>
-                                    <button className={suggestedClass(data)} onClick={()=>changeSelection([option.device, data])}>
-                                        {data}
-                                    </button>
-                                </li>)
-                            })}
-                        </ul>
-                    </li>
-                )
-            })
-            }
-        </ul>)
-}
-
-function ParameterManager({ subparameter, sources, updateValues, parameter, defineAutoParameter, deviceStates, activeVisParameters }) {
-
-    const claves = getDataStreamKeys(sources, deviceStates);
-    //claves.push("Manual");
-
-    const [manual, setManual] = useState(true)
-    const [selection, setSelection] = useState([]);
-    const select = selection;
-
-    function changeSelection(option) {
-        if (option === "Manual") {
-            setManual(true);
-            defineAutoParameter(false);
+    // Display text on the card. Upon creation, it checks the status
+    const [display, setDisplay] = useState(()=>{
+        let disp;
+        if (subparameter===undefined){
+            disp=dataMappings[parameter.name];
         } else {
-            setManual(false);
+            disp=dataMappings[parameter.name][subparameter.name];
         }
-        setSelection(option);
+        if (disp==="Manual") disp=[0, "Manual"];
+        if (displayName!==undefined) disp=(subparameter.name+": "+disp[1]);
+        else disp=(disp[1]);
+        return disp
+    });
+
+    // Changes the data source
+    function selectNewSource(sourceName) {
+        const maps=Object.assign({}, dataMappings);
+        if (subparameter!==undefined){
+            maps[parameter.name][subparameter.name]=sourceName;
+        } else {
+            maps[parameter.name]=sourceName;
+        }
+
+        setDataMappings(maps); // Changes datamappings
+
+        // Changes the display text when the data source/dataMappings change
+        let disp;
+        if (subparameter===undefined){
+            disp=maps[parameter.name];
+        } else {
+            disp=maps[parameter.name][subparameter.name];
+        }
+        if (sourceName==="Manual") disp=[0, "Manual"];
+        if (displayName!==undefined) setDisplay(subparameter.name+": "+disp[1]);
+        else setDisplay(disp[1]);
+        
     }
 
-    useEffect(() => {
-        if (!manual) {
-            defineAutoParameter(true);
-        }
-    })
+    // Changes the color of the button as dataMappings changes
+    const dispColor=useMemo(()=>(display.includes("Manual"))?"btn btn-sm btn-outline-dark ms-2":"btn btn-sm btn-outline-primary ms-2", [dataMappings])
+    
+    return (
+        <div>
+            <button type="button" className={dispColor} data-bs-toggle="dropdown" aria-expanded="false">{display}</button>
+            <ul className="dropdown-menu">
+                <li><button className="dropdown-item" onClick={()=>selectNewSource("Manual")}>Manual</button></li>
+                {claves.map((option) => {
+                    return (
+                        <li key={option.device}>
+                            <button type="button" className="dropdown-item" data-bs-toggle="dropdown-submenu" data-bs-target="#nested-dropdown" aria-expanded="false">{option.device}</button>
+                            <ul className='submenu dropdown-menu' id="nested-dropdown">
+                                {option.data.map((data) => {
+                                    return (
+                                    <li key={data}>
+                                        <button className={suggestedClass(data)} onClick={()=>selectNewSource([option.device, data])}>
+                                            {data}
+                                        </button>
+                                    </li>)
+                                })}
+                            </ul>
+                        </li>
+                    )
+                })
+                }
+            </ul>
+        </div>)
+}
 
-    useEffect(() => { if (!sources.hasOwnProperty(select[0])) { setManual(true); defineAutoParameter(false) } }, [sources]);
+function ParameterManager({ claves, subparameter, sources, updateValues, parameter, activeVisParameters, dataMappings, setDataMappings}) {
+
+    const [manual, setManual] = useState(true) // Track if the parameter/subparameter is using the manual slider
+
+    // Runs every time the mappings are changed. Tracks changes to manual parameter.
+    useEffect(()=>{
+    if (subparameter!==undefined) {
+        if (dataMappings[parameter.name][subparameter.name]==="Manual") setManual(true);
+        else setManual(false);
+    } else {
+        if (dataMappings[parameter.name]==="Manual") setManual(true);
+        else setManual(false);
+    }}, [dataMappings])
+
+    // Drop-down buttons to select the devices & update dataMappings
+    const [dropDown, setDropDown]=useState();
+    useEffect(()=>setDropDown(<ParameterDropDown claves={claves} parameter={parameter} dataMappings={dataMappings} subparameter={subparameter} setDataMappings={setDataMappings}/>), [claves, dataMappings])
 
     return (
-        <li className="list-group-item py-4 container" key={subparameter.name}>
-            <h6>{subparameter.name}</h6>
+        <li className="list-group-item py-4 container" key={(subparameter===undefined)?parameter.name:subparameter.name}>
             {manual ?
-                <DataManualSlider parameter={parameter} subparameter={subparameter} updateValues={updateValues} changeSelection={changeSelection} claves={claves} activeVisParameters={activeVisParameters} /> :
-                <DataConnection parameter={parameter} subparameter={subparameter} updateValues={updateValues} sources={sources} selection={selection} changeSelection={changeSelection} claves={claves} />
+                <DataManualSlider 
+                    parameter={parameter.name} 
+                    subparameter={subparameter} 
+                    updateValues={updateValues} 
+                    claves={claves} 
+                    dropDown={dropDown}
+                    dataMappings={dataMappings}
+                    setDataMappings={setDataMappings}
+                    activeVisParameters={activeVisParameters} /> :
+                <DataAutoSlider 
+                    parameter={parameter.name} 
+                    subparameter={subparameter} 
+                    updateValues={updateValues} 
+                    sources={sources} 
+                    dataMappings={dataMappings}
+                    dropDown={dropDown}
+                    setDataMappings={setDataMappings}
+                    claves={claves} />
             }
         </li>
     )
 }
 
-function DataCard({ visParameter, updateValues, sources, deviceStates, activeVisParameters }) {
+function DataCard({ visParameter, updateValues, sources, deviceStates, activeVisParameters, dataMappings, setDataMappings}) {
 
+    // claves is the object returned from the getDataStreamKeys that provides the devices & their streams as a list
+    const [claves, setClaves] = useState([]);
+    useEffect(()=>setClaves(getDataStreamKeys(sources, deviceStates)), [deviceStates])
+
+    // Defines if the card has a property that is mapped to a parameter. Used for styling purposes
     const [hasAuto, setHasAuto] = React.useState(false);
-    let subparameters;
 
-    if (Array.isArray(visParameter.value)) {
-        subparameters = visParameter.value;
-    } else {
-        subparameters = [visParameter];
+    // Generates the drop-downs that hold subparameters (if any), provide a slider, and range functions
+    const mapeo = () => {
+        if (!Array.isArray(visParameter.value)) { // No subparameters
+            return <ParameterManager
+                claves={claves}
+                parameter={visParameter}
+                sources={sources}
+                updateValues={updateValues}
+                key={visParameter.name}
+                dataMappings={dataMappings}
+                setDataMappings={setDataMappings}
+                defineAutoParameter={setHasAuto}
+                deviceStates={deviceStates}
+                activeVisParameters={activeVisParameters} />;
+        } else {
+            return visParameter.value?.map((param) =>
+            <ParameterManager
+                claves={claves}
+                parameter={visParameter}
+                subparameter={param}
+                sources={sources}
+                dataMappings={dataMappings}
+                setDataMappings={setDataMappings}
+                updateValues={updateValues}
+                key={param.name}
+                defineAutoParameter={setHasAuto}
+                deviceStates={deviceStates}
+                activeVisParameters={activeVisParameters} />);
+        }
     }
 
-    const mapeo = subparameters?.map((param) =>
-        <ParameterManager
-            parameter={visParameter.name}
-            subparameter={param}
-            sources={sources}
-            updateValues={updateValues}
-            key={param.name}
-            defineAutoParameter={setHasAuto}
-            deviceStates={deviceStates}
-            activeVisParameters={activeVisParameters} />);
-    // Pasar visParameters a DataCardManager
+    
+    const [expanded, setExpanded] = React.useState(false); // Used for styling, checks to see if accordion is collapsed or not
+    
+    // This is the external drop-down that is shown on the actual card when collapsed. Create and declare the dropDown menu that contains data mappings. 
+    // The difference here is that it will be a mapping in case there are subparametes & it isn't updated as often
+    const [dropDown, setDropDown]=useState();
+    useEffect(()=>setDropDown(!Array.isArray(visParameter.value)?
+        <ParameterDropDown claves={claves} parameter={visParameter} dataMappings={dataMappings} setDataMappings={setDataMappings}/>:
+        visParameter.value?.map((param)=><ParameterDropDown claves={claves} parameter={visParameter} dataMappings={dataMappings} subparameter={param} setDataMappings={setDataMappings} displayName={true} key={param.name}/>)
+    ), [claves, dataMappings])
+
+
     return (
-        <div className={hasAuto ? "accordion-item accordion-custom" : "accordion-item"} key={visParameter.name}>
-            <h2 className="accordion-header accordion-color">
-                <button className="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target={'#' + visParameter.name.replace(" ", "_")} aria-expanded="false" aria-controls="collapseTwo">
-                    {visParameter.name}
+        <div className={hasAuto ? "list-group-item accordion-custom" : "list-group-item"} key={visParameter.name}>
+            <div className="d-flex align-items-center pt-1 pb-1"> 
+               <div>{visParameter.name}</div>
+                <div className={expanded?"btn-map-transition expanded me-3 col align-items-right":"btn-map-transition col me-3 align-items-right"}>
+                    <div className='d-flex justify-content-end'>
+                    {!(expanded)?dropDown:null}
+                    </div>
+                </div>
+                <button className="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target={'#' + visParameter.name.replace(" ", "_")} aria-expanded="false" aria-controls="collapseTwo" onClick={()=>setExpanded(!expanded)}>
+                Hey!
                 </button>
-            </h2>
-            <div id={visParameter.name.replace(" ", "_")} className="accordion-collapse collapse">
-                <div className="accordion-body">
-                    <ul className="list-group list-group-flush my-n2">
-                        {mapeo}
+            </div>
+            <div id={visParameter.name.replace(" ", "_")} className="collapse">
+                <div>
+                    <ul className="list-group list-group-flush">
+                        {mapeo()}
                     </ul>
                 </div>
             </div>
@@ -296,9 +391,26 @@ function DataCard({ visParameter, updateValues, sources, deviceStates, activeVis
     );
 }
 
-
 export default function DataManagement({ deviceStream, updateValues, visParameters, deviceStates, activeVisParameters }) {
+    // Some input props: 
+    //    activeVisParameters - object that defines the parameters that are being changed by the data stream
+    //    visParameters -  the object that contains the parameters' metadata of the visualization
+    //    dataStreamObject - contains the data stream in the shape: {Device1: {Metric1: int, Metric2: int}, Device2: ...}
+    //    deviceStates - an object containing which devices are active: {Device1: boolean, Device2: boolean}
 
+
+    // dataMappings is an array that contains the parameters of the visualization and describes what they are mapped to:
+    //      It has the shape: {Param1: Device Name/Manual, Param2: {Subparam1: Device Name/Manual}}
+    const [dataMappings, setDataMappings]=useState(visParameters.properties?.reduce((acc, datos)=>{
+        if (Array.isArray(datos.value)){
+            acc[datos.name]=datos.value.reduce((acc, data)=>{acc[data?.name]="Manual"; return acc}, {});
+        } else {
+            acc[datos.name]="Manual";
+        }
+        return acc
+    }, {}));
+    
+    // Generates the cards with the parameters
     const dataCards = visParameters.properties?.map((parameter) => (
         <DataCard
             visParameter={parameter}
@@ -306,13 +418,38 @@ export default function DataManagement({ deviceStream, updateValues, visParamete
             updateValues={updateValues}
             key={parameter.name}
             deviceStates={deviceStates}
+            dataMappings={dataMappings}
+            setDataMappings={setDataMappings}
             activeVisParameters={activeVisParameters} />));
+            
     return (
         <div>
             <h6>{visParameters.name}</h6>
-            <div className="accordion mt-3 mb-3 custom-scroll">
+            <div className="list-group">
                 {dataCards}
             </div>
         </div>
     );
+}
+
+
+function getDataStreamKeys(dataStreamObject, deviceStates) {
+    // Extracts the devices & their variables from the stream to put them into an array
+    // Parameters:
+    //    dataStreamObject - contains the data stream in the shape: {Device1: {Metric1: int, Metric2: int}, Device2: ...}
+    //    deviceStates - an object containing which devices are active: {Device1: boolean, Device2: boolean}
+
+    const returnItems = [];
+    for (const valor in dataStreamObject) {
+        if (deviceStates[valor]) {
+            let newObj = {};
+            newObj["device"] = valor;
+            newObj["data"] = [];
+            for (const datos in dataStreamObject[valor]) {
+                newObj["data"] = [...newObj["data"], datos];
+            }
+            returnItems.push(newObj);
+        }
+    }
+    return returnItems;
 }

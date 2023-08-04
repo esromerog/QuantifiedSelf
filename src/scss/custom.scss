@@ -1,15 +1,16 @@
-// @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;800&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@100;200;300;400;700;800&display=swap');
 
 
 $primary: #FFC107;
 $enable-negative-margins: true;
+$font-family-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 
 body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     
-    font-family: Lato,'Helvetica Neue',Arial, Helvetica, sans-serif;
+    font-family: Lato,"Lato",'Helvetica Neue',Arial, Helvetica, sans-serif;
     width: 100%;
     height  : 100%;
     overflow: hidden;
@@ -41,9 +42,10 @@ html {
 
 
  .accordion-color {
-    --bs-accordion-active-bg: #F6F6F6;
+    --bs-accordion-active-bg: #ffffff;
     --bs-accordion-active-color: #1A1A1A;
  }
+
 .accordion-custom {
     --bs-accordion-border-color: #FFC107;
     --bs-accordion-btn-color: #FFC107;
@@ -81,10 +83,10 @@ canvas {
 	li .submenu{ 
 		display: none;
 		position: absolute;
-		left:100%; top:-7px;
+		right:100%; top:-7px;
 	}
-	li .submenu-left{ 
-		right:100%; left:auto;
+	li .submenu-right{ 
+		left:100%; left:auto;
 	}
 	.dropdown-menu > li:hover{ background-color: #f1f1f1 }
 	.dropdown-menu > li:hover > .submenu{ display: block; }
@@ -113,6 +115,11 @@ canvas {
     transform: translateY(-50%);
   }
 
+
+.btn.w-100.custom-padding-button {
+    padding: 0;
+    margin: 0;
+}
 
 .img-vis {
     object-fit: cover;
@@ -150,6 +157,19 @@ canvas {
     padding-right: 0;
     overflow-y: hidden;
     margin: 0;
+}
+  
+.btn-map-transition {
+    opacity: 1;
+    transition: all 0.3s ease-out;
+
+}
+  /* The element to apply the animation to */
+.btn-map-transition.expanded {
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease-out;
+    
 }
 
 $btn-link-color: black;

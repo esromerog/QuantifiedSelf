@@ -33,10 +33,10 @@ const allVisSources = [
 
 function ImageCard({visSource, defineVisParameters}) {
   const [showAddData, setShowAddData]=useState(false);
-  const [addInfo, setShowAddInfo]=useState(false);
+
   return (
-    <div className='col img-holder' key={visSource.name}>
-      <button className='btn w-100 h-100 d-flex' onClick={()=>defineVisParameters(visSource)}>
+    <div className='col img-holder m-0 mb-1' key={visSource.name}>
+      <button className='w-100 h-100 btn p-0' onClick={()=>defineVisParameters(visSource)}>
         <img className={showAddData?"img-vis-hover img-vis rounded":"img-vis rounded"} src={visSource.img_name} alt={visSource.name} onMouseEnter={()=>setShowAddData(true)} onMouseLeave={()=>setShowAddData(false)}/></button>
         {showAddData?<div className='centered-over-image' key={visSource.name} onMouseEnter={()=>setShowAddData(true)}>
           <h6 className="image-hover-text align-self-center text-center">{visSource.name}</h6>
@@ -64,36 +64,11 @@ export default function RenderVisualizationCards({setVisParameters, setSelectedV
   }
   const visSources=allVisSources.map((visSource)=><ImageCard visSource={visSource} defineVisParameters={defineVisParameters} key={visSource.name}/>);
   return (
-    <div className="container-fluid">
-      <div className='row row-cols-2 w-100 h-100'>
+
+      <div className='row mt-2 row-cols-2 g-1'>
       {visSources}
       </div>
-    </div>
+
   )
 }
 
-function StartWindow({show, handleClose, data, streamFunction}) {
-  const source={};
-  source[data.heading]=true;
-
-  return (
-  <Modal show={show} onHide={handleClose} centered size="lg">
-      <Modal.Header closeButton>
-        <Modal.Title>{data.heading}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-          {data.description}
-          <div className='mt-3'>
-              <h6>Available data streams</h6>
-              <p>This device can stream the following data to a visualization. Hover to learn more.</p>
-          </div>
-      </Modal.Body>
-      <Modal.Footer className="d-flex justify-content-between">
-            <p className={texto.type}>{texto.text}</p>
-            {(!deviceStates["Emotiv"])?
-            (<button type="button" className="btn btn-outline-dark" onClick={handleActive} disabled={disabled}><i className="bi bi-bluetooth me-2"></i>Connect</button>):
-            (<div className="text-success mt-1 mb-1">Connected</div>)}
-      </Modal.Footer>
-   </Modal>
-  )
-}

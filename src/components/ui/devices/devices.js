@@ -33,7 +33,7 @@ export default function RenderDevices({data, deviceStates, deviceStreamFunctions
     return (
     <div>
         {/*<div><Expand data={data} key="General"/></div>*/}
-        <div className="mt-3">
+        <div className="mt-1">
             <ul className="list-group">
             {deviceButtonList}
             </ul>

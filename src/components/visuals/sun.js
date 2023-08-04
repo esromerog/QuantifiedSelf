@@ -247,7 +247,7 @@ const Sun = ({value}) => {
         p.background(0, 20, 80, 1);
 
         // gradient 
-        gradient_target = p.map(value.current["Sun Position"]*3, val, 0, 0, 1);
+        gradient_target = p.map(value.current["Sun Position"]["x"]*3, val, 0, 0, 1);
         let delta_gradient = gradient_target - gradient;
         gradient += delta_gradient * easing;
         // day colors
