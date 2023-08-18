@@ -1,0 +1,29 @@
+[
+    {
+      "properties": [
+        {"name": "Sun Position", "value": [{"name": "x", "value": 0}, {"name": "y", "value": 0}], "suggested": "Gyro"},
+        {"name": "Size", "value": 0}
+      ],
+      "name": "Sun Visualization",
+      "description": "2D visualization of a sun rising and setting on a range of mountains. Useful to test simple parameter changes",
+      "img_src": "sun.png"
+    },
+    {
+      "properties": [
+        {"name": "Speed Change", "value": 0}
+      ],
+      "name": "Abstract Colors",
+      "description": "Shader-based visualization that resembles a lava-lamp",
+      "img_src": "round.png"
+    },
+      {
+      "properties": [
+        {"name": "Bass source", "value": 0},
+        {"name": "High Pitch source", "value": 0},
+        {"name": "Chimes source", "value": 0}
+      ],
+      "name": "Audio player",
+      "img_src": "round.png"
+    }
+]
+  

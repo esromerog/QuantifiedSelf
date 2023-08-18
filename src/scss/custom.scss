@@ -149,7 +149,6 @@ canvas {
     padding-left: 0 !important;
     padding-right: 0 !important;
     margin: 0;
-    overflow-x: hidden;
 }
 
 .full-height {
@@ -162,14 +161,32 @@ canvas {
 .btn-map-transition {
     opacity: 1;
     transition: all 0.3s ease-out;
-
 }
   /* The element to apply the animation to */
 .btn-map-transition.expanded {
     opacity: 0;
     pointer-events: none;
-    transition: all 0.3s ease-out;
+    transition: opacity 0.3s ease-out;
     
+}
+.btn-map-transition.closed {
+    opacity: 1;
+    transition: opacity 0.3s ease-out;
+}
+
+.fa-arrow-down{
+    transform: rotate(0deg);
+    transition: transform 0.3s linear;
+}
+
+.fa-arrow-down.close{
+    transform: rotate(0deg);
+    transition: transform 0.3s linear;
+}
+  
+.fa-arrow-down.open{
+    transform: rotate(-90deg);
+    transition: transform 0.3s linear;
 }
 
 $btn-link-color: black;

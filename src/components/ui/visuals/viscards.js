@@ -1,35 +1,7 @@
 import {useState, React} from 'react'
-import sunImage from "../../../imgs/sun.png"
-import circleImage from "../../../imgs/round.png"
 
-const allVisSources = [
-  {
-    properties: [
-      {name: "Sun Position", value: [{name: "x", value: 0}, {name: "y", value: 0}], suggested: 'Gyro'},
-      {name: "Size", value: 0}
-    ],
-    name: "Sun Visualization",
-    description: "2D visualization of a sun rising and setting on a range of mountains. Useful to test simple parameter changes",
-    img_name: sunImage
-  },
-  {
-    properties: [
-      {name: "Speed Change", value: 0},
-    ],
-    name: "Abstract Colors",
-    description: "Shader-based visualization that resembles a lava-lamp",
-    img_name: circleImage
-  },
-    {
-    properties: [
-      {name: "Bass source", value: 0},
-      {name: "High Pitch source", value: 0},
-      {name: "Chimes source", value: 0}
-    ],
-    name: "Audio player",
-    img_name: circleImage
-  }
-]
+import { allVisSources } from '../../../App';
+
 
 function ImageCard({visSource, defineVisParameters}) {
   const [showAddData, setShowAddData]=useState(false);

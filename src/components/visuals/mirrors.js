@@ -25,6 +25,7 @@ const Mirrors = ({ value }) => {
   useEffect(() => {
     // ------------------------------------------------ Setup ------------------------------------------------
     const canvas = canvasRef.current;
+    
     let scene = new Scene();
 
     let camera = new PerspectiveCamera(75, canvas.offsetWidth / canvas.offsetHeight, 0.1, 1000);
@@ -64,6 +65,7 @@ const Mirrors = ({ value }) => {
     let onWindowResize = () => {
       camera.aspect = canvas.offsetWidth / canvas.offsetHeight;
       camera.updateProjectionMatrix();
+      console.log("Resize event!")
       renderer.setSize(canvas.offsetWidth, canvas.offsetHeight);
     }
     

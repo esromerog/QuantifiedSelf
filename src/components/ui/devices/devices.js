@@ -16,7 +16,7 @@ return (
 }
 
 export default function RenderDevices({data, deviceStates, deviceStreamFunctions}) {
-    const [activeData, setActiveData] = useState(data[1]);
+    const [activeData, setActiveData] = useState(data[0]);
 
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
@@ -57,9 +57,9 @@ function ConnectionWindow({show, handleClose, data, streamFunction}) {
         <Modal.Body>
             {data.description}
             <div className='mt-3'>
-                <h6>Available data streams</h6>
+                <h5>Available data streams</h5>
                 <p>This device can stream the following data to a visualization. Hover to learn more.</p>
-                <AvailableDataInformation source={source} popupInfo={[data]}/>
+                <AvailableDataInformation source={source} popupInfo={[data]} groupData={true}/>
             </div>
         </Modal.Body>
         {streamFunction}

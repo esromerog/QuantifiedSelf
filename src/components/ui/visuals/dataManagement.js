@@ -41,17 +41,13 @@ function DataManualSlider({ parameter, subparameter, updateValues, activeVisPara
 
     return (
         <div className="row justify-content-start">
-            <div className="col-xl-3 col-lg-4">
+            <div className={subparameter===undefined?"col-xxl-2 col-xl-3 col-lg-4":"col-xxl-3 col-xl-4 col-lg-5"}>
                 <div className="input-group">
-                    <span className="input-group-text">{(subparameter===undefined)?(null):subparameter.name}</span>
-                    <div className="form-floating">
-                        <input type="text" className="form-control" id="valorManualInput" placeholder={valor} value={valor} onChange={handleFormChange}></input>
-                        <label htmlFor="valorManualInput">Value</label>
-                    </div>
-                    <label className="visually-hidden" htmlFor="valorManualInput">{valor}</label>
+                    {subparameter===undefined?null:<span className="input-group-text">{(subparameter===undefined)?(null):subparameter.name}</span>}
+                    <input type="text" className="form-control" id="valorManualInput" placeholder={valor} value={valor} onChange={handleFormChange}></input>
                 </div>
             </div>
-            <div className='col-xl-6 col-lg-5 align-self-center'><input type="range" className="form-range align-self-center" onChange={handleInputChange} id="customRange1" value={valor} step={0.01} min={min} max={max}></input></div>
+            <div className={subparameter===undefined?'col-xxl-7 col-xl-6 col-lg-5 align-self-center':'col-xxl-6 col-xl-5 col-lg-4 align-self-center'}><input type="range" className="form-range align-self-center" onChange={handleInputChange} id="customRange1" value={valor} step={0.01} min={min} max={max}></input></div>
             <div className='col-1 align-self-center mb-2'>{dropDown}</div>
         </div>
     )
@@ -155,11 +151,8 @@ function DataAutoSlider({ dataMappings, subparameter, parameter, updateValues, s
         <div className="row justify-content-start">
             <div className="col-3">
                 <div className="input-group">
-                    <span className="input-group-text">{(subparameter===undefined)?(null):subparameter.name}</span>
-                    <div className="form-floating">
-                        <input type="text" className="form-control" id="valorManualInput" value={Math.round(source * 1000) / 1000 /*subparameter.value*/} disabled></input>
-                        <label htmlFor="valorManualInput">{select[1]}</label>
-                    </div>
+                    {subparameter===undefined?null:<span className="input-group-text">{(subparameter===undefined)?(null):subparameter.name}</span>}
+                    <input type="text" className="form-control" id="valorManualInput" value={Math.round(source * 1000) / 1000 /*subparameter.value*/} disabled></input>
                 </div>
             </div>
             <div className='col-6 align-self-center'>
@@ -362,8 +355,18 @@ function DataCard({ visParameter, updateValues, sources, deviceStates, activeVis
     // The difference here is that it will be a mapping in case there are subparametes & it isn't updated as often
     const [dropDown, setDropDown]=useState();
     useEffect(()=>setDropDown(!Array.isArray(visParameter.value)?
-        <ParameterDropDown claves={claves} parameter={visParameter} dataMappings={dataMappings} setDataMappings={setDataMappings}/>:
-        visParameter.value?.map((param)=><ParameterDropDown claves={claves} parameter={visParameter} dataMappings={dataMappings} subparameter={param} setDataMappings={setDataMappings} displayName={true} key={param.name}/>)
+        <div className='mt-1 mb-1'><ParameterDropDown claves={claves} parameter={visParameter} dataMappings={dataMappings} setDataMappings={setDataMappings}/></div>:
+        visParameter.value?.map((param)=>
+            <div className='mt-1 mb-1'>
+                <ParameterDropDown 
+                    claves={claves}
+                    parameter={visParameter}
+                    dataMappings={dataMappings}
+                    subparameter={param}
+                    setDataMappings={setDataMappings}
+                    displayName={true}
+                    key={param.name}/>
+            </div>)
     ), [claves, dataMappings])
 
 
@@ -371,13 +374,19 @@ function DataCard({ visParameter, updateValues, sources, deviceStates, activeVis
         <div className={hasAuto ? "list-group-item accordion-custom" : "list-group-item"} key={visParameter.name}>
             <div className="d-flex align-items-center pt-1 pb-1"> 
                <div>{visParameter.name}</div>
-                <div className={expanded?"btn-map-transition expanded me-3 col align-items-right":"btn-map-transition col me-3 align-items-right"}>
-                    <div className='d-flex justify-content-end'>
+                <div className={expanded?"btn-map-transition expanded col align-items-right":"btn-map-transition closed col align-items-right"}>
+                    <div className='d-flex justify-content-end flex-wrap'>
                     {!(expanded)?dropDown:null}
                     </div>
                 </div>
-                <button className="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target={'#' + visParameter.name.replace(" ", "_")} aria-expanded="false" aria-controls="collapseTwo" onClick={()=>setExpanded(!expanded)}>
-                Hey!
+                <button 
+                    className={(expanded)?"btn btn-link fa-arrow-down open": "btn btn-link fa-arrow-down close"}
+                    type="button" data-bs-toggle="collapse" 
+                    data-bs-target={'#' + visParameter.name.replace(" ", "_")} 
+                    aria-expanded="false" 
+                    aria-controls="collapseTwo" 
+                    onClick={()=>setExpanded(!expanded)}>
+                <i class="bi bi-three-dots-vertical"></i>
                 </button>
             </div>
             <div id={visParameter.name.replace(" ", "_")} className="collapse">

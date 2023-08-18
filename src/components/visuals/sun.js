@@ -218,6 +218,7 @@ const Sun = ({value}) => {
             p.background(220);
             p.background(0, 20, 80);
 
+            
             // Create the sun
             let centerX = p.width / 2;
             let centerY = p.height / 2;
@@ -296,6 +297,7 @@ const Sun = ({value}) => {
 
         const Q=new P5(p=>Sketch(p, value), canvasRef.current);
 
+        canvasRef.current.firstChild.style.visibility = "visible"
         function updateCanvasDimensions() {
             Q.updateCanvasDimensions()
         }

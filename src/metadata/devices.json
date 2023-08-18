@@ -1,0 +1,12 @@
+[
+    {
+      "heading": "Emotiv",
+      "description": "EEG device developed by...",
+      "type": "EEG device",
+      "data": [
+        { "name": "Alpha", "description": "I'll write this later", "type": "EEG Metrics"},
+        { "name": "Beta", "description": "Maybe I'll also write this later", "type": "EEG Metrics"},
+        { "name": "Gyro", "description": "Gyroscope data for the EMOTIV headset", "type": "Movement"}
+      ]
+    }
+]
