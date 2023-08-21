@@ -357,7 +357,7 @@ function DataCard({ visParameter, updateValues, sources, deviceStates, activeVis
     useEffect(()=>setDropDown(!Array.isArray(visParameter.value)?
         <div className='mt-1 mb-1'><ParameterDropDown claves={claves} parameter={visParameter} dataMappings={dataMappings} setDataMappings={setDataMappings}/></div>:
         visParameter.value?.map((param)=>
-            <div className='mt-1 mb-1'>
+            <div className='mt-1 mb-1' key={param.name}>
                 <ParameterDropDown 
                     claves={claves}
                     parameter={visParameter}
@@ -372,7 +372,7 @@ function DataCard({ visParameter, updateValues, sources, deviceStates, activeVis
 
     return (
         <div className={hasAuto ? "list-group-item accordion-custom" : "list-group-item"} key={visParameter.name}>
-            <div className="d-flex align-items-center pt-1 pb-1"> 
+            <div className="d-flex align-items-center pt-1 pb-1" key={visParameter.name}> 
                <div>{visParameter.name}</div>
                 <div className={expanded?"btn-map-transition expanded col align-items-right":"btn-map-transition closed col align-items-right"}>
                     <div className='d-flex justify-content-end flex-wrap'>
@@ -386,7 +386,7 @@ function DataCard({ visParameter, updateValues, sources, deviceStates, activeVis
                     aria-expanded="false" 
                     aria-controls="collapseTwo" 
                     onClick={()=>setExpanded(!expanded)}>
-                <i class="bi bi-three-dots-vertical"></i>
+                <i className="bi bi-three-dots-vertical"></i>
                 </button>
             </div>
             <div id={visParameter.name.replace(" ", "_")} className="collapse">
