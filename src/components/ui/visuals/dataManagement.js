@@ -2,20 +2,30 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 
 import Overlay from 'react-bootstrap/Overlay';
 import Tooltip from 'react-bootstrap/Tooltip';
+import { useSelector, useDispatch } from 'react-redux';
 
+const selectParams=state=>state.params;
+const selectStream=state=>state.deviceStream;
 
-function DataManualSlider({ parameter, subparameter, updateValues, activeVisParameters, dropDown}) {
+function DataManualSlider({ parameter, subparameter, dropDown}) {
     // This function is the list item when it is connected not connected to a datastream
     // It contains the logic to handle changing into manual mode, setting auto-range, and setting the value of the parameter, to the stream value.
 
     let valor;
 
+    // I can rework this to use the store state.params initial state/default values. 
+    // May also loop through the visParameters JSON using the keys of the state.params object
+    const params=useSelector(selectParams);
+    const dispatch=useDispatch();
+
     const subparam=(subparameter===undefined)?parameter:subparameter.name;
 
+    // I can rework this to use the store state.params initial state/default values. 
+    // May also loop through the visParameters JSON using the keys of the state.params object
     if (subparameter===undefined) {
-        valor = activeVisParameters[parameter];
+        valor = params[parameter];
     } else {
-        valor = activeVisParameters[parameter][subparameter.name];
+        valor = params[parameter][subparameter.name];
     }
 
     // Defines min and max of slider
@@ -23,8 +33,16 @@ function DataManualSlider({ parameter, subparameter, updateValues, activeVisPara
     const max = 1;
 
     // Handles updating the values of the slider
+    // This is what must be replaced with the action
+    
     const handleInputChange = (e) => {
-        updateValues(parameter, subparam, e.target.value);
+        dispatch({
+            type: 'params/update', 
+            payload: {
+                name1: parameter, 
+                name2: subparam, 
+                newValue: e.target.value}
+            })
     }
 
     // Handles changing the values of the input
@@ -35,7 +53,13 @@ function DataManualSlider({ parameter, subparameter, updateValues, activeVisPara
         } else if (formValue < min) {
             formValue = min;
         }
-        updateValues(parameter, subparam, formValue);
+        dispatch({
+            type: 'params/update', 
+            payload: {
+                name1: parameter, 
+                name2: subparam, 
+                newValue: formValue}
+            })
         e.target.value = formValue;
     }
 
@@ -55,10 +79,13 @@ function DataManualSlider({ parameter, subparameter, updateValues, activeVisPara
 
 
 
-function DataAutoSlider({ dataMappings, subparameter, parameter, updateValues, sources, dropDown }) {
+function DataAutoSlider({ dataMappings, subparameter, parameter, dropDown }) {
     // This function is the list item when it is connected to a data stream.
     // It contains the logic to handle changing into manual mode, setting auto-range, and setting the value of the parameter, to the stream value.
 
+
+    const dispatch=useDispatch();
+    const stream=useSelector(selectStream);
 
     // Logic to handle the range tooltip
     const [show, setShow] = useState(false);
@@ -66,9 +93,14 @@ function DataAutoSlider({ dataMappings, subparameter, parameter, updateValues, s
     
     // Defines which dataSource is selected
     const select = (subparameter===undefined)?dataMappings[parameter]:dataMappings[parameter][subparameter.name];
+    
+    // This will use the react store with deviceStream
     let source; // Extracts the value from that dataSource
+
+    // Logic that fetches the data from the device stream based on your selection in the dropdown
+    // I could also change or make this logic more complicated if I end up going for an LSL format in the stream
     try {
-        source = sources[select[0]][select[1]];
+        source = stream[select[0]][select[1]];
     } catch (error) {
         source = (subparameter===undefined)?0:subparameter.value;
     }
@@ -116,11 +148,18 @@ function DataAutoSlider({ dataMappings, subparameter, parameter, updateValues, s
         setBuffer([])
         setDisabled(true);
     }
-    const subparam=(subparameter===undefined)?(parameter):subparameter.name;
+
+    const subparam = (subparameter===undefined)?(parameter):subparameter.name;
     
     useEffect(() => {
         // Updates the values
-        updateValues(parameter, subparam, normalizeValue(source, min, max));
+        dispatch({
+            type: 'params/update', 
+            payload: {
+                name1: parameter, 
+                name2: subparam, 
+                newValue: normalizeValue(source, min, max)}
+            })
     }, [source]);
 
     useEffect(()=>{
@@ -264,7 +303,7 @@ function ParameterDropDown({ claves, parameter, subparameter, dataMappings, setD
         </div>)
 }
 
-function ParameterManager({ claves, subparameter, sources, updateValues, parameter, activeVisParameters, dataMappings, setDataMappings}) {
+function ParameterManager({ claves, subparameter, parameter, dataMappings, setDataMappings}) {
 
     const [manual, setManual] = useState(true) // Track if the parameter/subparameter is using the manual slider
 
@@ -280,7 +319,14 @@ function ParameterManager({ claves, subparameter, sources, updateValues, paramet
 
     // Drop-down buttons to select the devices & update dataMappings
     const [dropDown, setDropDown]=useState();
-    useEffect(()=>setDropDown(<ParameterDropDown claves={claves} parameter={parameter} dataMappings={dataMappings} subparameter={subparameter} setDataMappings={setDataMappings}/>), [claves, dataMappings])
+    useEffect(()=>setDropDown(
+        <ParameterDropDown 
+            claves={claves} 
+            parameter={parameter} 
+            dataMappings={dataMappings} 
+            subparameter={subparameter} 
+            setDataMappings={setDataMappings} />
+        ), [claves, dataMappings])
 
     return (
         <li className="list-group-item py-4 container" key={(subparameter===undefined)?parameter.name:subparameter.name}>
@@ -288,34 +334,26 @@ function ParameterManager({ claves, subparameter, sources, updateValues, paramet
                 <DataManualSlider 
                     parameter={parameter.name} 
                     subparameter={subparameter} 
-                    updateValues={updateValues} 
-                    claves={claves} 
-                    dropDown={dropDown}
-                    dataMappings={dataMappings}
-                    setDataMappings={setDataMappings}
-                    activeVisParameters={activeVisParameters} /> :
+                    dropDown={dropDown}/> :
                 <DataAutoSlider 
                     parameter={parameter.name} 
                     subparameter={subparameter} 
-                    updateValues={updateValues} 
-                    sources={sources} 
                     dataMappings={dataMappings}
-                    dropDown={dropDown}
-                    setDataMappings={setDataMappings}
-                    claves={claves} />
+                    dropDown={dropDown}/>
             }
         </li>
     )
 }
 
-function DataCard({ visParameter, updateValues, sources, deviceStates, activeVisParameters, dataMappings, setDataMappings}) {
+const selectStates=state=>state.deviceStates;
 
+function DataCard({ visParameter, dataMappings, setDataMappings}) {
+
+    const deviceStates=useSelector(selectStates);
+    const stream=useSelector(selectStream);
     // claves is the object returned from the getDataStreamKeys that provides the devices & their streams as a list
     const [claves, setClaves] = useState([]);
-    useEffect(()=>setClaves(getDataStreamKeys(sources, deviceStates)), [deviceStates])
-
-    // Defines if the card has a property that is mapped to a parameter. Used for styling purposes
-    const [hasAuto, setHasAuto] = React.useState(false);
+    useEffect(()=>setClaves(getDataStreamKeys(stream, deviceStates)), [deviceStates])
 
     // Generates the drop-downs that hold subparameters (if any), provide a slider, and range functions
     const mapeo = () => {
@@ -323,39 +361,33 @@ function DataCard({ visParameter, updateValues, sources, deviceStates, activeVis
             return <ParameterManager
                 claves={claves}
                 parameter={visParameter}
-                sources={sources}
-                updateValues={updateValues}
-                key={visParameter.name}
                 dataMappings={dataMappings}
-                setDataMappings={setDataMappings}
-                defineAutoParameter={setHasAuto}
-                deviceStates={deviceStates}
-                activeVisParameters={activeVisParameters} />;
+                setDataMappings={setDataMappings} />;
         } else {
             return visParameter.value?.map((param) =>
             <ParameterManager
                 claves={claves}
+                key={param.name}
                 parameter={visParameter}
                 subparameter={param}
-                sources={sources}
                 dataMappings={dataMappings}
-                setDataMappings={setDataMappings}
-                updateValues={updateValues}
-                key={param.name}
-                defineAutoParameter={setHasAuto}
-                deviceStates={deviceStates}
-                activeVisParameters={activeVisParameters} />);
+                setDataMappings={setDataMappings} />);
         }
     }
 
-    
     const [expanded, setExpanded] = React.useState(false); // Used for styling, checks to see if accordion is collapsed or not
     
     // This is the external drop-down that is shown on the actual card when collapsed. Create and declare the dropDown menu that contains data mappings. 
     // The difference here is that it will be a mapping in case there are subparametes & it isn't updated as often
     const [dropDown, setDropDown]=useState();
     useEffect(()=>setDropDown(!Array.isArray(visParameter.value)?
-        <div className='mt-1 mb-1'><ParameterDropDown claves={claves} parameter={visParameter} dataMappings={dataMappings} setDataMappings={setDataMappings}/></div>:
+        <div className='mt-1 mb-1'>
+            <ParameterDropDown 
+                claves={claves} 
+                parameter={visParameter} 
+                dataMappings={dataMappings} 
+                setDataMappings={setDataMappings}/>
+        </div>:
         visParameter.value?.map((param)=>
             <div className='mt-1 mb-1' key={param.name}>
                 <ParameterDropDown 
@@ -364,14 +396,13 @@ function DataCard({ visParameter, updateValues, sources, deviceStates, activeVis
                     dataMappings={dataMappings}
                     subparameter={param}
                     setDataMappings={setDataMappings}
-                    displayName={true}
-                    key={param.name}/>
+                    displayName={true}/>
             </div>)
     ), [claves, dataMappings])
 
 
     return (
-        <div className={hasAuto ? "list-group-item accordion-custom" : "list-group-item"} key={visParameter.name}>
+        <div className="list-group-item" key={visParameter.name}>
             <div className="d-flex align-items-center pt-1 pb-1" key={visParameter.name}> 
                <div>{visParameter.name}</div>
                 <div className={expanded?"btn-map-transition expanded col align-items-right":"btn-map-transition closed col align-items-right"}>
@@ -400,17 +431,17 @@ function DataCard({ visParameter, updateValues, sources, deviceStates, activeVis
     );
 }
 
-export default function DataManagement({ deviceStream, updateValues, visParameters, deviceStates, activeVisParameters }) {
+export default function DataManagement({ visInfo }) {
     // Some input props: 
     //    activeVisParameters - object that defines the parameters that are being changed by the data stream
-    //    visParameters -  the object that contains the parameters' metadata of the visualization
+    //    visInfo -  the object that contains the selected visualization's metadata
     //    dataStreamObject - contains the data stream in the shape: {Device1: {Metric1: int, Metric2: int}, Device2: ...}
     //    deviceStates - an object containing which devices are active: {Device1: boolean, Device2: boolean}
 
 
     // dataMappings is an array that contains the parameters of the visualization and describes what they are mapped to:
     //      It has the shape: {Param1: Device Name/Manual, Param2: {Subparam1: Device Name/Manual}}
-    const [dataMappings, setDataMappings]=useState(visParameters.properties?.reduce((acc, datos)=>{
+    const [dataMappings, setDataMappings]=useState(visInfo.properties?.reduce((acc, datos)=>{
         if (Array.isArray(datos.value)){
             acc[datos.name]=datos.value.reduce((acc, data)=>{acc[data?.name]="Manual"; return acc}, {});
         } else {
@@ -420,20 +451,16 @@ export default function DataManagement({ deviceStream, updateValues, visParamete
     }, {}));
     
     // Generates the cards with the parameters
-    const dataCards = visParameters.properties?.map((parameter) => (
+    const dataCards = visInfo.properties?.map((parameter) => (
         <DataCard
             visParameter={parameter}
-            sources={deviceStream}
-            updateValues={updateValues}
             key={parameter.name}
-            deviceStates={deviceStates}
             dataMappings={dataMappings}
-            setDataMappings={setDataMappings}
-            activeVisParameters={activeVisParameters} />));
+            setDataMappings={setDataMappings} />));
             
     return (
         <div>
-            <h6>{visParameters.name}</h6>
+            <h6>{visInfo.name}</h6>
             <div className="list-group">
                 {dataCards}
             </div>

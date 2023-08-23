@@ -2,6 +2,10 @@ import React, { useEffect, useState, useRef } from 'react';
 
 import Overlay from 'react-bootstrap/Overlay';
 import Tooltip from 'react-bootstrap/Tooltip';
+import { useSelector } from 'react-redux';
+import devicesRaw from '../../../metadata/devices';
+
+const devices = devicesRaw;
 
 function PopupItem({item}) {
     const [show, setShow] = useState(false);
@@ -24,7 +28,9 @@ function PopupItem({item}) {
     )
 }
 
-function DataCards({source, popupInfo, groupData}) {
+
+function DataCards({source, groupData}) {
+
     const dataArray=[];
     function appendToArray(value, info) {
         const datatoAppend=info.find(x=>x.heading===value).data.map((obj)=>{
@@ -36,11 +42,10 @@ function DataCards({source, popupInfo, groupData}) {
 
     for (const valor in source) {
         if (source[valor]) {
-            dataArray.push(appendToArray(valor, popupInfo));
+            dataArray.push(appendToArray(valor, devices));
         }
     }
     const showData=dataArray.flat();
-    console.log(dataArray)
 
     // Group data by type if it's defined
     if (groupData!==undefined) {
@@ -83,14 +88,32 @@ function DataCards({source, popupInfo, groupData}) {
     }
 }
 
-export default function AvailableDataInformation({source, popupInfo, groupData}) {
 
-    const [dataCard, updateDataCard]=useState(<DataCards source={source} popupInfo={[...popupInfo]} groupData={groupData}/>);
-    useEffect(()=>updateDataCard(<DataCards source={source} popupInfo={[...popupInfo]} groupData={groupData}/>), [source]);
+
+export default function AvailableDataInformation() {
+    
+    const source=useSelector(state=>state.deviceStates); // Device states
+
+    // Generate updatable DataCards as new devices become active
+    const [dataCard, updateDataCard]=useState(<DataCards source={source}/>);
+    useEffect(()=>updateDataCard(<DataCards source={source}/>), [source]);
     
     return (
         <div className='container'>
             {dataCard}
         </div>
     )
+}
+
+
+export function ModalDataInformation({source, popupInfo, groupData}) {
+
+    // Generate static DataCards when the component mounts
+    const dataCard=<DataCards source={source} groupData={groupData}/>;
+    
+    return (
+        <div className='container'>
+            {dataCard}
+        </div>
+    )  
 }
