@@ -3,6 +3,8 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import Overlay from 'react-bootstrap/Overlay';
 import Tooltip from 'react-bootstrap/Tooltip';
 import { useSelector, useDispatch } from 'react-redux';
+import { allVisSources } from '../../../App';
+import { useParams } from 'react-router-dom';
 
 const selectParams=state=>state.params;
 const selectStream=state=>state.deviceStream;
@@ -16,17 +18,20 @@ function DataManualSlider({ parameter, subparameter, dropDown}) {
     // I can rework this to use the store state.params initial state/default values. 
     // May also loop through the visParameters JSON using the keys of the state.params object
     const params=useSelector(selectParams);
+
+    try {
+        if (subparameter===undefined) {
+            valor = params[parameter];
+        } else {
+            valor = params[parameter][subparameter.name];
+        }
+    } catch {
+        valor = 0;
+    }
+ 
     const dispatch=useDispatch();
 
     const subparam=(subparameter===undefined)?parameter:subparameter.name;
-
-    // I can rework this to use the store state.params initial state/default values. 
-    // May also loop through the visParameters JSON using the keys of the state.params object
-    if (subparameter===undefined) {
-        valor = params[parameter];
-    } else {
-        valor = params[parameter][subparameter.name];
-    }
 
     // Defines min and max of slider
     const min = 0;
@@ -431,7 +436,7 @@ function DataCard({ visParameter, dataMappings, setDataMappings}) {
     );
 }
 
-export default function DataManagement({ visInfo }) {
+export default function DataManagement() {
     // Some input props: 
     //    activeVisParameters - object that defines the parameters that are being changed by the data stream
     //    visInfo -  the object that contains the selected visualization's metadata
@@ -441,6 +446,11 @@ export default function DataManagement({ visInfo }) {
 
     // dataMappings is an array that contains the parameters of the visualization and describes what they are mapped to:
     //      It has the shape: {Param1: Device Name/Manual, Param2: {Subparam1: Device Name/Manual}}
+
+    let { visID } = useParams();
+
+    const visInfo=allVisSources.find(x => x.name === visID);
+
     const [dataMappings, setDataMappings]=useState(visInfo.properties?.reduce((acc, datos)=>{
         if (Array.isArray(datos.value)){
             acc[datos.name]=datos.value.reduce((acc, data)=>{acc[data?.name]="Manual"; return acc}, {});

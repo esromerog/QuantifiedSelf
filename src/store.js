@@ -10,7 +10,6 @@ const initialState = {
       }, {}),
     params: {},
     deviceStream: {},
-    visMetadata: {},
 };
 
 // React Redux Store to manage the data that moves throghout the entire app
@@ -29,8 +28,7 @@ function rootReducer(state=initialState, action) {
         case 'params/set':
             // Logic to handle parameter updates
             return {...state,
-                params: action.payload.params,
-                visMetadata: action.payload.visMetadata
+                params: action.payload,
             }
 
         case 'devices/statesUpdate':
