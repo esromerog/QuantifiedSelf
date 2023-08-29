@@ -17,10 +17,6 @@ var fromX, fromY;
 var toX, toY;
 var step = 2.5;
 
-<<<<<<< HEAD
-=======
-
->>>>>>> devPC
 function P5Wrapper({sketch, params}) {
     const canvasRef = React.useRef();
 
@@ -51,7 +47,6 @@ function P5Wrapper({sketch, params}) {
 }
 
 const Sun = ({ value }) => {
->>>>>>> fa36f81ffec323e92c8f9436c72d60de3644a6a7
 
     //Xavier's star class
     /*
