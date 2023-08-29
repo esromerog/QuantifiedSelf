@@ -15,6 +15,10 @@ export const allVisSources = visSourcesImport.map(
     }
   });
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> devPC
 function MainUI() {
   let { visID } = useParams();
   const visMetadata = allVisSources.find(x => x.name === visID);
@@ -54,4 +58,7 @@ export default function App() {
   );
 }
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> devPC

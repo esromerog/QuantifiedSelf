@@ -17,6 +17,10 @@ var fromX, fromY;
 var toX, toY;
 var step = 2.5;
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> devPC
 function P5Wrapper({sketch, params}) {
     const canvasRef = React.useRef();
 
