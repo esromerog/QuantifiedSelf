@@ -414,12 +414,13 @@ class Cortex {
 
   }
 
+
+import store from '../../store';
+
 class CortexPower extends Cortex {
     
-    constructor(user, socketUrl, oldData, handleValue) {
+    constructor(user, socketUrl) {
         super(user, socketUrl);
-        this.oldData=oldData;
-        this.handleValue=handleValue;
     }
 
     // Add error handling functino using parsedData to check if there's data. I could also throw a return value from the sub?
@@ -427,29 +428,13 @@ class CortexPower extends Cortex {
     manipulate(parsedData) {
         let power = parsedData['pow'];
         let receivingValue = computePower(power,true)[1]  //theta is 0; alpha is 1
-        let newData=(Object.assign({}, this.oldData));
-        newData["Emotiv"]["Alpha"]=receivingValue;
-        newData["Emotiv"]["Beta"]=0;
-        this.handleValue(newData);
+        let newData={
+            "Alpha":receivingValue,
+            "Beta":0,
+        };
+        store.dispatch({type:'devices/streamUpdate', payload: {device: "Emotiv", data: newData}})
     }
 
 }
 
-
-
 export default CortexPower;
-
-
-/*
-function CortexComp({oldData, handleValue, changeIntervalRef}) {
-    clearInterval(changeIntervalRef.current);
-    changeIntervalRef.current = setInterval(() => {
-        let newData=(Object.assign({}, oldData));
-        newData["Muse"]["Alpha"]=Math.round(Math.random()*1000);;
-        newData["Muse"]["Beta"]=Math.round(Math.random()*100);;
-        handleValue(newData);
-    }, 500);
-}
-
-export default CortexComp;
-*/
