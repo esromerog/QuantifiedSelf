@@ -17,8 +17,6 @@ var fromX, fromY;
 var toX, toY;
 var step = 2.5;
 
-
-
 const Sun = ({value}) => {
 
     //Xavier's star class

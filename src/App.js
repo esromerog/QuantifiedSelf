@@ -5,6 +5,8 @@ import './components/ui/visuals/dataManagement';
 import DataManagement from "./components/ui/visuals/dataManagement";
 import Sun from './components/visuals/sun';
 import Mirrors from "./components/visuals/mirrors";
+import Bagel from "./components/visuals/bagel";
+import AudioPlayerWithFilter from "./components/visuals/Audio_player";
 import { FullScreen, useFullScreenHandle } from 'react-full-screen'
 import { createPortal } from 'react-dom'
 
@@ -80,6 +82,8 @@ function App() {
   const visStreamFunctions = {
     "Sun Visualization": <Sun value={visParametersRef} />,
     "Abstract Colors": <Mirrors value={visParametersRef} />,
+    "Circle Visualization": <Bagel value={visParametersRef} />,
+    "Audio player": <AudioPlayerWithFilter value={visParametersRef} />,
   };
 
   const [mainMenu, setMainMenu] = useState(true);

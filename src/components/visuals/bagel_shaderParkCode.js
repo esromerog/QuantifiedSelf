@@ -1,4 +1,5 @@
-export const bagelShaderParkCode = `
+export function bagelShaderParkCode() {
+    return `
 setMaxIterations(50)
 
 //setStepSize(.1)
@@ -12,7 +13,7 @@ let attract = 0.5
 let speed = 0.3
 let nscale=0;
 let nAmplitude = 2;
-let hueOffset = 0.3;
+let hueOffset = 0;
 let rings = 1;
 let mixAmt = 1
 
@@ -48,4 +49,4 @@ color(col);
 horizon();
 mixGeo(relative)
 fractalBall()
-`;
+`};
