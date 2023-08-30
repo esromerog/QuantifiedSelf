@@ -2,6 +2,8 @@ import React, { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import Sun from '../../visuals/sun';
 import Mirrors from "../../visuals/mirrors";
+import Bagel from "../../visuals/bagel";
+import AudioPlayerWithFilter from "../../visuals/Audio_player";
 
 import RenderVisualizationCards from './viscards'
 import { FullScreen, useFullScreenHandle } from 'react-full-screen'
@@ -36,6 +38,8 @@ export default function MainVisualsWindow({visMetadata}) {
     const visStreamFunctions = {
         "Sun Visualization": <Sun value={paramsRef} />,
         "Abstract Colors": <Mirrors value={paramsRef} />,
+        "Circle Visualization": <Bagel value={paramsRef} />,
+        "Audio player": <AudioPlayerWithFilter value={paramsRef} />,
     };
 
     const fullScreenHandle = useFullScreenHandle();
