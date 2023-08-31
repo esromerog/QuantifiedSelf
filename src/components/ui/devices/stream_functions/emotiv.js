@@ -13,7 +13,7 @@ function CortexComp() {
         "clientSecret":"s5Ham3dnkkAVHjI88d64WVcZ8UUn5jJ0zi3DfbT4FAOIJgyQtZZ8HORc8VZInMqx1oJgMu9HNQzZwoGSqap9g7KSuFQN5fjSUpex9NtjVAUUfQqfC3FHG0PVvW0yZxyp",
         "debit":100
     }
-    const c=new CortexPower(user, socketUrl);
+    const c = new CortexPower(user, socketUrl);
   
     c.sub(['pow','eeg','mot']);
   
