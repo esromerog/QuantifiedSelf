@@ -15,7 +15,7 @@ function CortexComp() {
     }
     const c=new CortexPower(user, socketUrl);
   
-    c.sub(['pow','eeg']);
+    c.sub(['pow','eeg','mot']);
   
 }
 

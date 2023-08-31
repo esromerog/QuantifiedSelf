@@ -4,9 +4,15 @@
       "description": "EEG device developed by...",
       "type": "EEG device",
       "data": [
-        { "name": "Alpha", "description": "I'll write this later", "type": "EEG Metrics"},
-        { "name": "Beta", "description": "Maybe I'll also write this later", "type": "EEG Metrics"},
-        { "name": "Gyro", "description": "Gyroscope data for the EMOTIV headset", "type": "Movement"}
+        { "name": "Theta", "description": "(4-8Hz)", "type": "EEG Metrics"},
+        { "name": "Alpha", "description": "(8-12Hz)", "type": "EEG Metrics"},
+        { "name": "Low beta", "description": "(12-16Hz)", "type": "EEG Metrics"},
+        { "name": "High beta", "description": "(16-25Hz)", "type": "EEG Metrics"},
+        { "name": "Gamma", "description": "(25-45Hz)", "type": "EEG Metrics"},
+        { "name": "X", "description": "Gyroscope data for the EMOTIV headset", "type": "Movement"},
+        { "name": "Y", "description": "Gyroscope data for the EMOTIV headset", "type": "Movement"},
+        { "name": "Z", "description": "Gyroscope data for the EMOTIV headset", "type": "Movement"}
+
       ]
     }
 ]
