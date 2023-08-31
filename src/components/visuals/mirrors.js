@@ -1,10 +1,8 @@
 import { useEffect, useRef } from "react";
 import { spCode } from "./mirrors_shaderpackcode";
 import { createSculptureWithGeometry } from 'shader-park-core';
-import { Scene, BoxGeometry, SphereGeometry, Vector3, PerspectiveCamera, WebGLRenderer, Color, Clock, MeshBasicMaterial, MeshStandardMaterial, Mesh } from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-
-
+import { OrbitControls } from 'shader-park-core/node_modules/three/examples/jsm/controls/OrbitControls.js';
+import { Scene,  BoxGeometry, SphereGeometry, Vector3, PerspectiveCamera, WebGLRenderer, Color, Clock, MeshBasicMaterial, MeshStandardMaterial, Mesh } from 'shader-park-core/node_modules/three';
 
 const Mirrors = ({ value }) => {
 
@@ -60,12 +58,11 @@ const Mirrors = ({ value }) => {
       rotateSpeed: 0.5
     });
 
-    controls.enabled=false;
+    controls.enabled = false;
 
     let onWindowResize = () => {
       camera.aspect = canvas.offsetWidth / canvas.offsetHeight;
       camera.updateProjectionMatrix();
-      console.log("Resize event!")
       renderer.setSize(canvas.offsetWidth, canvas.offsetHeight);
     }
     
@@ -88,8 +85,7 @@ const Mirrors = ({ value }) => {
       renderer.clear();
       renderer.dispose();
       controls.dispose();
-      controls=null;
-    }
+    };
   }, []);
 
   // Event listeners (except for resize)

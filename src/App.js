@@ -15,6 +15,7 @@ export const allVisSources = visSourcesImport.map(
     }
   });
 
+
 function lslClient(socketUrl, audioContext) {
   const socket = new WebSocket(socketUrl)
   socket.binaryType = "arraybuffer";
@@ -37,7 +38,7 @@ function MainUI() {
   //const [field, setField]=useState();
 
   //var audioContext=new AudioContext({sampleRate: 88200});
-  lslClient("ws://localhost:8333")
+  //lslClient("ws://localhost:8333")
 
 
   if (visMetadata===undefined&&visID!="home") {
