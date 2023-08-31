@@ -1,5 +1,5 @@
 import "./App.scss";
-import React from 'react';
+import React, { useState } from 'react';
 import MainVisualsWindow from "./components/ui/visuals/mainVisuals";
 import visSourcesImport from './metadata/vis'
 import { DeviceSelectionWindow, DataManagementWindow } from "./components/ui/devices/mainDevices";
@@ -15,10 +15,30 @@ export const allVisSources = visSourcesImport.map(
     }
   });
 
+function lslClient(socketUrl, audioContext) {
+  const socket = new WebSocket(socketUrl)
+  socket.binaryType = "arraybuffer";
+  socket.addEventListener('message', (message)=>{
+      const view = new Int32Array(message.data);
+      console.log(view)
+      
+      //const audioBufferChunk=audioContext.decodeAudioData(message.data)
+      //source = audioContext.createBufferSource();
+      //source.buffer = audioBufferChunk;
+      //source.connect(audioContext.destination);
+      //source.start();
+  })
+}
+
 
 function MainUI() {
   let { visID } = useParams();
   const visMetadata = allVisSources.find(x => x.name === visID);
+  //const [field, setField]=useState();
+
+  //var audioContext=new AudioContext({sampleRate: 88200});
+  lslClient("ws://localhost:8333")
+
 
   if (visMetadata===undefined&&visID!="home") {
     return <Navigate to="/home/devices" />
