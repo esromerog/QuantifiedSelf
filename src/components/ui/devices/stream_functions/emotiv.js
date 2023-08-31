@@ -8,7 +8,7 @@ function CortexComp() {
     let socketUrl = 'wss://localhost:6868'
         // this key does not inquire for EEG raw data
     let user = {
-        "license":"",
+        "license":"d272cb40-6432-44e7-9bbd-896edf2d2df1",
         "clientId":"BY2tKexlRKRaiVt5nbixVfj4Ip42BrVW2xUmJvmL",
         "clientSecret":"s5Ham3dnkkAVHjI88d64WVcZ8UUn5jJ0zi3DfbT4FAOIJgyQtZZ8HORc8VZInMqx1oJgMu9HNQzZwoGSqap9g7KSuFQN5fjSUpex9NtjVAUUfQqfC3FHG0PVvW0yZxyp",
         "debit":100
