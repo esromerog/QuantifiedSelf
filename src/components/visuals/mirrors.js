@@ -121,6 +121,4 @@ const Mirrors = ({ value }) => {
   return <div className="h-100" ref={canvasRef} />
 };
 
-
-
 export default Mirrors;
