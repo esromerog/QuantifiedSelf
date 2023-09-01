@@ -16,6 +16,50 @@ function computePower(arr, returnRelative) {
     return powerArr
 
 }
+
+function computeRotation(arr) {
+  /**
+  * a function that takes the 'mot' stream and returns rotation radians on x,y,z
+  * there are two possible data formats based on the headset versions:
+  [
+    "COUNTER_MEMS","INTERPOLATED_MEMS",
+    "Q0","Q1","Q2","Q3",
+    "ACCX","ACCY","ACCZ",
+    "MAGX","MAGY","MAGZ"
+  ]
+  and
+  [
+    "COUNTER_MEMS","INTERPOLATED_MEMS",
+    "GYROX","GYROY","GYROZ",
+    "ACCX","ACCY","ACCZ",
+    "MAGX","MAGY","MAGZ"
+  ]  
+  
+  transformation:
+  Gyro_phy = (Gyro - 2^13) / (2^14 / 1000) 
+  ACC_phy = (ACC - 2^13) / (2^14 /16) 
+  Mag_phy = (Mag - 2^13) / (2^14 /24)
+  */
+  var rotation;
+  var type;
+  // gyros
+  if (arr.length==11) {
+    let g = arr.slice(2,5);
+    // radians per second
+    const resultArray = g.map(element => (element - 2 ** 13) / (57.29 * 2 ** 14 / 1000));
+    rotation = g;
+  //quaternions
+  } else if (arr.length==12) {
+    let q = arr.slice(2,6);
+    let quat = new Quaternion(q);
+    let euler = quat.toEuler('XYZ'); // Use the desired rotation order (e.g., 'ZYX')
+    rotation = [euler.roll, euler.pitch, euler.yaw]
+  } else {
+    //TODO: throw some error
+  }
+  return rotation;
+}
+
   //cortex stuff
 function log(message) {
     // var paragraph = document.getElementById("elementA");
@@ -426,13 +470,30 @@ class CortexPower extends Cortex {
     // Add error handling functino using parsedData to check if there's data. I could also throw a return value from the sub?
 
     manipulate(parsedData) {
+        // resolving power information
         let power = parsedData['pow'];
-        let receivingValue = computePower(power,true)[1]  //theta is 0; alpha is 1
+        let powerVector = computePower(power,true)
         let newData={
-            "Alpha":receivingValue,
-            "Beta":0,
+            "Theta":powerVector[0],
+            "Alpha":powerVector[1],
+            "Low beta":powerVector[2],
+            "High beta":powerVector[3],
+            "Gamma":powerVector[4]
         };
         store.dispatch({type:'devices/streamUpdate', payload: {device: "Emotiv", data: newData}})
+
+        // resolving raw data
+        let raw = parsedData['eeg'].slice(2,16);
+
+        // resolving motion information
+        let motion = parsedData['mot'];
+        let motionVector = computeRotation(motion);
+        let motData={
+          'X': motionVector[0],
+          'Y': motionVector[1],
+          'Z': motionVector[2]
+        }
+
     }
 
 }
