@@ -7,8 +7,8 @@ var gammaThreshold = 0.6;
 
 const AudioPlayerWithFilter = ({value}) => {
 
-  const audioRef = useRef(null);
-  const [context, setContext] = useState(null);
+  const audioRef = useRef();
+  const [context, setContext] = useState();
 
   let alphaUrl = 'https://cdn.glitch.global/5a67df53-0005-444e-a6b5-39c528cf3420/alpha.mp3?v=1689885015601';
   let betaUrl = 'https://cdn.glitch.global/5a67df53-0005-444e-a6b5-39c528cf3420/beta.mp3?v=1690921282654';
@@ -29,8 +29,9 @@ const AudioPlayerWithFilter = ({value}) => {
   const loadAudio = () => {
     if (!context) return;
 
-    //THE ALPHA AUDIO
+    // THE ALPHA AUDIO
     loadSound(alphaUrl, context, (buffer) => {
+      console.log("Alpha loaded");
       const alphaSource = context.createBufferSource();
       alphaSource.buffer = buffer;
       // Create a BiquadbassNode for the bandpass filter
@@ -44,7 +45,7 @@ const AudioPlayerWithFilter = ({value}) => {
       filter.connect(context.destination);
       // Start the first audio source
       alphaSource.start();
-      });
+    });
     
     // THE BETA AUDIO
     // Load and create the second audio buffer source
@@ -99,11 +100,12 @@ function mapRange(value, fromMin, fromMax, toMin, toMax) {
 
 function loadSound(url, context, callback) {
   var request = new XMLHttpRequest();
-  request.open('GET', url, true);
   request.responseType = 'arraybuffer';
+  request.open('GET', url, true);
 
   // Decode asynchronously
   request.onload = function () {
+    console.log(request.response)
     context.decodeAudioData(request.response, function (buffer) {
       callback(buffer);
     }, Error);

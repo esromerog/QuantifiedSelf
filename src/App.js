@@ -5,6 +5,14 @@ import visSourcesImport from './metadata/vis'
 import { DeviceSelectionWindow, DataManagementWindow } from "./components/ui/devices/mainDevices";
 import { Routes, Route, Outlet, Navigate, useParams } from 'react-router-dom';
 
+
+// Some improvements that I need to make (ASAP):
+// Add an .env file or a way to hide licenses (cough, cough, EMOTIV)
+// Maybe have the user put his license information in here (?) Otherwise do they access Cortex through our account (?)
+
+// Another useful thing is the stream selection when in the devices tabs:
+// Don't stream every variable - check which ones the user has selected to only make those available in the dropdown
+
 export const allVisSources = visSourcesImport.map(
   (visSource) => {
     return {
@@ -38,7 +46,7 @@ function MainUI() {
   //const [field, setField]=useState();
 
   //var audioContext=new AudioContext({sampleRate: 88200});
-  //lslClient("ws://localhost:8333")
+  lslClient("ws://localhost:8333")
 
 
   if (visMetadata===undefined&&visID!="home") {
