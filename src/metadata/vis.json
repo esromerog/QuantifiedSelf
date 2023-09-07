@@ -31,6 +31,14 @@
       ],
       "name": "Circle Visualization",
       "img_src": "bagel.png"
+  },
+   {
+      "properties": [
+        {"name": "X_rotation", "value": 0},
+        {"name": "Y_rotation", "value": 0},
+        {"name": "Z_rotation", "value": 0}
+      ],
+      "name": "Head Position",
+      "img_src": "bagel.png"
   }
 ]
-  
