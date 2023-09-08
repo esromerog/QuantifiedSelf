@@ -1,18 +1,19 @@
 [
     {
       "heading": "Emotiv",
-      "description": "EEG device developed by...",
+      "short_description": "The Emotiv is a consumer-grade EEG headset used for research and brain-computer interfaces, capable of reading brain signals, providing derived metrics, and tracking head movement.",
+      "description": "The Emotiv is an electroencephalography (EEG) headset that reads brain signals and sends them into a computer. This is a consumer-grade device generally used for research outside of laboratories and brain-computer interfaces (BCIs). Emotiv not only acquires the raw signals, but it also provides meaningful metrics derived from the signal. It also has motion data to track head movement.",
       "type": "EEG device",
       "data": [
-        { "name": "Theta", "description": "(4-8Hz)", "type": "EEG Metrics"},
-        { "name": "Alpha", "description": "(8-12Hz)", "type": "EEG Metrics"},
-        { "name": "Low beta", "description": "(12-16Hz)", "type": "EEG Metrics"},
-        { "name": "High beta", "description": "(16-25Hz)", "type": "EEG Metrics"},
-        { "name": "Gamma", "description": "(25-45Hz)", "type": "EEG Metrics"},
+        { "name": "Theta", "description": "Band power from (4-8Hz)", "type": "EEG Metrics"},
+        { "name": "Alpha", "description": "Band power from (8-12Hz)", "type": "EEG Metrics"},
+        { "name": "Low beta", "description": "Band power from (12-16Hz)", "type": "EEG Metrics"},
+        { "name": "High beta", "description": "Band power from (16-25Hz)", "type": "EEG Metrics"},
+        { "name": "Gamma", "description": "Band power from (25-45Hz)", "type": "EEG Metrics"},
         { "name": "Raw EEG", "description": "Raw EEG data", "type": "EEG Metrics"},
-        { "name": "X", "description": "Gyroscope data for the EMOTIV headset", "type": "Movement"},
-        { "name": "Y", "description": "Gyroscope data for the EMOTIV headset", "type": "Movement"},
-        { "name": "Z", "description": "Gyroscope data for the EMOTIV headset", "type": "Movement"}
+        { "name": "X", "description": "X-axis gyroscope data for the EMOTIV headset", "type": "Movement"},
+        { "name": "Y", "description": "Y-axis gyroscope data for the EMOTIV headset", "type": "Movement"},
+        { "name": "Z", "description": "Z-axis gyroscope data for the EMOTIV headset", "type": "Movement"}
 
       ]
     }

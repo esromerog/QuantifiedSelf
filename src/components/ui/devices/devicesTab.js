@@ -13,7 +13,7 @@ return (
         <h5 className="mb-1">{data.heading}</h5>
         <small>{data.type}</small>
         </div>
-        <p className="mb-2">{data.description}</p>
+        <p className="mb-2">{data.short_description}</p>
     </button>
 );
 }

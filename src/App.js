@@ -26,10 +26,10 @@ export const allVisSources = visSourcesImport.map(
 
 function lslClient(socketUrl, audioContext) {
   const socket = new WebSocket(socketUrl)
-  socket.binaryType = "arraybuffer";
+
   socket.addEventListener('message', (message)=>{
-      const view = new Int32Array(message.data);
-      console.log(view)
+
+      console.log(JSON.parse(message.data))
       
       //const audioBufferChunk=audioContext.decodeAudioData(message.data)
       //source = audioContext.createBufferSource();
@@ -83,3 +83,16 @@ export default function App() {
     </Routes>
   );
 }
+
+
+// Notes
+
+// To persist data in a sessionstorage, I could follow the tutorial
+// https://www.geeksforgeeks.org/how-to-persist-redux-state-in-local-storage-without-any-external-library/
+// Also featured here: https://stackoverflow.com/questions/49330546/how-to-persist-redux-state-in-the-easiest-way
+
+// It would be session storage instead of local storage though
+// To save the data from an object into a CSV, I can use papaparse
+// After papaparse, I can manually save with:
+// https://stackoverflow.com/questions/19327749/javascript-blob-filename-without-link
+

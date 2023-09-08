@@ -5,7 +5,7 @@
         {"name": "Size", "value": 0}
       ],
       "name": "Sun Visualization",
-      "description": "2D visualization of a sun rising and setting on a range of mountains. Useful to test simple parameter changes",
+      "description": "2D visualization of a sun rising and setting on a range of mountains",
       "img_src": "sun.png"
     },
     {
@@ -13,7 +13,7 @@
         {"name": "Speed Change", "value": 0}
       ],
       "name": "Abstract Colors",
-      "description": "Shader-based visualization that resembles a lava-lamp",
+      "description": "Lava-lamp visualization with a changing sphere",
       "img_src": "round.png"
     },
      {
@@ -29,7 +29,7 @@
       "properties": [
         {"name": "Circle size", "value": 0}
       ],
-      "name": "Circle Visualization",
+      "name": "Circular visualization with waves flowing through it.",
       "img_src": "bagel.png"
   }
 ]
