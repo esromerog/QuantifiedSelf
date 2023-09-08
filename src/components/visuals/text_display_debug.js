@@ -1,32 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
 
-const DisplayStrings = ({ string, devmessage }) => {
-  const [stringContent, setStringContent] = useState([]);
-  const [devContent, setDevContent] = useState([]);
-  const stringBoxRef = useRef(null);
-  const devBoxRef = useRef(null);
-
-  useEffect(() => {
-    if (string) {
-      setStringContent((prevContent) => [...prevContent, string]);
-    }
-  }, [string]);
-
-  useEffect(() => {
-    if (devmessage) {
-      setDevContent((prevContent) => [...prevContent, devmessage]);
-    }
-  }, [devmessage]);
-
+const DisplayStrings = ({value}) => {
   return (
     <div style={styles.container}>
-      <div style={styles.box} ref={stringBoxRef}>
-        {stringContent.map((item, index) => (
-          <p key={index}>{item}</p>
-        ))}
-      </div>
-      <div style={styles.box} ref={devBoxRef}>
-        {devContent.map((item, index) => (
+      <div style={styles.box}>
+        {value.current.map((item, index) => (
           <p key={index}>{item}</p>
         ))}
       </div>

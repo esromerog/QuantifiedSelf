@@ -455,7 +455,6 @@ class Cortex {
           })
       }
 
-
   }
 
 
@@ -473,14 +472,6 @@ class CortexPower extends Cortex {
         // resolving power information
         let power = parsedData['pow'];
         let powerVector = computePower(power,true)
-        let newData={
-            "Theta":powerVector[0],
-            "Alpha":powerVector[1],
-            "Low beta":powerVector[2],
-            "High beta":powerVector[3],
-            "Gamma":powerVector[4]
-        };
-        store.dispatch({type:'devices/streamUpdate', payload: {device: "Emotiv", data: newData}})
 
         // resolving raw data
         let raw = parsedData['eeg'].slice(2,16);
@@ -488,11 +479,19 @@ class CortexPower extends Cortex {
         // resolving motion information
         let motion = parsedData['mot'];
         let motionVector = computeRotation(motion);
-        let motData={
+        
+        let newData={
+          "Theta":powerVector[0],
+          "Alpha":powerVector[1],
+          "Low beta":powerVector[2],
+          "High beta":powerVector[3],
+          "Gamma":powerVector[4],
           'X': motionVector[0],
           'Y': motionVector[1],
           'Z': motionVector[2]
-        }
+        };
+
+        store.dispatch({type:'devices/streamUpdate', payload: {device: "Emotiv", data: newData}})
 
     }
 
