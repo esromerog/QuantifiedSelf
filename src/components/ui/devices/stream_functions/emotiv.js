@@ -8,12 +8,12 @@ function CortexComp() {
     let socketUrl = 'wss://localhost:6868'
         // this key does not inquire for EEG raw data
     let user = {
-        "license": process.env.REACT_APP_CORTEX_LICENSE,
+        "license":"",
         "clientId": process.env.REACT_APP_CORTEX_CLIENT_ID,
         "clientSecret": process.env.REACT_APP_CORTEX_CLIENT_SECRET,
         "debit":100
     }
-    const c = new CortexPower(user, socketUrl);
+    const c=new CortexPower(user, socketUrl);
   
     c.sub(['pow','eeg','mot']);
   

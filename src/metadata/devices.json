@@ -14,7 +14,6 @@
         { "name": "X", "description": "X-axis gyroscope data for the EMOTIV headset", "type": "Movement"},
         { "name": "Y", "description": "Y-axis gyroscope data for the EMOTIV headset", "type": "Movement"},
         { "name": "Z", "description": "Z-axis gyroscope data for the EMOTIV headset", "type": "Movement"}
-
       ]
     }
 ]

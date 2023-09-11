@@ -20,7 +20,8 @@ export const allVisSources = visSourcesImport.map(
       img_name: require(`./assets/${visSource.img_src}`),
       properties: visSource.properties
     }
-  });
+  }
+);
 
 /*
 function lslClient(socketUrl, audioContext) {
@@ -52,7 +53,6 @@ function MainUI() {
   //var audioContext=new AudioContext({sampleRate: 88200});
   //lslClient("ws://localhost:8333")
 
-
   if (visMetadata===undefined&&visID!="home") {
     return <Navigate to="/home/devices" />
   } else {
@@ -60,9 +60,9 @@ function MainUI() {
       <div className="container-fluid full-width h-100">
         <div className="row full-width h-100">
           <div className="col-5 overflow-scroll disable-scrollbar h-100">
-            <RecordComponent saveObject={saveObject} recording={recording} setRecording={setRecording} />
             <div className="vertical-spacing ms-5 me-5">
               <Outlet />
+              <div className="float-end mt-2 ms-2"><RecordComponent saveObject={saveObject} recording={recording} setRecording={setRecording} /></div>
             </div>
             {/*<div className="d-flex justify-content-end me-5">
           <button className="btn btn-link" alt="Pop into another window" onClick={()=>setToggleOtherScreen(true)}><i className="bi bi-box-arrow-up-right"></i></button></div>*/}
