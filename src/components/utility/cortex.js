@@ -474,7 +474,7 @@ class CortexPower extends Cortex {
         let powerVector = computePower(power,true)
 
         // resolving raw data
-        let raw = parsedData['eeg'].slice(2,16);
+        // let raw = parsedData['eeg'].slice(2,16);
 
         // resolving motion information
         let motion = parsedData['mot'];

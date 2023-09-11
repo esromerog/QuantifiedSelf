@@ -4,10 +4,9 @@ import MainVisualsWindow from "./components/ui/visuals/mainVisuals";
 import visSourcesImport from './metadata/vis'
 import { DeviceSelectionWindow, DataManagementWindow } from "./components/ui/devices/mainDevices";
 import { Routes, Route, Outlet, Navigate, useParams } from 'react-router-dom';
+import { RecordComponent } from "./components/ui/recording";
 
-
-// Some improvements that I need to make (ASAP):
-// Add an .env file or a way to hide licenses (cough, cough, EMOTIV)
+// Some improvements that I need to make (after env):
 // Maybe have the user put his license information in here (?) Otherwise do they access Cortex through our account (?)
 
 // Another useful thing is the stream selection when in the devices tabs:
@@ -23,7 +22,7 @@ export const allVisSources = visSourcesImport.map(
     }
   });
 
-
+/*
 function lslClient(socketUrl, audioContext) {
   const socket = new WebSocket(socketUrl)
 
@@ -38,15 +37,20 @@ function lslClient(socketUrl, audioContext) {
       //source.start();
   })
 }
+*/
 
+// Object where recording is temporarily stored (JavaScript Memory)
+const saveObject = [];
 
 function MainUI() {
   let { visID } = useParams();
   const visMetadata = allVisSources.find(x => x.name === visID);
+  const [recording, setRecording] = useState(false);
+  
   //const [field, setField]=useState();
 
   //var audioContext=new AudioContext({sampleRate: 88200});
-  lslClient("ws://localhost:8333")
+  //lslClient("ws://localhost:8333")
 
 
   if (visMetadata===undefined&&visID!="home") {
@@ -56,6 +60,7 @@ function MainUI() {
       <div className="container-fluid full-width h-100">
         <div className="row full-width h-100">
           <div className="col-5 overflow-scroll disable-scrollbar h-100">
+            <RecordComponent saveObject={saveObject} recording={recording} setRecording={setRecording} />
             <div className="vertical-spacing ms-5 me-5">
               <Outlet />
             </div>
