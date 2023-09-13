@@ -5,7 +5,7 @@
         {"name": "Size", "value": 0}
       ],
       "name": "Sun Visualization",
-      "description": "2D visualization of a sun rising and setting on a range of mountains",
+      "description": "2D visualization of a sun rising and setting on a range of mountains. Useful to test simple parameter changes",
       "img_src": "sun.png"
     },
     {
@@ -13,7 +13,7 @@
         {"name": "Speed Change", "value": 0}
       ],
       "name": "Abstract Colors",
-      "description": "Lava-lamp visualization with a changing sphere",
+      "description": "Shader-based visualization that resembles a lava-lamp",
       "img_src": "round.png"
     },
      {
@@ -29,7 +29,7 @@
       "properties": [
         {"name": "Circle size", "value": 0}
       ],
-      "name": "Circular visualization with waves flowing through it.",
+      "name": "Circle Visualization",
       "img_src": "bagel.png"
   },
    {
@@ -39,6 +39,27 @@
         {"name": "Z_rotation", "value": 0}
       ],
       "name": "Head Position",
-      "img_src": "bagel.png"
+      "img_src": "rotation.png"
+  },
+  {
+      "properties": [
+        {"name": "signal1", "value": 0},
+        {"name": "signal2", "value": 0},
+        {"name": "signal3", "value": 0},
+        {"name": "signal4", "value": 0},
+        {"name": "signal5", "value": 0},
+        {"name": "signal6", "value": 0},
+        {"name": "signal7", "value": 0},
+        {"name": "signal8", "value": 0},
+        {"name": "signal9", "value": 0},
+        {"name": "signal10", "value": 0},
+        {"name": "signal11", "value": 0},
+        {"name": "signal12", "value": 0},
+        {"name": "signal13", "value": 0},
+        {"name": "signal14", "value": 0}
+
+      ],
+      "name": "Signal View",
+      "img_src": "signal.png"
   }
 ]

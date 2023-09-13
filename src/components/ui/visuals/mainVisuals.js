@@ -5,6 +5,8 @@ import Mirrors from "../../visuals/mirrors";
 import Bagel from "../../visuals/bagel";
 import AudioPlayerWithFilter from "../../visuals/Audio_player";
 import Head from "../../visuals/head_position";
+import SignalView from "../../visuals/signal_display";
+
 
 import RenderVisualizationCards from './viscards'
 import { FullScreen, useFullScreenHandle } from 'react-full-screen'
@@ -42,7 +44,7 @@ export default function MainVisualsWindow({visMetadata}) {
         "Circle Visualization": <Bagel value={paramsRef} />,
         "Audio player": <AudioPlayerWithFilter value={paramsRef} />,
         "Head Position": <Head value={paramsRef} />,
-
+        "Signal View": <SignalView value={paramsRef} />,
     };
 
     const fullScreenHandle = useFullScreenHandle();

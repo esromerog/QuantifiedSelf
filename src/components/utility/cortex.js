@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
+import Quaternion from 'quaternion';
 
-function computePower(arr, returnRelative) {
+function computePower(arr) {
   /**
   * a function that returns the avg power for each frequency band, with the option of returning relative power.
   */
@@ -14,7 +15,6 @@ function computePower(arr, returnRelative) {
     powerArr[k] /= numChn;
   }
     return powerArr
-
 }
 
 function computeRotation(arr) {
@@ -47,18 +47,19 @@ function computeRotation(arr) {
     let g = arr.slice(2,5);
     // radians per second
     const resultArray = g.map(element => (element - 2 ** 13) / (57.29 * 2 ** 14 / 1000));
-    rotation = g;
   //quaternions
   } else if (arr.length==12) {
     let q = arr.slice(2,6);
     let quat = new Quaternion(q);
-    let euler = quat.toEuler('XYZ'); // Use the desired rotation order (e.g., 'ZYX')
-    rotation = [euler.roll, euler.pitch, euler.yaw]
+    let euler = quat.toEuler('XYZ'); // Use the desired rotation order (e.g., 'XYZ')
+    // rotation = [euler.roll, euler.pitch, euler.yaw];
+    rotation = euler;
   } else {
-    //TODO: throw some error
+    rotatio = [-1,-1,-1]; //DEBUG
   }
   return rotation;
 }
+
 
   //cortex stuff
 function log(message) {
@@ -460,39 +461,64 @@ class Cortex {
 
 
 import store from '../../store';
-
+//initialize the output
+let powerVector = [0,0,0,0,0];
+let motionVector = [0,0,0];
+let rawVector = [0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+let time = 0;
+let chns = ['AF3', 'F7', 'F3', 'FC5', 'T7', 'P7', 'O1', 'O2', 'P8', 'T8', 'FC6', 'F4', 'F8', 'AF4'];
 class CortexPower extends Cortex {
     
     constructor(user, socketUrl) {
-        super(user, socketUrl);
+      super(user, socketUrl);
     }
 
     // Add error handling functino using parsedData to check if there's data. I could also throw a return value from the sub?
-
+    // 'eeg' contains ['COUNTER', 'INTERPOLATED', 'AF3', 'F7', 'F3', 'FC5', 'T7', 'P7', 'O1', 'O2', 'P8', 'T8', 'FC6', 'F4', 'F8', 'AF4', 'RAW_CQ', 'MARKER_HARDWARE', 'MARKERS']
     manipulate(parsedData) {
-        // resolving power information
-        let power = parsedData['pow'];
-        let powerVector = computePower(power,true)  //theta is 0; alpha is 1
+        // resolving power data
+        try {
+          let power = parsedData['pow'];
+          powerVector = computePower(power) 
+        } catch (error) {
+        }
+
+        // resolving motion data
+        try {
+          let motion = parsedData['mot'];
+          motionVector = computeRotation(motion);
+        } catch (error) {
+        }
+
+        // resolving raw data
+        try {
+          let raw = parsedData['eeg'];
+          time = parsedData['time']; // take timestamp whenever eeg is updated, bc it's the fastest sampled data
+          rawVector = raw.slice(2,-3);
+        } catch (error) {
+        }
+
+        // create the dictionary
         let newData={
             "Theta":powerVector[0],
             "Alpha":powerVector[1],
             "Low beta":powerVector[2],
             "High beta":powerVector[3],
-            "Gamma":powerVector[4]
+            "Gamma":powerVector[4],
+            'X': motionVector[0],
+            'Y': motionVector[1],
+            'Z': motionVector[2],
+            'time': time,
         };
-        store.dispatch({type:'devices/streamUpdate', payload: {device: "Emotiv", data: newData}})
 
-        // resolving motion information
-        let motion = parsedData['mot'];
-        let motionVector = computeRotation(motion);
-        let motData={
-          'X': motionVector[0],
-          'Y': motionVector[1],
-          'Z': motionVector[2]
+        //append the raw channels
+        for (let i = 0; i < chns.length; i++) {
+          let key = chns[i];
+          let val = rawVector[i];
+          newData[key] = val;
         }
-
+        store.dispatch({type:'devices/streamUpdate', payload: {device: "Emotiv", data: newData}})
     }
-
 }
 
 export default CortexPower;
