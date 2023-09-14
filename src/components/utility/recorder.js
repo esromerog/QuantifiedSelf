@@ -13,9 +13,9 @@ function saveToObject(saveObject) {
     saveObject.push(store.getState().deviceStream);
 
     // Code to save it to local storage (in case this works better for MindHive)
-    // const data = sessionStorage.getItem("data");
+    // const data = JSON.parse(sessionStorage.getItem("data"));
     // data.push(store.getState().deviceStream)
-    // sessionStorage.setItem("data", data);
+    // sessionStorage.setItem("data", JSON.stringify(data));
     
 }
 
@@ -51,11 +51,11 @@ function autoCSVDownload(saveObject) {
     const finalObject = {}
     const currentDate = new Date();
     const dateString = currentDate.fileName();
+    // const saveObject = JSON.parse(sessionStorage.getItem("data"));
 
     for (const key in saveObject[0]) {
         finalObject[key] = saveObject.map((data)=>data[key]);
         const json = JSON.stringify(finalObject[key]);
-        console.log(json);
         const blob = new Blob([Papa.unparse(json)], {type: "text/csv"});
         const url = window.URL.createObjectURL(blob);
         a.href = url;
@@ -73,7 +73,9 @@ export function stopRecording(unsub, saveObject) {
     unsub.dispose();
 
     autoCSVDownload(saveObject);
-    saveObject = [];
+    while(saveObject.length > 0) {
+        saveObject.pop();
+    }
 
     // sessionStorage.removeItem("data");
 }

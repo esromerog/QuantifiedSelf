@@ -1,5 +1,5 @@
 import "./App.scss";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import MainVisualsWindow from "./components/ui/visuals/mainVisuals";
 import visSourcesImport from './metadata/vis'
 import { DeviceSelectionWindow, DataManagementWindow } from "./components/ui/devices/mainDevices";
@@ -47,6 +47,7 @@ function MainUI() {
   let { visID } = useParams();
   const visMetadata = allVisSources.find(x => x.name === visID);
   const [recording, setRecording] = useState(false);
+  
   
   //const [field, setField]=useState();
 

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect} from 'react';
 
 import { subToStore, stopRecording } from '../utility/recorder';
 
@@ -18,7 +18,18 @@ export function RecordComponent({recording, setRecording, saveObject}) {
             setRecording(false);
         }
     }
-
+    /*
+    Code used to save it in session storage. This useEffect aims to prevent sessionStorage persisting after the component is unmounted.
+    This may be used anywhere that is only loaded/mounted once in the webpage to clear the sessionstorage.
+    
+    useEffect(()=>{
+        sessionStorage.setItem("data", JSON.stringify([]))
+        return () => {
+          sessionStorage.removeItem("data");
+        }
+    }, [])
+    */
+   
     return (
         <button className={buttonClassName} onClick={handleClick}>
             <i className={iconClassName}> {recordingText}</i>
