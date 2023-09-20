@@ -6,6 +6,7 @@ import Bagel from "../../visuals/bagel";
 import AudioPlayerWithFilter from "../../visuals/Audio_player";
 import Head from "../../visuals/head_position";
 import SignalView from "../../visuals/signal_display";
+import PowerBars from "../../visuals/relative_power";
 
 
 import RenderVisualizationCards from './viscards'
@@ -45,6 +46,7 @@ export default function MainVisualsWindow({visMetadata}) {
         "Audio player": <AudioPlayerWithFilter value={paramsRef} />,
         "Head Position": <Head value={paramsRef} />,
         "Signal View": <SignalView value={paramsRef} />,
+        "Power Bars": <PowerBars value={paramsRef} />
     };
 
     const fullScreenHandle = useFullScreenHandle();
