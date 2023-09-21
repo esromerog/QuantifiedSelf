@@ -38,7 +38,6 @@ export function FileUploader() {
         let i = 0;
 
         // const device = streamFile[0].device
-        // const 
         // delete streamFile[0].device
         const device = streamingDevice.heading;
         const samplingRate = devicesRaw.find(({heading}) => heading === device).sampling_rate;
@@ -54,7 +53,7 @@ export function FileUploader() {
                 console.log(device);
                 dispatch({type: 'devices/statesUpdate', payload: device});
             }
-        }, 1000);
+        }, 1000/samplingRate);
     }
 
 
