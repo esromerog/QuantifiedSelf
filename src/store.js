@@ -1,5 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { createStore } from "redux";
+import { createStore, applyMiddleware, compose} from "redux";
 import devicesRaw from './metadata/devices'
 
 const initialState = {
@@ -52,8 +52,8 @@ function rootReducer(state=initialState, action) {
             return state
     }
 }
-
+const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 // const store = configureStore({reducer: rootReducer});
-const store = createStore(rootReducer);
+const store = createStore(rootReducer, composeEnhancers(applyMiddleware()));
 
 export default store;

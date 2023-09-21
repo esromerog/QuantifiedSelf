@@ -5,11 +5,14 @@ import visSourcesImport from './metadata/vis'
 import { DeviceSelectionWindow, DataManagementWindow } from "./components/ui/devices/mainDevices";
 import { Routes, Route, Outlet, Navigate, useParams } from 'react-router-dom';
 import { RecordComponent } from "./components/ui/recording";
+import { FileUploader } from "./components/ui/devices/file_upload";
+
 
 // Some improvements that I need to make (after env):
 // Maybe have the user put his license information in here (?) Otherwise do they access Cortex through our account (?)
 
 // Another useful thing is the stream selection when in the devices tabs:
+// Store data mappings on the store
 // Don't stream every variable - check which ones the user has selected to only make those available in the dropdown
 
 export const allVisSources = visSourcesImport.map(
@@ -63,7 +66,10 @@ function MainUI() {
           <div className="col-5 overflow-scroll disable-scrollbar h-100">
             <div className="vertical-spacing ms-5 me-5">
               <Outlet />
-              <div className="float-end mt-2 ms-2"><RecordComponent saveObject={saveObject} recording={recording} setRecording={setRecording} /></div>
+              <div className="float-end mt-2 ms-2">
+                <RecordComponent saveObject={saveObject} recording={recording} setRecording={setRecording} />
+                <FileUploader />
+              </div>
             </div>
             {/*<div className="d-flex justify-content-end me-5">
           <button className="btn btn-link" alt="Pop into another window" onClick={()=>setToggleOtherScreen(true)}><i className="bi bi-box-arrow-up-right"></i></button></div>*/}

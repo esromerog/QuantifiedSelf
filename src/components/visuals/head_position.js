@@ -46,9 +46,9 @@ const Head = ({value}) => {
         p.draw = () => {
           p.background(40);
           //my box code:
-          p.rotateX(value.current['X_rotation']);
-          p.rotateY(value.current['Y_rotation']);
-          p.rotateZ(value.current['Z_rotation']);
+          p.rotateX(value.current['Rotation']['x']);
+          p.rotateY(value.current['Rotation']['y']);
+          p.rotateZ(value.current['Rotation']['z']);
           p.box(100, 100, 100);
         };
 

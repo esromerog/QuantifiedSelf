@@ -228,15 +228,17 @@ function DataAutoSlider({ dataMappings, subparameter, parameter, dropDown }) {
 }
 
 
-function ParameterDropDown({ claves, parameter, subparameter, dataMappings, setDataMappings, displayName}) {
+function ParameterDropDown({ claves, parameter, subparameter, dataMappings, setDataMappings, displayName } ) {
 
     
     const suggestedClass = (option) => {
         // Checks to see if the parameter has a suggested class. If that suggested class is equal to the option, changes styling.
-        if ('suggested' in parameter) {
-            return !(parameter.suggested === option) ? "dropdown-item" : "dropdown-item text-primary";
+        if ('suggested' in parameter && parameter.suggested === option) {
+            return "dropdown-item text-primary";
+        } else if (subparameter!==undefined && 'suggested' in subparameter && parameter.suggested === option) {
+            return "dropdown-item text-primary";
         } else {
-            return "dropdown-item"
+            return "dropdown-item";
         }
     }
 

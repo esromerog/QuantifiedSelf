@@ -16,7 +16,7 @@ export function DeviceSelectionWindow() {
     const mainMenu = (visID === "home")?true:false;
     
     const deviceStreamFunctions = {
-        Emotiv: <Emotiv />,
+        "EMOTIV": <Emotiv />,
     };
 
     return (

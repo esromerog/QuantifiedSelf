@@ -55,6 +55,9 @@ function autoCSVDownload(saveObject) {
 
     for (const key in saveObject[0]) {
         finalObject[key] = saveObject.map((data)=>data[key]);
+        // finalObject[key][0]["Device"] = key;
+        // finalObject[key] = finalObject[key].map((data)=>data[key]=)
+        // finalObject[key][0]["Device"] = key;
         const json = JSON.stringify(finalObject[key]);
         const blob = new Blob([Papa.unparse(json)], {type: "text/csv"});
         const url = window.URL.createObjectURL(blob);

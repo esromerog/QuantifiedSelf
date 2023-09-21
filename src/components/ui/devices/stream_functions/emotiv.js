@@ -3,6 +3,7 @@ import React, {useState} from 'react';
 import Modal from 'react-bootstrap/Modal';
 import { useDispatch, useSelector } from 'react-redux';
 
+
 // Actual connection logic
 function CortexComp() {
     let socketUrl = 'wss://localhost:6868'
@@ -37,8 +38,8 @@ export function Emotiv() {
         setConnText({text:"Attempting connection ...", type:"text-warning"});
         setDisabled(true);
         setTimeout(() => {
-            if (deviceStreamRef.current["Emotiv"]!==undefined) {
-                dispatch({type: 'devices/statesUpdate', payload: "Emotiv"});
+            if (deviceStreamRef.current["EMOTIV"]!==undefined) {
+                dispatch({type: 'devices/statesUpdate', payload: "EMOTIV"});
                 setConnText({text:"", type:""});
             } else {
                 setConnText({text:"Unable to connect", type:"text-danger"});
@@ -50,7 +51,7 @@ export function Emotiv() {
     return (
         <Modal.Footer className="d-flex justify-content-between">
             <p className={connText.type}>{connText.text}</p>
-            {(!deviceStates["Emotiv"])?
+            {(!deviceStates["emotiv"])?
             (<button type="button" className="btn btn-outline-dark" onClick={handleActive} disabled={disabled}><i className="bi bi-bluetooth me-2"></i>Connect</button>):
             (<div className="text-success mt-1 mb-1">Connected</div>)}
         </Modal.Footer>
