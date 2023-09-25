@@ -66,8 +66,8 @@ const PowerBars = ({value}) => {
           p.fill(0);
           p.textSize(20);
           p.text("Relative Power Values", width/2+marginLeft, marginTop/2);
-          let values = Object.values(value.current);
-          let sum = values.reduce((acc, currentValue) => acc + currentValue, 0);
+          //let values = Object.values(value.current);
+          // let sum = values.reduce((acc, currentValue) => acc + currentValue, 0);
           /*
           * axes
           */
@@ -111,7 +111,7 @@ const PowerBars = ({value}) => {
               p.text(xlabels[t], vert_x+graphWidth*(1/xlabels.length*(t+0.5)), vert_y2+20);
               p.fill(colors[t]);
               let barwidth = graphWidth*1/xlabels.length*2/4;
-              p.rect(vert_x+graphWidth*(1/xlabels.length*t)+1/2*barwidth, vert_y2, barwidth, -p.map(value.current[keys[t]]/(sum),0,1,0,vert_y2-vert_y1));
+              p.rect(vert_x+graphWidth*(1/xlabels.length*t)+1/2*barwidth, vert_y2, barwidth, -p.map(value.current[keys[t]],0,1,0,vert_y2-vert_y1));
               p.pop();
               }
           /*
@@ -133,13 +133,13 @@ const PowerBars = ({value}) => {
 
         };
 
-        p.mousePressed = () => {
-          let ind = getMouseLabel(p.mouseX, p.mouseY);
-          if (ind!=-1) {
-            ts_key = xlabels[ind];
-          }
-          return false
-        };
+        // p.mousePressed = () => {
+        //   let ind = getMouseLabel(p.mouseX, p.mouseY);
+        //   if (ind!=-1) {
+        //     ts_key = xlabels[ind];
+        //   }
+        //   return false
+        // };
 
         function getMouseLabel(x,y) { // given a mouse location, return the area it is in
           for (let t=0; t<5; t++) {
