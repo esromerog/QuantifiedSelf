@@ -46,7 +46,6 @@ const PowerBars = ({value}) => {
         let width = canvasRef.current.offsetWidth;
         let height = canvasRef.current.offsetHeight;
         let ts = [];
-        // let ts_key = 'val1';
         let ts_key = 'time series';
         var keys = ['val1','val2','val3','val4','val5'];
         var xlabels = ['Theta','Alpha',"Low beta","High beta","Gamma"]; //data for the x axis
@@ -62,8 +61,8 @@ const PowerBars = ({value}) => {
         let vert_x = marginLeft+1/16*width;
         let vert_y1 = marginTop-1/20*height;  //up
         let vert_y2 = marginTop+1/20*height+graphHeight;  //down
-        let graphOffset = 0.2*height+graph2Height;
-        let secondGraphShrink = 0.8;
+        let graphOffset = 0.17*height+graph2Height;
+        let secondGraphShrink = 0.75;
 
         p.setup = () => {
           p.createCanvas(canvasRef.current.offsetWidth, canvasRef.current.offsetHeight);
@@ -133,7 +132,7 @@ const PowerBars = ({value}) => {
           let lower = secondGraphShrink*vert_y2+graphOffset;  //down
 
           // time series
-          ts.push(value.current[ts_key]); //todo
+          ts.push(divideIfNotZero(value.current[ts_key],sum)); //todo
           if (ts.length > graphWidth) {
             ts.shift();
           }

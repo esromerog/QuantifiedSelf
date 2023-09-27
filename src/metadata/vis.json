@@ -54,6 +54,6 @@
         {"name": "time series", "value": 0}
       ],
       "name": "Power Bars",
-      "img_src": "signal.png"
+      "img_src": "power.png"
   }
 ]
