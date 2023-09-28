@@ -45,7 +45,7 @@
         {"name": "time series", "value": 0}
       ],
       "name": "Power Bars",
-      "img_src": "signal.png"
+      "img_src": "power.png"
   },
   {
     "properties": [
@@ -80,6 +80,6 @@
         {"name": "val5", "value": 0}
       ],
       "name": "Flower",
-      "img_src": "power.png"
+      "img_src": "flower.png"
   }
 ]
