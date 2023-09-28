@@ -3,13 +3,9 @@ import { createStore, applyMiddleware, compose} from "redux";
 import devicesRaw from './metadata/devices'
 
 const initialState = {
-    deviceStates: devicesRaw.reduce((acc, obj) => {
-        const deviceName = obj.heading;
-        acc[deviceName] = false;
-        return acc
-      }, {}),
     params: {},
-    deviceStream: {},
+    dataStream: {},
+    deviceMeta: {},
 };
 
 // React Redux Store to manage the data that moves throghout the entire app
@@ -25,27 +21,51 @@ function rootReducer(state=initialState, action) {
             return {...state,
                 params: newData
             }
+
         case 'params/set':
-            // Logic to handle parameter updates
+            // Logic to handle initializing parameters
             return {...state,
                 params: action.payload,
             }
 
-        case 'devices/statesUpdate':
-            // Logic to handle device states updates
-            const newDevices={...state.deviceStates}
-            newDevices[action.payload]=!newDevices[action.payload];
-            return {...state,
-                deviceStates: newDevices
+        case 'devices/create':
+            // Logic to handle creation of a new device
+            return {...state,
+                deviceMeta: {
+                    ...state.deviceMeta,
+                    [action.payload.id]: action.payload.metadata
+                },
+                dataStream: {
+                    ...state.dataStream,
+                    [action.payload.id]: {}
+                }
             }
+
+
+        case 'devices/updateMetadata': 
+            // This logic is especially useful in device that may disconnect like the emotiv
+            // It is also useful for handling pre-recorded files
+
+            return {...state,
+                deviceMeta: {
+                    ...state.deviceMeta,
+                    [action.payload.id]: {
+                        ...state.deviceMeta[action.payload.id],
+                        [action.payload.field]: action.payload.data
+                    }
+                }
+            }
+
+        case 'devices/updateMappings':
+            // Track the parameters to which a device is mapped and update them
 
         case 'devices/streamUpdate':
             // Logic to handle device stream updates
 
             return {...state,
-                deviceStream: {
-                    ...state.deviceStream,
-                    [action.payload.device]: action.payload.data
+                dataStream: {
+                    ...state.dataStream,
+                    [action.payload.id]: action.payload.data
                 }
             }
         default:

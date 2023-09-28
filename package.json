@@ -4,6 +4,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@babel/parser": "^7.23.0",
+    "@babel/traverse": "^7.23.0",
+    "@codesandbox/sandpack-react": "^2.8.0",
+    "@monaco-editor/react": "^4.5.2",
     "@p5-wrapper/react": "github:P5-wrapper/react",
     "@react-three/fiber": "^8.13.6",
     "@reduxjs/toolkit": "^1.9.5",
@@ -15,6 +19,7 @@
     "bootstrap": "^5.3.1",
     "bootstrap-icons": "^1.10.5",
     "install": "^0.13.0",
+    "monaco-jsx-highlighter": "^2.0.4",
     "npm": "^9.8.1",
     "p5": "^1.7.0",
     "papaparse": "^5.4.1",
@@ -29,6 +34,7 @@
     "react-router-dom": "^6.15.0",
     "react-scripts": "^5.0.1",
     "redux": "^4.2.1",
+    "reselect": "^4.1.8",
     "shader-park-core": "^0.1.41",
     "web-vitals": "^2.1.4"
   },

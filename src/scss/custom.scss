@@ -26,6 +26,11 @@ html {
     background-color: white;
 }
 
+div.code-editor {
+    position: fixed;
+    height: 100%;
+    width: 100%;
+}
 
 .vertical-spacing {
     margin-top: 25vh;

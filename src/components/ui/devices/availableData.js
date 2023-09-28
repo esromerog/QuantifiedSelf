@@ -4,6 +4,7 @@ import Overlay from 'react-bootstrap/Overlay';
 import Tooltip from 'react-bootstrap/Tooltip';
 import { useSelector } from 'react-redux';
 import devicesRaw from '../../../metadata/devices';
+import { selectDevices } from './mainDevices';
 
 const devices = devicesRaw;
 
@@ -32,24 +33,23 @@ function PopupItem({item}) {
 function DataCards({source, groupData}) {
 
     const dataArray=[];
+
     function appendToArray(value, info) {
-        const datatoAppend=info.find(x=>x.heading===value).data.map((obj)=>{
+        const datatoAppend=info.find(x => x.heading===value).data.map((obj)=>{
                 obj["source"]=value;
                 return obj;
             });
         return datatoAppend;
     }
 
-    for (const valor in source) {
-        if (source[valor]) {
-            dataArray.push(appendToArray(valor, devices));
-        }
+    for (const valor of source) {
+        dataArray.push(appendToArray(valor, devices));
     }
+
     const showData=dataArray.flat();
 
     // Group data by type if it's defined
     if (groupData!==undefined) {
-        
         const groupedData=showData.reduce(function(rv, x) {
             (rv[x["type"]] = rv[x["type"]] || []).push(x);
             return rv;
@@ -88,11 +88,18 @@ function DataCards({source, groupData}) {
     }
 }
 
-
-
 export default function AvailableDataInformation() {
     
-    const source=useSelector(state=>state.deviceStates); // Device states
+    const dataStream=useSelector(selectDevices); // Gets active devices
+
+    const source = devicesRaw.reduce((acc, data) => {
+        const foundItems = dataStream.filter(value => data.heading.includes(value));
+        if (foundItems.length > 0) {
+          acc.push(data.heading);
+        }
+        return acc; // Always return the accumulator
+      }, []);
+    console.log(source);
 
     // Generate updatable DataCards as new devices become active
     const [dataCard, updateDataCard]=useState(<DataCards source={source}/>);
@@ -106,7 +113,7 @@ export default function AvailableDataInformation() {
 }
 
 
-export function ModalDataInformation({source, popupInfo, groupData}) {
+export function ModalDataInformation({source, groupData}) {
 
     // Generate static DataCards when the component mounts
     const dataCard=<DataCards source={source} groupData={groupData}/>;

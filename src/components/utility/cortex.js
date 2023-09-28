@@ -517,7 +517,7 @@ class CortexPower extends Cortex {
           let val = rawVector[i];
           newData[key] = val;
         }
-        store.dispatch({type:'devices/streamUpdate', payload: {device: "EMOTIV", data: newData}})
+        store.dispatch({type:'devices/streamUpdate', payload: {id: "EMOTIV", data: newData}})
     }
 }
 

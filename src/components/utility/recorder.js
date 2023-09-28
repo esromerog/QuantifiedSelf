@@ -5,16 +5,11 @@ import Papa from 'papaparse';
 
 
 function saveToObject(saveObject) {
-    // Function to save the React store to an object
-    // If I wanted to use session storage look at:
-    // https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage
-    // https://www.geeksforgeeks.org/how-to-persist-redux-state-in-local-storage-without-any-external-library/
-
-    saveObject.push(store.getState().deviceStream);
+    saveObject.push(store.getState().dataStream);
 
     // Code to save it to local storage (in case this works better for MindHive)
     // const data = JSON.parse(sessionStorage.getItem("data"));
-    // data.push(store.getState().deviceStream)
+    // data.push(store.getState().dataStream)
     // sessionStorage.setItem("data", JSON.stringify(data));
     
 }

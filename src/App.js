@@ -5,8 +5,8 @@ import visSourcesImport from './metadata/vis'
 import { DeviceSelectionWindow, DataManagementWindow } from "./components/ui/devices/mainDevices";
 import { Routes, Route, Outlet, Navigate, useParams } from 'react-router-dom';
 import { RecordComponent } from "./components/ui/recording";
-import { FileUploader } from "./components/ui/devices/file_upload";
 
+// I could deploy to Netlify - https://www.geeksforgeeks.org/how-to-deploy-react-app-on-netlify-using-github/
 
 // Some improvements that I need to make (after env):
 // Maybe have the user put his license information in here (?) Otherwise do they access Cortex through our account (?)
@@ -26,24 +26,7 @@ export const allVisSources = visSourcesImport.map(
   }
 );
 
-/*
-function lslClient(socketUrl, audioContext) {
-  const socket = new WebSocket(socketUrl)
-
-  socket.addEventListener('message', (message)=>{
-
-      console.log(JSON.parse(message.data))
-      
-      //const audioBufferChunk=audioContext.decodeAudioData(message.data)
-      //source = audioContext.createBufferSource();
-      //source.buffer = audioBufferChunk;
-      //source.connect(audioContext.destination);
-      //source.start();
-  })
-}
-*/
-
-// Object where recording is temporarily stored (JavaScript Memory)
+// Object where recording is temporarily stored
 const saveObject = [];
 
 function MainUI() {
@@ -51,12 +34,6 @@ function MainUI() {
   const visMetadata = allVisSources.find(x => x.name === visID);
   const [recording, setRecording] = useState(false);
   
-  
-  //const [field, setField]=useState();
-
-  //var audioContext=new AudioContext({sampleRate: 88200});
-  //lslClient("ws://localhost:8333")
-
   if (visMetadata===undefined&&visID!="home") {
     return <Navigate to="/home/devices" />
   } else {
@@ -66,10 +43,7 @@ function MainUI() {
           <div className="col-5 overflow-scroll disable-scrollbar h-100">
             <div className="vertical-spacing ms-5 me-5">
               <Outlet />
-              <div className="float-end mt-2 ms-2">
-                <RecordComponent saveObject={saveObject} recording={recording} setRecording={setRecording} />
-                <FileUploader />
-              </div>
+              <RecordComponent saveObject={saveObject} recording={recording} setRecording={setRecording} /> 
             </div>
             {/*<div className="d-flex justify-content-end me-5">
           <button className="btn btn-link" alt="Pop into another window" onClick={()=>setToggleOtherScreen(true)}><i className="bi bi-box-arrow-up-right"></i></button></div>*/}

@@ -54,5 +54,29 @@
       ],
       "name": "Power Bars",
       "img_src": "signal.png"
+  },
+  {
+    "properties": [
+      {
+        "name": "Sun Position",
+        "value": [
+          {
+            "name": "x",
+            "value": 0
+          },
+          {
+            "name": "y",
+            "value": 0
+          }
+        ]
+      },
+      {
+        "name": "Size",
+        "value": 0
+      }
+    ],
+    "name": "Custom",
+    "description": "2D visualization of a sun rising and setting on a range of mountains. Useful to test simple parameter changes",
+    "img_src": "sun.png"
   }
 ]
