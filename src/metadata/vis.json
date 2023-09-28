@@ -70,7 +70,6 @@
     "name": "Custom",
     "description": "2D visualization of a sun rising and setting on a range of mountains. Useful to test simple parameter changes",
     "img_src": "sun.png"
-      "img_src": "power.png"
   },
   {
       "properties": [
