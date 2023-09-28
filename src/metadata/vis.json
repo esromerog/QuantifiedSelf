@@ -3,16 +3,7 @@
     "properties": [
       {
         "name": "Sun Position",
-        "value": [
-          {
-            "name": "x",
-            "value": 0
-          },
-          {
-            "name": "y",
-            "value": 0
-          }
-        ]
+        "value": 0
       },
       {
         "name": "Size",
