@@ -3,16 +3,7 @@
     "properties": [
       {
         "name": "Sun Position",
-        "value": [
-          {
-            "name": "x",
-            "value": 0
-          },
-          {
-            "name": "y",
-            "value": 0
-          }
-        ]
+        "value": 0
       },
       {
         "name": "Size",
@@ -50,7 +41,8 @@
         {"name": "val2", "value": 0},
         {"name": "val3", "value": 0},
         {"name": "val4", "value": 0},
-        {"name": "val5", "value": 0}
+        {"name": "val5", "value": 0},
+        {"name": "time series", "value": 0}
       ],
       "name": "Power Bars",
       "img_src": "signal.png"
@@ -78,5 +70,17 @@
     "name": "Custom",
     "description": "2D visualization of a sun rising and setting on a range of mountains. Useful to test simple parameter changes",
     "img_src": "sun.png"
+      "img_src": "power.png"
+  },
+  {
+      "properties": [
+        {"name": "val1", "value": 0},
+        {"name": "val2", "value": 0},
+        {"name": "val3", "value": 0},
+        {"name": "val4", "value": 0},
+        {"name": "val5", "value": 0}
+      ],
+      "name": "Flower",
+      "img_src": "power.png"
   }
 ]

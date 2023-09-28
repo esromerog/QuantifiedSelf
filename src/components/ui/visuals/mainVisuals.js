@@ -7,6 +7,7 @@ import AudioPlayerWithFilter from "../../visuals/Audio_player";
 import Head from "../../visuals/head_position";
 import SignalView from "../../visuals/signal_display";
 import PowerBars from "../../visuals/relative_power";
+import Flower from "../../visuals/flower";
 
 
 import RenderVisualizationCards from './viscards'
@@ -371,7 +372,8 @@ export default function MainVisualsWindow({ visMetadata }) {
         "Head Position": <Head value={paramsRef} />,
         "Signal View": <SignalView value={paramsRef} />,
         "Power Bars": <PowerBars value={paramsRef} />,
-        "Custom": <P5Visuals value={paramsRef} code={code}/>
+        "Custom": <P5Visuals value={paramsRef} code={code}/>,
+        "Flower": <Flower value={paramsRef} />
     };
 
     const fullScreenHandle = useFullScreenHandle();

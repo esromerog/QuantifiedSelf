@@ -32,13 +32,21 @@ function P5Wrapper({sketch, params}) {
 
 }
 
+function divideIfNotZero(numerator, denominator) {
+  if (denominator === 0 || isNaN(denominator)) {
+        return 0;
+  }
+  else {
+        return numerator / denominator;
+  }
+}
 
 const PowerBars = ({value}) => {
      const Sketch = (p, value, canvasRef) => {
         let width = canvasRef.current.offsetWidth;
         let height = canvasRef.current.offsetHeight;
         let ts = [];
-        let ts_key = 'val1';
+        let ts_key = 'time series';
         var keys = ['val1','val2','val3','val4','val5'];
         var xlabels = ['Theta','Alpha',"Low beta","High beta","Gamma"]; //data for the x axis
         var colors = ["#f9b820","#f9b820","#f9b820","#f9b820","#f9b820"];
@@ -53,8 +61,8 @@ const PowerBars = ({value}) => {
         let vert_x = marginLeft+1/16*width;
         let vert_y1 = marginTop-1/20*height;  //up
         let vert_y2 = marginTop+1/20*height+graphHeight;  //down
-        let graphOffset = 0.2*height+graph2Height;
-        let secondGraphShrink = 0.8;
+        let graphOffset = 0.17*height+graph2Height;
+        let secondGraphShrink = 0.75;
 
         p.setup = () => {
           p.createCanvas(canvasRef.current.offsetWidth, canvasRef.current.offsetHeight);
@@ -65,9 +73,11 @@ const PowerBars = ({value}) => {
           p.background(255);
           p.fill(0);
           p.textSize(20);
+          // computing the sum of all the current values (the first five)
+          let values = Object.values(value.current).slice(0,5);
+          let sum = values.reduce((acc, currentValue) => Math.abs(acc) + Math.abs(currentValue), 0);
           p.text("Relative Power Values", width/2+marginLeft, marginTop/2);
-          //let values = Object.values(value.current);
-          // let sum = values.reduce((acc, currentValue) => acc + currentValue, 0);
+
           /*
           * axes
           */
@@ -105,15 +115,16 @@ const PowerBars = ({value}) => {
           /*
           * bar plot code
           */
+
           for (var t=0; t<xlabels.length; t++) {
               p.push();
               p.fill(0);
               p.text(xlabels[t], vert_x+graphWidth*(1/xlabels.length*(t+0.5)), vert_y2+20);
               p.fill(colors[t]);
               let barwidth = graphWidth*1/xlabels.length*2/4;
-              p.rect(vert_x+graphWidth*(1/xlabels.length*t)+1/2*barwidth, vert_y2, barwidth, -p.map(value.current[keys[t]],0,1,0,vert_y2-vert_y1));
+              p.rect(vert_x+graphWidth*(1/xlabels.length*t)+1/2*barwidth, vert_y2, barwidth, p.map(divideIfNotZero(value.current[keys[t]],sum),0,1,0,vert_y1-vert_y2));
               p.pop();
-              }
+            }
           /*
           * time series code
           */
@@ -121,7 +132,7 @@ const PowerBars = ({value}) => {
           let lower = secondGraphShrink*vert_y2+graphOffset;  //down
 
           // time series
-          ts.push(value.current[ts_key]); //todo
+          ts.push(divideIfNotZero(value.current[ts_key],sum)); //todo
           if (ts.length > graphWidth) {
             ts.shift();
           }
