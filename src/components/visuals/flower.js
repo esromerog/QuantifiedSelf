@@ -48,7 +48,7 @@ const Flower = ({ value }) => {
 	* https://openprocessing.org/sketch/724567
 	*/
 
-	function flower(p5, values, sum, width, height, r, c, petalCount, circleCount, maxRad, minRad, frac, rot) {
+	function flower(p5, values, sum, colors, width, height, r, c, petalCount, circleCount, maxRad, minRad, frac, rot) {
 	  let rad = 0;
 	  p5.noStroke();
 	  p5.push();
@@ -65,9 +65,11 @@ const Flower = ({ value }) => {
 	        rad = p5.map(i, frac * circleCount, circleCount, maxRad*petalSize, minRad);
 	      }
 
-	      let col1 = p5.color(255 * t, 255, 0, 10);
-	      let col2 = p5.color(50 * t + 205, 127 * (1 - t), 0, 100);
-	      p5.fill(p5.lerpColor(col1, col2, i / circleCount));
+	      // let col1 = p5.color(255 * t, 255, 0, 10);
+	      let col2 = p5.color(50 * t+205 , 255*(1-t), 200, 200);
+	      let col1 = colors[j];
+	      col1.setAlpha(255 * t);
+	      p5.fill(p5.lerpColor(col1, col2, i / circleCount-0.4));
 	      p5.ellipse(x, y, 2 * rad, 2 * rad);
 	    }
 	  }
@@ -75,6 +77,12 @@ const Flower = ({ value }) => {
 	}
 
     const Sketch = (p, value, canvasRef) => {
+    	let theta = p.color(72, 50, 133); //blue
+		let alpha = p.color(37, 167, 0); //green
+		let beta1 = p.color(247, 213, 30); //bright yellow
+		let beta2 = p.color(247, 148, 30); //orange
+		let gamma = p.color(237, 25, 33); //gamma
+		let colors = [theta, alpha, beta1, beta2, gamma]
         p.setup = () => {
         	p.createCanvas(canvasRef.current.offsetWidth, canvasRef.current.offsetHeight);
         };
@@ -84,7 +92,7 @@ const Flower = ({ value }) => {
         	let values = Object.values(value.current);
         	let sum = values.reduce((acc, currentValue) => Math.abs(acc) + Math.abs(currentValue), 0);
   			t = (0.3*p.abs(p.sin(p.frameCount * 0.004)))+0.8;
-  			flower(p, values, sum, canvasRef.current.offsetWidth, canvasRef.current.offsetHeight,
+  			flower(p, values, sum, colors, canvasRef.current.offsetWidth, canvasRef.current.offsetHeight,
   				150 * t + 100, 10, 5, 100, 68, 0.1 * (t) + 0.1, 0.6, p.PI * (1 - t));
         };
 	};
