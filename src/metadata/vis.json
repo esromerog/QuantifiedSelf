@@ -46,5 +46,16 @@
       ],
       "name": "Power Bars",
       "img_src": "power.png"
+  },
+  {
+      "properties": [
+        {"name": "val1", "value": 0},
+        {"name": "val2", "value": 0},
+        {"name": "val3", "value": 0},
+        {"name": "val4", "value": 0},
+        {"name": "val5", "value": 0}
+      ],
+      "name": "Flower",
+      "img_src": "power.png"
   }
 ]
