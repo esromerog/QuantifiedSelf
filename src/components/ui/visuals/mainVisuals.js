@@ -292,26 +292,62 @@ p.draw = () => {
     // p.background(230, 25, 90);
     mountains(p, cCloser, cFurther, cMist);
 
-};`
-
-const P5Visuals = ({ value, code }) => {
-    try {
-        const sketch = new Function('p', 'value', 'canvasRef', code);
-        return (<P5Wrapper value={value} code={code} sketch={sketch}/>)
-    } catch (e) {
-        console.log(e)
-        return (<div className='h-100'>{e.toString()}</div>)
-    }
 }
 
-const P5Wrapper = ({ value, sketch, code}) => {
+
+;`
+
+
+
+const P5Visuals = ({ value, code }) => {
+    const [error, setError] = useState(false);
+    const blacklist = ['document.', 'http', "/>", "eval", "decode", "window."];
+
+    let cleanCode = "";
+    
+    function blacklistCharacters(inputString, blacklist) {
+        // Check if the input string contains any blacklisted characters
+        const utf8Data = inputString.replace( /[^\x20-\x7E]+/g, '' );
+        
+        for (let i = 0; i < blacklist.length; i++) {
+          if (inputString.includes(blacklist[i])) {
+            throw new Error('Your code contains blacklisted characters');
+          }
+        }
+      
+        // If no blacklisted characters are found, return the input string
+        return inputString;
+    }
+
+    const regexSetup =  /p\.setup\s*=\s*(?:\(\)\s*=>\s*{([^}]+)}|function\s*\(\s*\)\s*{([^}]+)})\s*;\s*p\.draw/g
+    const regexDraw = /p\.draw\s*=\s*(?:\(\)\s*=>\s*{([^]*)}|function\s*\(\s*\)\s*{([^]*)})/s
+
+    cleanCode = code
+        .replace(regexSetup, (match, capturedCode) => `p.setup = () => { \ntry {\n${capturedCode}\n} catch (e) {\nconsole.log(e);\n} \n} \np.draw`)
+        .replace(regexDraw, (match, capturedCode) => `p.draw = () => { \ntry {\n${capturedCode}\n} catch (e) {\nconsole.log(e);\n} \n}`);
+    
+    cleanCode = blacklistCharacters(cleanCode, blacklist)
+
+    const canvas = <P5Wrapper value={value} code={cleanCode} setError={setError} />
+    
+
+    return canvas
+
+}
+
+const P5Wrapper = ({ value, code, setError }) => {
 
     const canvasRef = React.useRef();
+    let Q;
 
     useEffect(() => {
-
-        const Q = new P5(p => sketch(p, value, canvasRef), canvasRef.current);
-
+        try {
+            const sketch = new Function('p', 'value', 'canvasRef', code);
+            Q = new P5(p => sketch(p, value, canvasRef), canvasRef.current);
+        } catch (e) {
+            Q = new P5(function q() { }, canvasRef.current);
+            setError(e);
+        }
         canvasRef.current.firstChild.style.visibility = "visible"
         function updateCanvasDimensions() {
             Q.createCanvas(canvasRef.current.offsetWidth, canvasRef.current.offsetHeight);
@@ -327,11 +363,12 @@ const P5Wrapper = ({ value, sketch, code}) => {
             window.removeEventListener("resize", updateCanvasDimensions, true);
         }
 
-    }, [code]); // Might use code if this doesn't work
 
+    }, [code]);
 
+    //  className="h-100"
     return (
-        <div className="h-100" ref={canvasRef} />
+        <div ref={canvasRef} className='h-100'/>
     )
 
 };
@@ -372,8 +409,8 @@ export default function MainVisualsWindow({ visMetadata }) {
         "Head Position": <Head value={paramsRef} />,
         "Signal View": <SignalView value={paramsRef} />,
         "Power Bars": <PowerBars value={paramsRef} />,
-        "Custom": <P5Visuals value={paramsRef} code={code}/>,
-        "Flower": <Flower value={paramsRef} />
+        "Custom": <P5Visuals value={paramsRef} code={code} />,
+        // "Flower": <Flower value={paramsRef} />
     };
 
     const fullScreenHandle = useFullScreenHandle();
@@ -381,11 +418,11 @@ export default function MainVisualsWindow({ visMetadata }) {
 
     return (
         <div className='h-100'>
-            {((!mainMenu)&&dispCode)?
-            <div className='fixed-top col-5 h-100' style={{background: '#1E1E1E'}}>
-                <h5 className='m-2' style={{color: 'white'}}>Code</h5>
-                <CodeEditor code={code} setCode={setCode} />
-            </div>:null}
+            {((!mainMenu) && dispCode) ?
+                <div className='fixed-top col-5 h-100' style={{ background: '#1E1E1E' }}>
+                    <h5 className='m-2' style={{ color: 'white' }}>Code</h5>
+                    <CodeEditor code={code} setCode={setCode} />
+                </div> : null}
             <div className="h-100">
                 <div className="d-flex justify-content-between align-items-center align-text-center mt-1">
                     <div className="d-flex align-items-center">
@@ -393,11 +430,11 @@ export default function MainVisualsWindow({ visMetadata }) {
                         <h4 className="text-left text-transition align-self-center m-0">Visualization</h4>
                     </div>
                     <div className="d-flex align-items-center">
-                        {(mainMenu) ? null : 
-                        <div className='align-self-center me-3'>
-                            <button className="btn btn-link " onClick={fullScreenHandle.enter}><b><i className="bi bi-arrows-fullscreen" alt="full-screen"></i></b></button>
-                            <button className="btn btn-link " onClick={()=>setDispCode(!dispCode)}><b><i className="bi bi-code-slash" alt="code"></i></b></button>
-                        </div>
+                        {(mainMenu) ? null :
+                            <div className='align-self-center me-3'>
+                                <button className="btn btn-link " onClick={fullScreenHandle.enter}><b><i className="bi bi-arrows-fullscreen" alt="full-screen"></i></b></button>
+                                <button className="btn btn-link " onClick={() => setDispCode(!dispCode)}><b><i className="bi bi-code-slash" alt="code"></i></b></button>
+                            </div>
                         }
                     </div>
                 </div>

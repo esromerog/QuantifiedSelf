@@ -11,9 +11,9 @@ function EmotivDeviceButton({ data, name, handleShow }) {
 
     return (
         <div>
-            <button type="button" className="list-group-item list-group-item-action" onClick={() => handleShow(data)}>
-                <div className="d-flex w-100 justify-content-between mt-2">
-                    <h5 className="mb-1">{data.heading}</h5>
+            <button type="button" className="list-group-item list-group-item-action" onClick={() => handleShow(name)}>
+                <div className="d-flex w-100 justify-content-between mb-3 mt-1">
+                    <h5 className="mb-2">{data.heading}</h5>
                     <small>{name}</small>
                 </div>
             </button>
@@ -28,7 +28,7 @@ function DeviceList({ data, name, handleShow }) {
 
     return (
         <div>
-            {deviceButton[name]}
+            {deviceButton[data.heading]}
         </div>
     )
 
@@ -36,24 +36,33 @@ function DeviceList({ data, name, handleShow }) {
 
 export default function RenderDevices() {
     const [show, setShow] = useState(false);
-
+    const [currId, setCurrId] = useState("");
+    
     function handleShow(data) { 
-        setShow(true) 
+        setShow(true);
+        setCurrId(data);
     };
 
     const handleClose = () => setShow(false);
 
-    const activeDevices = useSelector(selectDevices);
+    const deviceMeta = useSelector(state=>state.deviceMeta)
 
-    const deviceButtonList = activeDevices?.map((deviceName) => {
-        const data = devicesRaw.find(({ heading }) => deviceName.includes(heading));
+    const deviceButtonList = Object.keys(deviceMeta)?.map((id) => {
+        const data = devicesRaw.find(({ heading }) => deviceMeta[id].device===heading);
         return (
-            <DeviceList data={data} name={deviceName} handleShow={handleShow} />
+            <DeviceList data={data} name={id} handleShow={handleShow} />
         )
     });
 
     const deviceModal = {
         "EMOTIV": <EmotivConnection show={show} handleClose={handleClose} />
+    }
+
+
+    function getDeviceModal(id) {
+        return (
+            deviceModal[deviceMeta[id].device]
+        )
     }
 
     return (
@@ -63,7 +72,7 @@ export default function RenderDevices() {
                     {deviceButtonList}
                 </ul>
             </div>
-            {deviceModal["EMOTIV"]}
+            {getDeviceModal(currId)}
         </div>
     );
 }
