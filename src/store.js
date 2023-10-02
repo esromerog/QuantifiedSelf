@@ -14,10 +14,9 @@ function rootReducer(state=initialState, action) {
         case 'params/update':
             // Logic to handle parameter updates
             const newData={...state.params}
-            const name1=action.payload.name1;
-            const name2=action.payload.name2;
+            const name=action.payload.name;
             const newValue=action.payload.newValue;
-            (name1 === name2) ? newData[name1] = newValue : newData[name1][name2] = newValue;
+            newData[name] = newValue;
             return {...state,
                 params: newData
             }

@@ -33,23 +33,25 @@ function MainUI() {
   let { visID } = useParams();
   const visMetadata = allVisSources.find(x => x.name === visID);
   const [recording, setRecording] = useState(false);
-  
-  if (visMetadata===undefined&&visID!="home") {
+
+  if (visMetadata === undefined && visID != "home") {
     return <Navigate to="/home/devices" />
   } else {
     return (
       <div className="container-fluid full-width h-100">
         <div className="row full-width h-100">
-          <div className="col-5 overflow-scroll disable-scrollbar h-100">
+          <div className="col-5 overflow-scroll disable-scrollbar h-100 full-width">
             <div className="vertical-spacing ms-5 me-5">
               <Outlet />
-              <RecordComponent saveObject={saveObject} recording={recording} setRecording={setRecording} /> 
+              <div className="mt-5">
+                <RecordComponent saveObject={saveObject} recording={recording} setRecording={setRecording} />
+              </div>
             </div>
             {/*<div className="d-flex justify-content-end me-5">
           <button className="btn btn-link" alt="Pop into another window" onClick={()=>setToggleOtherScreen(true)}><i className="bi bi-box-arrow-up-right"></i></button></div>*/}
           </div>
           <div className="col-7 full-width h-100 ">
-            <MainVisualsWindow visMetadata={visMetadata}/>
+            <MainVisualsWindow visMetadata={visMetadata} />
           </div>
         </div>
       </div>
@@ -65,7 +67,7 @@ export default function App() {
         <Route path="devices" element={<DeviceSelectionWindow />} />
         <Route path="data" element={<DataManagementWindow />} />
       </Route>
-      <Route path="/" element={<Navigate to="home/devices"/>} />
+      <Route path="/" element={<Navigate to="home/devices" />} />
     </Routes>
   );
 }

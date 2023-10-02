@@ -9,10 +9,6 @@ import { selectDevices } from '../mainDevices';
 
 const device = devicesRaw.find(({ heading }) => heading === "EMOTIV");
 
-function selectIds(state) {
-    Object.keys(state.dataStream)
-}
-
 export function EmotivConnection({ show, handleClose }) {
     // Modal to connect to the Emotiv headset
     
@@ -30,8 +26,7 @@ export function EmotivConnection({ show, handleClose }) {
             "clientSecret": process.env.REACT_APP_CORTEX_CLIENT_SECRET,
             "debit": 100
         }
-        // for testing
-    
+
         const c = new CortexPower(user, socketUrl);
         c.sub(['pow', 'eeg', 'mot']);
 
@@ -39,8 +34,8 @@ export function EmotivConnection({ show, handleClose }) {
         setDisabled(true);
         setTimeout(() => {
             const id = c.headsetId;
-            if (id !== undefined) {
-                setConnText({ text: "Success!", type: "" });
+            if (c.sessionId !== undefined) {
+                setConnText({ text: " ", type: "text-success" });
                 dispatch({
                     type: 'devices/create',
                     payload: {
@@ -72,7 +67,7 @@ export function EmotivConnection({ show, handleClose }) {
             </Modal.Body>
             <Modal.Footer className="d-flex justify-content-between">
                 <p className={connText.type}>{connText.text}</p>
-                {!(connText.text === "Success!") ?
+                {!(connText.text === " ") ?
                     (<button type="button" className="btn btn-outline-dark" onClick={handleActive} disabled={disabled}><i className="bi bi-bluetooth me-2"></i>Connect</button>) :
                     (<div className="text-success mt-1 mb-1">Connected</div>)}
             </Modal.Footer>

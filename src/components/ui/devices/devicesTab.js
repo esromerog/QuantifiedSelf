@@ -27,7 +27,7 @@ function DeviceList({ data, name, handleShow }) {
     }
 
     return (
-        <div>
+        <div key={name}>
             {deviceButton[data.heading]}
         </div>
     )
@@ -50,7 +50,7 @@ export default function RenderDevices() {
     const deviceButtonList = Object.keys(deviceMeta)?.map((id) => {
         const data = devicesRaw.find(({ heading }) => deviceMeta[id].device===heading);
         return (
-            <DeviceList data={data} name={id} handleShow={handleShow} />
+            <DeviceList data={data} name={id} handleShow={handleShow} key={id}/>
         )
     });
 
@@ -61,7 +61,7 @@ export default function RenderDevices() {
 
     function getDeviceModal(id) {
         return (
-            deviceModal[deviceMeta[id].device]
+            deviceModal[deviceMeta[id]?.device]
         )
     }
 

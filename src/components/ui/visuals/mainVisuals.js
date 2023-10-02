@@ -417,7 +417,7 @@ export default function MainVisualsWindow({ visMetadata }) {
     const [dispCode, setDispCode] = useState(false);
 
     return (
-        <div className='h-100'>
+        <div className={`h-100 ${mainMenu ? 'big-right-margin': ''}`}>
             {((!mainMenu) && dispCode) ?
                 <div className='fixed-top col-5 h-100' style={{ background: '#1E1E1E' }}>
                     <h5 className='m-2' style={{ color: 'white' }}>Code</h5>
@@ -427,7 +427,7 @@ export default function MainVisualsWindow({ visMetadata }) {
                 <div className="d-flex justify-content-between align-items-center align-text-center mt-1">
                     <div className="d-flex align-items-center">
                         {(mainMenu) ? null : <Link to="/home/devices" className="btn btn-link" ><b><i className="bi bi-arrow-left" alt="back"></i></b></Link>}
-                        <h4 className="text-left text-transition align-self-center m-0">Visualization</h4>
+                        <h4 className="text-left text-transition align-self-center m-0 mt-2">Visualization</h4>
                     </div>
                     <div className="d-flex align-items-center">
                         {(mainMenu) ? null :

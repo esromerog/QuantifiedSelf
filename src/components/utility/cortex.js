@@ -475,18 +475,6 @@ class CortexPower extends Cortex {
         super(user, socketUrl);
     }
 
-    /*
-    defineDeviceData(headsetId) {
-        store.dispatch({
-            type: 'devices/create', 
-            payload: { 
-                id: headsetId,
-                metadata: {device: "EMOTIV"}
-            }
-        })
-    }
-*/
-
     // Add error handling functino using parsedData to check if there's data. I could also throw a return value from the sub?
     // 'eeg' contains ['COUNTER', 'INTERPOLATED', 'AF3', 'F7', 'F3', 'FC5', 'T7', 'P7', 'O1', 'O2', 'P8', 'T8', 'FC6', 'F4', 'F8', 'AF4', 'RAW_CQ', 'MARKER_HARDWARE', 'MARKERS']
     manipulate(parsedData) {

@@ -31,8 +31,8 @@ export function DeviceSelectionWindow() {
 
     const [modalDevice, setModalDevice] = useState("");
     const [show, setShow] = useState(false);
-    const handleClose = () => setShow(false);
-    function handleShow(device) { setShow(true), setModalDevice(device)};
+    const handleClose = () => { setShow(false); setModalDevice("")}
+    function handleShow(device) { setShow(true); setModalDevice(device)};
 
 
     const deviceModals = {

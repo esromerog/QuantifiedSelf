@@ -1,8 +1,8 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Lato:wght@100;200;300;400;700;800&display=swap');
 
-
-$primary: #FFC107;
+// Purple - 7749F8; Green - 4AB69B; Yellow - F6C651
+$primary: #F6C651;
 $enable-negative-margins: true;
 $font-family-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 
@@ -10,14 +10,15 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     
-    font-family: Lato,"Lato",'Helvetica Neue',Arial, Helvetica, sans-serif;
+    font-family: Inter,"Inter",'Helvetica Neue',Arial, Helvetica, sans-serif;
     width: 100%;
     height  : 100%;
     overflow: hidden;
     position: relative;
     --bs-body-color: #1A1A1A;
-    --bs-secondary-color: #666666;
+    --bs-secondary-color: #111c38;
 }
+
 html {
     height: 100%;
     width: 100%;
@@ -59,6 +60,13 @@ div.w-100{
 .accordion-custom {
     --bs-accordion-border-color: #FFC107;
     --bs-accordion-btn-color: #FFC107;
+}
+
+div.big-right-margin {
+    margin-right: 15%;
+}
+div.big-left-margin {
+    margin-left: 15%;
 }
 
 
@@ -197,6 +205,15 @@ canvas {
 .fa-arrow-down.open{
     transform: rotate(-90deg);
     transition: transform 0.3s linear;
+}
+
+.btn.btn-mapping {
+    --bs-btn-color: #7749F8;
+    --bs-btn-border-color: #7749F8;
+    --bs-btn-hover-color: white;
+    --bs-btn-hover-bg:#7749F8;
+    --bs-btn-active-color: white;
+    --bs-btn-active-bg:#7749F8;
 }
 
 $btn-link-color: black;
