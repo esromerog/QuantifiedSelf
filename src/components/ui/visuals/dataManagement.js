@@ -37,7 +37,10 @@ function DataManualSlider({ parameter }) {
 
     // I can rework this to use the store state.params initial state/default values. 
     // May also loop through the visParameters JSON using the keys of the state.params object
-    const params = useSelector(selectParams);
+
+    let { visID } = useParams();
+
+    const params = useSelector(state => state.params[visID]);
 
     try {
         valor = params[parameter];
@@ -59,6 +62,7 @@ function DataManualSlider({ parameter }) {
             type: 'params/update',
             payload: {
                 name: parameter,
+                visualization: visID,
                 newValue: e.target.value
             }
         })
@@ -76,6 +80,7 @@ function DataManualSlider({ parameter }) {
             type: 'params/update',
             payload: {
                 name: parameter,
+                visualization: visID,
                 newValue: formValue
             }
         })
@@ -109,7 +114,7 @@ function DataManualSlider({ parameter }) {
 
 
 
-function DataAutoSlider({ dataMappings, subparameter, parameter }) {
+function DataAutoSlider({ dataMappings, parameter }) {
     // This function is the list item when it is connected to a data stream.
     // It contains the logic to handle changing into manual mode, setting auto-range, and setting the value of the parameter, to the stream value.
 
@@ -148,9 +153,11 @@ function DataAutoSlider({ dataMappings, subparameter, parameter }) {
         }
         if (valor > max) {
             setFormMin(parseFloat(max) - 1);
+            return
         }
         if (valor === max) {
             setFormMin(parseFloat(max) - 1);
+            return
         }
         setMin(formMin);
     }
@@ -164,9 +171,11 @@ function DataAutoSlider({ dataMappings, subparameter, parameter }) {
         }
         if (valor < min) {
             setFormMax(parseFloat(min) + 1);
+            return
         }
         if (valor === min) {
             setFormMax(parseFloat(min) + 1);
+            return
         }
         setMax(parseFloat(formMax));
     }
@@ -304,14 +313,17 @@ function ParameterDropDown({ claves, parameter, dataMappings, setDataMappings, d
         return disp
     });
 
+    let { visID } = useParams();
+
     // Changes the data source
     function selectNewSource(sourceName) {
         const maps = Object.assign({}, dataMappings);
         maps[parameter.name] = sourceName;
         setDataMappings(maps); // Changes datamappings
+        sessionStorage.setItem("dataMappings", JSON.stringify({ [visID]: maps }));
 
         // Changes the display text when the data source/dataMappings change
-        const disp = maps[parameter.name];
+        let disp = maps[parameter.name];
 
         if (sourceName === "Manual") disp = [0, "Manual"];
         if (displayName !== undefined) setDisplay(parameter.name + ": " + disp[1]);
@@ -385,21 +397,12 @@ function DataCard({ visParameter, dataMappings, setDataMappings }) {
 
     // Generates the drop-downs that hold subparameters (if any), provide a slider, and range functions
     const mapeo = () => {
-        if (!Array.isArray(visParameter.value)) { // No subparameters
-            return <ParameterManager
-                claves={claves}
-                parameter={visParameter}
-                dataMappings={dataMappings}
-                setDataMappings={setDataMappings} />;
-        } else {
-            return visParameter.value?.map((param) =>
-                <ParameterManager
-                    claves={claves}
-                    key={param.name}
-                    parameter={visParameter}
-                    dataMappings={dataMappings}
-                    setDataMappings={setDataMappings} />);
-        }
+        return <ParameterManager
+            claves={claves}
+            parameter={visParameter}
+            dataMappings={dataMappings}
+            setDataMappings={setDataMappings} />;
+
     }
 
     const [expanded, setExpanded] = React.useState(false); // Used for styling, checks to see if accordion is collapsed or not
@@ -456,16 +459,25 @@ export default function DataManagement() {
 
 
     // dataMappings is an array that contains the parameters of the visualization and describes what they are mapped to:
-    //      It has the shape: {Param1: Device Name/Manual, Param2: {Subparam1: Device Name/Manual}}
+    //      It has the shape: {Param1: Device Name/Manual}
 
     let { visID } = useParams();
 
     const visInfo = allVisSources.find(x => x.name === visID);
 
-    const [dataMappings, setDataMappings] = useState(visInfo.properties?.reduce((acc, datos) => {
-        acc[datos.name] = "Manual";
-        return acc
-    }, {}));
+    const [dataMappings, setDataMappings] = useState(() => {
+        const storedMappings = sessionStorage.getItem("dataMappings");
+        if (storedMappings !== null && visInfo.name in JSON.parse(storedMappings)) {
+            return JSON.parse(storedMappings);
+        } else {
+            const defaultMappings = visInfo.properties?.reduce((acc, datos) => {
+                acc[datos.name] = "Manual";
+                return acc
+            }, {})
+            sessionStorage.setItem("dataMappings", JSON.stringify({ [visID]: defaultMappings }));
+            return defaultMappings
+        }
+    });
 
     // Generates the cards with the parameters
     const dataCards = visInfo.properties?.map((parameter) => (

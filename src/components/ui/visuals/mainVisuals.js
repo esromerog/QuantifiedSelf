@@ -304,32 +304,32 @@ const P5Visuals = ({ value, code }) => {
     const blacklist = ['document.', 'http', "/>", "eval", "decode", "window."];
 
     let cleanCode = "";
-    
+
     function blacklistCharacters(inputString, blacklist) {
         // Check if the input string contains any blacklisted characters
-        const utf8Data = inputString.replace( /[^\x20-\x7E]+/g, '' );
-        
+        const utf8Data = inputString.replace(/[^\x20-\x7E]+/g, '');
+
         for (let i = 0; i < blacklist.length; i++) {
-          if (inputString.includes(blacklist[i])) {
-            throw new Error('Your code contains blacklisted characters');
-          }
+            if (inputString.includes(blacklist[i])) {
+                throw new Error('Your code contains blacklisted characters');
+            }
         }
-      
+
         // If no blacklisted characters are found, return the input string
         return inputString;
     }
 
-    const regexSetup =  /p\.setup\s*=\s*(?:\(\)\s*=>\s*{([^}]+)}|function\s*\(\s*\)\s*{([^}]+)})\s*;\s*p\.draw/g
+    const regexSetup = /p\.setup\s*=\s*(?:\(\)\s*=>\s*{([^}]+)}|function\s*\(\s*\)\s*{([^}]+)})\s*;\s*p\.draw/g
     const regexDraw = /p\.draw\s*=\s*(?:\(\)\s*=>\s*{([^]*)}|function\s*\(\s*\)\s*{([^]*)})/s
 
     cleanCode = code
         .replace(regexSetup, (match, capturedCode) => `p.setup = () => { \ntry {\n${capturedCode}\n} catch (e) {\nconsole.log(e);\n} \n} \np.draw`)
         .replace(regexDraw, (match, capturedCode) => `p.draw = () => { \ntry {\n${capturedCode}\n} catch (e) {\nconsole.log(e);\n} \n}`);
-    
+
     cleanCode = blacklistCharacters(cleanCode, blacklist)
 
     const canvas = <P5Wrapper value={value} code={cleanCode} setError={setError} />
-    
+
 
     return canvas
 
@@ -368,38 +368,51 @@ const P5Wrapper = ({ value, code, setError }) => {
 
     //  className="h-100"
     return (
-        <div ref={canvasRef} className='h-100'/>
+        <div ref={canvasRef} className='h-100' />
     )
 
 };
 
 export default function MainVisualsWindow({ visMetadata }) {
 
-    const dispatch = useDispatch();
+    const { tab } = useParams();
+    
+
+    
+    return (
+        <div className='h-100'>
+            ()
+        </div>
+    )
+}
+
+
+function MainMenu() {
+
+    <div className='h-100 big-right-margin'>
+        <div className="h-100">
+            <div className="d-flex justify-content-between align-items-center align-text-center mt-1">
+                <div className="d-flex align-items-center">
+                    <h4 className="text-left text-transition align-self-center m-0 mt-2">Visualization</h4>
+                </div>
+            </div>
+            <div className="full-width h-100 overflow-scroll disable-scrollbar">
+                <RenderVisualizationCards />
+            </div>
+        </div>
+    </div>
+}
+
+function VisualWindow({ visMetadata }) {
 
     const [code, setCode] = useState(sunCode);
 
-    function defineVisParameters(selection) {
-        const v = selection.properties.reduce((acc, parameter) => {
-            if (Array.isArray(parameter.value)) {
-                acc[parameter.name] = parameter.value.reduce((acc, datos) => { acc[datos.name] = 0; return acc }, {});
-            } else {
-                acc[parameter.name] = parameter.value;
-            }
-            return acc;
-        }, {});
-        dispatch({ type: 'params/set', payload: v });
-    }
+    const params = useSelector(state => state.params[visMetadata.name]);
 
-    const mainMenu = (visMetadata === undefined) ? true : false;
-    useEffect(() => { if (!mainMenu) defineVisParameters(visMetadata) }, [visMetadata]);
+    console.log(params)
 
-    // Need to use useRef to update canvas in-real-time
-    const params = useSelector(state => state.params);
     const paramsRef = useRef(params);
     paramsRef.current = params;
-
-
 
     const visStreamFunctions = {
         "Sun Visualization": <Sun value={paramsRef} />,
@@ -417,8 +430,8 @@ export default function MainVisualsWindow({ visMetadata }) {
     const [dispCode, setDispCode] = useState(false);
 
     return (
-        <div className={`h-100 ${mainMenu ? 'big-right-margin': ''}`}>
-            {((!mainMenu) && dispCode) ?
+        <div className='h-100 big-right-margin'>
+            {(dispCode) ?
                 <div className='fixed-top col-5 h-100' style={{ background: '#1E1E1E' }}>
                     <h5 className='m-2' style={{ color: 'white' }}>Code</h5>
                     <CodeEditor code={code} setCode={setCode} />
@@ -426,32 +439,22 @@ export default function MainVisualsWindow({ visMetadata }) {
             <div className="h-100">
                 <div className="d-flex justify-content-between align-items-center align-text-center mt-1">
                     <div className="d-flex align-items-center">
-                        {(mainMenu) ? null : <Link to="/home/devices" className="btn btn-link" ><b><i className="bi bi-arrow-left" alt="back"></i></b></Link>}
+                        <Link to="/home/devices" className="btn btn-link" ><b><i className="bi bi-arrow-left" alt="back"></i></b></Link>
                         <h4 className="text-left text-transition align-self-center m-0 mt-2">Visualization</h4>
                     </div>
                     <div className="d-flex align-items-center">
-                        {(mainMenu) ? null :
-                            <div className='align-self-center me-3'>
-                                <button className="btn btn-link " onClick={fullScreenHandle.enter}><b><i className="bi bi-arrows-fullscreen" alt="full-screen"></i></b></button>
-                                <button className="btn btn-link " onClick={() => setDispCode(!dispCode)}><b><i className="bi bi-code-slash" alt="code"></i></b></button>
-                            </div>
-                        }
+                        <div className='align-self-center me-3'>
+                            <button className="btn btn-link " onClick={fullScreenHandle.enter}><b><i className="bi bi-arrows-fullscreen" alt="full-screen"></i></b></button>
+                            <button className="btn btn-link " onClick={() => setDispCode(!dispCode)}><b><i className="bi bi-code-slash" alt="code"></i></b></button>
+                        </div>
                     </div>
                 </div>
                 <FullScreen handle={fullScreenHandle} className="full-width h-100">
-                    <div className={(mainMenu) ? "full-width h-100 overflow-scroll disable-scrollbar" : "full-width h-100"}>
-                        {function renderStream() {
-                            if (mainMenu) {
-                                return <RenderVisualizationCards />;
-                            } else if (!(Object.keys(params).length === 0)) {
-                                return visStreamFunctions[visMetadata.name]
-                            }
-                        }()}
+                    <div className="full-width h-100">
+                        {params && visStreamFunctions[visMetadata.name]}
                     </div>
                 </FullScreen>
             </div>
         </div>
     )
 }
-
-

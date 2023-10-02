@@ -1,35 +1,67 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { createStore, applyMiddleware, compose} from "redux";
+import { createStore, applyMiddleware, compose } from "redux";
 import devicesRaw from './metadata/devices'
+import visualsRaw from './metadata/vis'
+
+
+
+const storedMappings = sessionStorage.getItem("dataMappings");
 
 const initialState = {
-    params: {},
+    params: visualsRaw.reduce((acc, selection) => {
+        if (storedMappings !== null && selection.name in JSON.parse(storedMappings)) {
+            const maps = JSON.parse(storedMappings)
+            acc[selection] = Object.keys(maps).reduce((acc, parameter) => {
+                acc[parameter] = 0;
+                return acc;
+            }, {})
+            return acc
+        } else {
+            // Gets the parameters from the default JSON
+            acc[selection] = selection.properties.reduce((acc, parameter) => {
+                acc[parameter.name] = parameter.value;
+                return acc;
+            }, {});
+            return acc
+        }
+    }, {}),
     dataStream: {},
     deviceMeta: {},
 };
 
 // React Redux Store to manage the data that moves throghout the entire app
-function rootReducer(state=initialState, action) {
-    switch(action.type) {
+function rootReducer(state = initialState, action) {
+    switch (action.type) {
         case 'params/update':
             // Logic to handle parameter updates
-            const newData={...state.params}
-            const name=action.payload.name;
-            const newValue=action.payload.newValue;
+            const vis = action.payload.visualization;
+            const newData = { ...state.params[vis] }
+            const name = action.payload.name;
+            const newValue = action.payload.newValue;
             newData[name] = newValue;
-            return {...state,
-                params: newData
+            return {
+                ...state,
+                params: {
+                    ...state.params,
+                    [vis]: newData
+                }
             }
 
-        case 'params/set':
+
+        case 'params/load':
             // Logic to handle initializing parameters
-            return {...state,
-                params: action.payload,
+            return {
+                ...state,
+                params: {
+                    ...state.params,
+                    [action.payload.visualization]: action.payload.params,
+                }
             }
 
         case 'devices/create':
             // Logic to handle creation of a new device
-            return {...state,
+            return {
+                ...state,
                 deviceMeta: {
                     ...state.deviceMeta,
                     [action.payload.id]: action.payload.metadata
@@ -41,11 +73,12 @@ function rootReducer(state=initialState, action) {
             }
 
 
-        case 'devices/updateMetadata': 
+        case 'devices/updateMetadata':
             // This logic is especially useful in device that may disconnect like the emotiv
             // It is also useful for handling pre-recorded files
 
-            return {...state,
+            return {
+                ...state,
                 deviceMeta: {
                     ...state.deviceMeta,
                     [action.payload.id]: {
@@ -55,13 +88,12 @@ function rootReducer(state=initialState, action) {
                 }
             }
 
-        case 'devices/updateMappings':
-            // Track the parameters to which a device is mapped and update them
 
         case 'devices/streamUpdate':
             // Logic to handle device stream updates
 
-            return {...state,
+            return {
+                ...state,
                 dataStream: {
                     ...state.dataStream,
                     [action.payload.id]: action.payload.data
