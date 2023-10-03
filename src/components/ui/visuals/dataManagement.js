@@ -40,7 +40,7 @@ function DataManualSlider({ parameter }) {
 
     let { visID } = useParams();
 
-    const params = useSelector(state => state.params[visID]);
+    const params = useSelector(state => state.params);
 
     try {
         valor = params[parameter];
@@ -62,7 +62,6 @@ function DataManualSlider({ parameter }) {
             type: 'params/update',
             payload: {
                 name: parameter,
-                visualization: visID,
                 newValue: e.target.value
             }
         })
@@ -80,7 +79,6 @@ function DataManualSlider({ parameter }) {
             type: 'params/update',
             payload: {
                 name: parameter,
-                visualization: visID,
                 newValue: formValue
             }
         })
@@ -192,6 +190,8 @@ function DataAutoSlider({ dataMappings, parameter }) {
         setBuffer([])
         setDisabled(true);
     }
+
+    let { visID } = useParams();
 
     useEffect(() => {
         // Updates the values
@@ -308,7 +308,7 @@ function ParameterDropDown({ claves, parameter, dataMappings, setDataMappings, d
         let disp = dataMappings[parameter.name];
 
         if (disp === "Manual") disp = [0, "Manual"];
-        if (displayName !== undefined) disp = (parameter.name + ": " + disp[1]);
+        if (displayName !== undefined) disp = (parameter.name + ": " + disp);
         else disp = (disp[1]);
         return disp
     });
@@ -320,7 +320,13 @@ function ParameterDropDown({ claves, parameter, dataMappings, setDataMappings, d
         const maps = Object.assign({}, dataMappings);
         maps[parameter.name] = sourceName;
         setDataMappings(maps); // Changes datamappings
-        sessionStorage.setItem("dataMappings", JSON.stringify({ [visID]: maps }));
+        const currMappings = JSON.parse(sessionStorage.getItem("dataMappings"));
+        const updatedMappings = {
+            ...currMappings,
+            [visID]: maps
+        }
+        
+        sessionStorage.setItem("dataMappings", JSON.stringify(updatedMappings));
 
         // Changes the display text when the data source/dataMappings change
         let disp = maps[parameter.name];
@@ -467,14 +473,17 @@ export default function DataManagement() {
 
     const [dataMappings, setDataMappings] = useState(() => {
         const storedMappings = sessionStorage.getItem("dataMappings");
+        console.log(JSON.parse(storedMappings));
         if (storedMappings !== null && visInfo.name in JSON.parse(storedMappings)) {
-            return JSON.parse(storedMappings);
+            const mappings = JSON.parse(storedMappings)
+            return mappings[visID];
         } else {
             const defaultMappings = visInfo.properties?.reduce((acc, datos) => {
                 acc[datos.name] = "Manual";
                 return acc
             }, {})
-            sessionStorage.setItem("dataMappings", JSON.stringify({ [visID]: defaultMappings }));
+            
+
             return defaultMappings
         }
     });

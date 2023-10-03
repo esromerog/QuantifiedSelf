@@ -74,6 +74,7 @@ function log(message) {
     // console.log(message)
 }
 class Cortex {
+    
     constructor(user, socketUrl) {
         // create socket
         this.socket = new WebSocket(socketUrl)

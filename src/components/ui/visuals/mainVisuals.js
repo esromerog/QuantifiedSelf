@@ -375,41 +375,37 @@ const P5Wrapper = ({ value, code, setError }) => {
 
 export default function MainVisualsWindow({ visMetadata }) {
 
-    const { tab } = useParams();
-    
+    const mainMenu = visMetadata === undefined;
 
-    
     return (
         <div className='h-100'>
-            ()
+            {mainMenu ?
+                <MainMenu /> :
+                <VisualWindow visMetadata={visMetadata} />}
         </div>
     )
 }
 
 
 function MainMenu() {
-
-    <div className='h-100 big-right-margin'>
-        <div className="h-100">
-            <div className="d-flex justify-content-between align-items-center align-text-center mt-1">
-                <div className="d-flex align-items-center">
-                    <h4 className="text-left text-transition align-self-center m-0 mt-2">Visualization</h4>
+    return (
+        <div className='h-100 big-right-margin'>
+            <div className="h-100">
+                <div className="d-flex justify-content-between align-items-center align-text-center mb-3 mt-3">
+                    <h4 className="text-left text-transition align-self-center m-0">Visualization</h4>
+                </div>
+                <div className="full-width h-100 overflow-scroll disable-scrollbar">
+                    <RenderVisualizationCards />
                 </div>
             </div>
-            <div className="full-width h-100 overflow-scroll disable-scrollbar">
-                <RenderVisualizationCards />
-            </div>
-        </div>
-    </div>
+        </div>)
 }
 
 function VisualWindow({ visMetadata }) {
 
     const [code, setCode] = useState(sunCode);
 
-    const params = useSelector(state => state.params[visMetadata.name]);
-
-    console.log(params)
+    const params = useSelector(state => state.params);
 
     const paramsRef = useRef(params);
     paramsRef.current = params;
@@ -430,7 +426,7 @@ function VisualWindow({ visMetadata }) {
     const [dispCode, setDispCode] = useState(false);
 
     return (
-        <div className='h-100 big-right-margin'>
+        <div className='h-100'>
             {(dispCode) ?
                 <div className='fixed-top col-5 h-100' style={{ background: '#1E1E1E' }}>
                     <h5 className='m-2' style={{ color: 'white' }}>Code</h5>
@@ -440,7 +436,7 @@ function VisualWindow({ visMetadata }) {
                 <div className="d-flex justify-content-between align-items-center align-text-center mt-1">
                     <div className="d-flex align-items-center">
                         <Link to="/home/devices" className="btn btn-link" ><b><i className="bi bi-arrow-left" alt="back"></i></b></Link>
-                        <h4 className="text-left text-transition align-self-center m-0 mt-2">Visualization</h4>
+                        <h4 className="text-left text-transition align-self-center m-0">Visualization</h4>
                     </div>
                     <div className="d-flex align-items-center">
                         <div className='align-self-center me-3'>

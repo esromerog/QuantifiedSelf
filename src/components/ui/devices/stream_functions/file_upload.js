@@ -1,10 +1,11 @@
 import React, { useState, useRef } from 'react';
 import Papa from 'papaparse';
 import devicesRaw from '../../../../metadata/devices';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Modal from 'react-bootstrap/Modal';
 import store from '../../../../store';
+import { toHaveFormValues } from '@testing-library/jest-dom/dist/matchers';
 
 export function FileUploader({ show, handleClose }) {
 
@@ -12,9 +13,10 @@ export function FileUploader({ show, handleClose }) {
 
     const [recordingDevice, setRecordingDevice] = useState("");
     const [successText, setSuccessText] = useState("");
+    const [id, setID] = useState("Pre-recorded device");
 
     async function uploadFile(e) {
-        if (recordingDevice==="") {
+        if (recordingDevice === "") {
             setSuccessText("You must first specify the device, please try again")
             return
         }
@@ -30,8 +32,17 @@ export function FileUploader({ show, handleClose }) {
             header: true,
             complete: (results) => {
                 // results.data - contains the uploaded file output
-                sessionStorage.setItem(recordingDevice, JSON.stringify(results.data))
-                dispatch({ type: 'devices/create', payload: { id: recordingDevice + "81", metadata: { device: recordingDevice } } })
+                const streamObject = new UploadedFile(results.data, recordingDevice, id);
+                dispatch({
+                    type: 'devices/create', 
+                    payload: { 
+                        id: id, 
+                        metadata: { 
+                            device: recordingDevice, 
+                            object: streamObject, 
+                            playing: false,
+                            looping: false,
+                }}})
                 setSuccessText("Uploaded!");
             },
             error: (error) => {
@@ -50,10 +61,19 @@ export function FileUploader({ show, handleClose }) {
         </option>
     )
 
+    function nameDevice(e) {
+        const regex =  /[!@#$%^&*+{}\[\]:;<>,.?~\\|\/\="']/g
+        const string = e.target.value.replace(regex, '');
+        e.target.value = string;
+        setID(string)
+    }
+
     return (
         <Modal show={show} onHide={handleClose} centered size="lg">
             <Modal.Header closeButton>
-                <Modal.Title>Upload a file</Modal.Title>
+                <Modal.Title>
+                    <input type="text" className='h4 m-0 invisible-input' placeholder='Pre-recorded device' onBlur={nameDevice}></input>
+                </Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 Upload the recorded file from your computer.
@@ -67,13 +87,13 @@ export function FileUploader({ show, handleClose }) {
                         </select>
                     </div>
                     <div className='input-group col' >
-                        <input 
-                            type="file" 
-                            className='form-control' 
-                            id="inputUpload" 
-                            accept="text/csv" 
+                        <input
+                            type="file"
+                            className='form-control'
+                            id="inputUpload"
+                            accept="text/csv"
                             onChange={uploadFile}
-                            disabled={(recordingDevice!=="")} />
+                            disabled={(recordingDevice === "")} />
                     </div>
                 </div>
             </Modal.Body>
@@ -86,63 +106,92 @@ export function FileUploader({ show, handleClose }) {
     )
 }
 
-function streamRecordedData(id) {
-    let i = 0;
 
-    const userFile = JSON.parse(sessionStorage.getItem(device));
 
-    // I fetch the sampling rate using the device name
-    const samplingRate = devicesRaw.find(({ heading }) => device.includes(heading)).sampling_rate;
+class UploadedFile {
 
-    var streamRecorder = setInterval(() => {
-        store.dispatch({
-            type: 'devices/streamUpdate',
-            payload: {
-                id: id,
-                data: userFile[i]
-            }
-        })
+    buffer_num = 0;
+    looping = false;
+    playing = false;
 
+    constructor(file, device, id) {
+        this.file = file;
+        this.device = device;
+        this.id = id;
+        this.sampling_rate = devicesRaw.find(({ heading }) => heading === device).sampling_rate;
+    }
+
+    startPlayback() {
+        this.playing = true;
         store.dispatch({
             type: 'devices/updateMetadata',
             payload: {
-                id: id,
-                field: "buffer_num",
-                data: i
+                id: this.id,
+                field: "playing",
+                data: this.playing
             }
         })
 
-        i++;
-        if (i > userFile.length - 1) {
-            clearInterval(streamRecorder);
-            console.log(device);
-        }
-    }, 1000 / samplingRate);
-}
+        this.streamRecorder = setInterval(() => {
+            store.dispatch({
+                type: 'devices/streamUpdate',
+                payload: {
+                    id: this.id,
+                    data: this.file[this.buffer_num]
+                }
+            })
 
-export function RecordedDataButton({ data, handleShow, name }) {
-    const [playing, setPlaying] = useState((!name.includes("Inactive")));
+            this.buffer_num++;
 
-    function startStreaming() {
-        streamRecordedData(name)
-        setPlaying(true);
+            if (this.buffer_num > this.file.length - 1) {
+                if (!this.looping) {
+                    this.pausePlayback()
+                }
+                this.buffer_num = 0;
+            }
+
+        }, 1000 / this.sampling_rate);
+
     }
 
-    return (
-        <div className='d-flex'>
-            <button type="button" className="list-group-item list-group-item-action" onClick={() => handleShow(data)}>
-                <div className="d-flex w-100 justify-content-between mt-2">
-                    <h5 className="mb-1">{data.heading}</h5>
-                    <small>{name + "(Pre-recorded)"}</small>
-                </div>
-                {/*<p className="mb-2">{data.short_description}</p>*/}
-            </button>
-            <button className="btn btn-link" onClick={startStreaming} disabled={playing}>
-                <i className="bi bi-play-circle-fill"></i>
-            </button>
-        </div>
-    );
+    pausePlayback() {
+        if (this.playing) {
+            clearInterval(this.streamRecorder);
+            this.playing = false;
+            store.dispatch({
+                type: 'devices/updateMetadata',
+                payload: {
+                    id: this.id,
+                    field: "playing",
+                    data: this.playing
+                }
+            })
+        }
+    }
+
+    loopPlayback() {
+        this.looping = !this.looping;
+        store.dispatch({
+            type: 'devices/updateMetadata',
+            payload: {
+                id: this.id,
+                field: "looping",
+                data: this.looping
+            }
+        })
+    }
+    
+
+    restartPlayback() {
+        this.buffer_num = 0;
+        if (this.playing) {
+            this.pausePlayback()
+        }
+    }
 }
+
+
+
 
 
 

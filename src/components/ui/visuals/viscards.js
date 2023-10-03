@@ -5,10 +5,13 @@ import { Link } from 'react-router-dom';
 
 function ImageCard({ visSource, defineVisParameters }) {
   const [showAddData, setShowAddData] = useState(false);
+  const dispatch = useDispatch()
 
   return (
     <div className='col img-holder m-0 mb-1' key={visSource.name}>
-      <Link to={"/" + visSource.name + "/devices"} className='w-100 h-100 btn p-0'>
+      <Link to={"/" + visSource.name + "/devices"} 
+        className='w-100 h-100 btn p-0' 
+        onClick={()=>dispatch({type: 'params/load', payload: visSource})}>
         <img
           className={showAddData ? "img-vis-hover img-vis rounded" : "img-vis rounded"}
           src={visSource.img_name} alt={visSource.name}
@@ -17,7 +20,9 @@ function ImageCard({ visSource, defineVisParameters }) {
       </Link>
       {showAddData ? <div className='centered-over-image' key={visSource.name} onMouseEnter={() => setShowAddData(true)}>
         <h6 className="image-hover-text align-self-center text-center">{visSource.name}</h6>
-        <a className="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target={'#' + visSource.name.replace(/\s/g, '')}><i className="bi bi-plus-circle"></i></a>
+        <a className="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target={'#' + visSource.name.replace(/\s/g, '')}>
+          <i className="bi bi-plus-circle">
+        </i></a>
         <div className="image-hover-text collapse" id={visSource.name.replace(/\s/g, '')}>
           {visSource.description}
         </div>
@@ -32,7 +37,7 @@ export default function RenderVisualizationCards() {
 
   return (
 
-    <div className='row mt-2 row-cols-2 g-1'>
+    <div className='row row-cols-2 g-1'>
       {visSources}
     </div>
 

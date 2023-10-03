@@ -8,23 +8,7 @@ import visualsRaw from './metadata/vis'
 const storedMappings = sessionStorage.getItem("dataMappings");
 
 const initialState = {
-    params: visualsRaw.reduce((acc, selection) => {
-        if (storedMappings !== null && selection.name in JSON.parse(storedMappings)) {
-            const maps = JSON.parse(storedMappings)
-            acc[selection] = Object.keys(maps).reduce((acc, parameter) => {
-                acc[parameter] = 0;
-                return acc;
-            }, {})
-            return acc
-        } else {
-            // Gets the parameters from the default JSON
-            acc[selection] = selection.properties.reduce((acc, parameter) => {
-                acc[parameter.name] = parameter.value;
-                return acc;
-            }, {});
-            return acc
-        }
-    }, {}),
+    params: {},
     dataStream: {},
     deviceMeta: {},
 };
@@ -34,28 +18,37 @@ function rootReducer(state = initialState, action) {
     switch (action.type) {
         case 'params/update':
             // Logic to handle parameter updates
-            const vis = action.payload.visualization;
-            const newData = { ...state.params[vis] }
+            const newData = { ...state.params }
             const name = action.payload.name;
             const newValue = action.payload.newValue;
             newData[name] = newValue;
             return {
                 ...state,
-                params: {
-                    ...state.params,
-                    [vis]: newData
-                }
+                params: newData
             }
 
 
         case 'params/load':
+            const storedMappings = sessionStorage.getItem("dataMappings");
+            let params = {};
+            const selection = action.payload
+
+            if (storedMappings !== null && selection.name in JSON.parse(storedMappings)) {
+                const maps = JSON.parse(storedMappings)
+                params = Object.keys(maps[selection.name]).reduce((acc, parameter) => {
+                    acc[parameter] = 0;
+                    return acc;
+                }, {})
+            } else {
+                params = selection.properties.reduce((acc, parameter) => {
+                    acc[parameter.name] = parameter.value;
+                    return acc;
+                }, {});
+            }
             // Logic to handle initializing parameters
             return {
                 ...state,
-                params: {
-                    ...state.params,
-                    [action.payload.visualization]: action.payload.params,
-                }
+                params: params
             }
 
         case 'devices/create':
@@ -74,7 +67,7 @@ function rootReducer(state = initialState, action) {
 
 
         case 'devices/updateMetadata':
-            // This logic is especially useful in device that may disconnect like the emotiv
+            // This logic is especially useful in a device that may disconnect like the emotiv
             // It is also useful for handling pre-recorded files
 
             return {
