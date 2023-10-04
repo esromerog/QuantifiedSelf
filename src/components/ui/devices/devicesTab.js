@@ -46,8 +46,6 @@ function FileDeviceButton({ data, name, handleShow }) {
         streamObject.restartPlayback();
     }
 
-    console.log(playing);
-
     return (
         <div className='card-group'>
             <div className='card rounded-0 mb-2 mt-1'>

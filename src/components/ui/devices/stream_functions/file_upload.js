@@ -6,14 +6,33 @@ import { useDispatch, useSelector } from 'react-redux';
 import Modal from 'react-bootstrap/Modal';
 import store from '../../../../store';
 import { toHaveFormValues } from '@testing-library/jest-dom/dist/matchers';
+import { createSelector } from 'reselect';
+
+
+
+const getDataIDs = createSelector(
+    [state=>state.deviceMeta],
+    (deviceMeta) => {
+        return Object.keys(deviceMeta)
+            .filter((name) =>"playing" in deviceMeta[name]);
+    }
+)
 
 export function FileUploader({ show, handleClose }) {
 
     const dispatch = useDispatch();
-
+    const prevRecordIDs = useSelector(getDataIDs);
+    console.log(prevRecordIDs);
     const [recordingDevice, setRecordingDevice] = useState("");
     const [successText, setSuccessText] = useState("");
-    const [id, setID] = useState("Pre-recorded device");
+    const [id, setID] = useState(()=>{
+        const rec = prevRecordIDs.length
+        if (rec!=0) {
+            return "Pre-recorded "+(rec+1)
+        } else {
+            return "Pre-recorded"
+        }
+    });
 
     async function uploadFile(e) {
         if (recordingDevice === "") {
