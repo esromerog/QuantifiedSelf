@@ -2,8 +2,22 @@ import React, { useEffect } from 'react';
 import Sketch from 'react-p5';
 import P5 from 'p5';
 
+// star variables
+var sun;
+var mountain;
+var xpos = 0;
+var ypos = 0;
+var ytarget = 0;
+var gradient = 0;
+var gradient_target = 0;
+var vol = 0;
+var power = 0;
+var easing = 0.1; // Easing value (adjust as needed)
+var fromX, fromY;
+var toX, toY;
+var step = 2.5;
 
-export function P5Wrapper({ sketch, params }) {
+function P5Wrapper({sketch, params}) {
     const canvasRef = React.useRef();
 
     useEffect(() => {
@@ -28,178 +42,75 @@ export function P5Wrapper({ sketch, params }) {
 
     return (
         <div className="h-100" ref={canvasRef} />
-    );
+    ); 
 
 }
 
-
 const Sun = ({ value }) => {
-    var sun;
-    var mountain;
-    var xpos = 0;
-    var ypos = 0;
-    var ytarget = 0;
-    var gradient = 0;
-    var gradient_target = 0;
-    var vol = 0;
-    var power = 0;
-    var easing = 0.1; // Easing value (adjust as needed)
-    var fromX, fromY;
-    var toX, toY;
-    var step = 2.5;
 
     //Xavier's star class
     /*
      * The Star class
      */
-    class Star {
+    function Star(p5_instance, position, radius, fadingFactor, flaresActivity, flaresColor, imageWidth) {
+        this.position = position;
+        this.radius = radius;
+        this.fadingFactor = fadingFactor;
+        this.flaresActivity = flaresActivity;
+        this.imageWidth = imageWidth;
+        this.body = p5_instance.createImage(this.imageWidth, this.imageWidth);
+        this.flares = p5_instance.createImage(this.imageWidth, this.imageWidth);
+        this.timeCounter = 0;
+        this.flaresColor = flaresColor;
+        this.p5_instance = p5_instance;
+        // Initialize the star's body image
+        var x, y, pixel, distanceSq;
+        var radiusSq = p5_instance.sq(this.radius);
+        var center = this.imageWidth / 2;
 
-        constructor(p5_instance, position, radius, fadingFactor, flaresActivity, flaresColor, imageWidth) {
-            this.position = position;
-            this.radius = radius;
-            this.fadingFactor = fadingFactor;
-            this.flaresActivity = flaresActivity;
-            this.imageWidth = imageWidth;
-            this.body = p5_instance.createImage(this.imageWidth, this.imageWidth);
-            this.flares = p5_instance.createImage(this.imageWidth, this.imageWidth);
-            this.timeCounter = 0;
-            this.flaresColor = flaresColor;
-            this.p5_instance = p5_instance;
-            // Initialize the star's body image
-            var x, y, pixel, distanceSq;
-            var radiusSq = p5_instance.sq(this.radius);
-            var center = this.imageWidth / 2;
+        this.body.loadPixels();
 
-            this.body.loadPixels();
-
-            for (x = 0; x < this.imageWidth; x++) {
-                for (y = 0; y < this.imageWidth; y++) {
-                    pixel = 4 * (x + y * this.imageWidth);
-                    distanceSq = p5_instance.sq(x - center) + p5_instance.sq(y - center);
-                    this.body.pixels[pixel] = 236;
-                    this.body.pixels[pixel + 1] = 24;
-                    this.body.pixels[pixel + 2] = 1;
-                    this.body.pixels[pixel + 3] = 255 * (0.95 - distanceSq / radiusSq);
-                }
+        for (x = 0; x < this.imageWidth; x++) {
+            for (y = 0; y < this.imageWidth; y++) {
+                pixel = 4 * (x + y * this.imageWidth);
+                distanceSq = p5_instance.sq(x - center) + p5_instance.sq(y - center);
+                this.body.pixels[pixel] = 236;
+                this.body.pixels[pixel + 1] = 24;
+                this.body.pixels[pixel + 2] = 1;
+                this.body.pixels[pixel + 3] = 255 * (0.95 - distanceSq / radiusSq);
             }
-
-            this.body.updatePixels();
         }
 
-        //
-        // The update method
-        //
-        update = function () {
-
-            var x, y, deltaX, deltaY, pixel, distanceSq, relativeAngle;
-            var dx, dy, sumColor, counter, pixelColor;
-            var radiusSq = this.p5_instance.sq(this.radius);
-            var center = this.imageWidth / 2;
-            var nPixels = this.p5_instance.sq(this.imageWidth);
-
-            // Create the flares in the star's body (save the result in the red channel)
-            this.flares.loadPixels();
-
-            for (x = 0; x < this.imageWidth; x++) {
-                for (y = 0; y < this.imageWidth; y++) {
-                    deltaX = x - center;
-                    deltaY = y - center;
-                    distanceSq = this.p5_instance.sq(deltaX) + this.p5_instance.sq(deltaY);
-
-                    if (distanceSq < radiusSq) {
-                        relativeAngle = this.p5_instance.atan2(deltaY, deltaX) / this.p5_instance.TWO_PI;
-
-                        if (relativeAngle < 0) {
-                            relativeAngle++;
-                        }
-
-                        pixel = 4 * (x + y * this.imageWidth);
-                        this.flares.pixels[pixel] = 255 * this.p5_instance.noise(0.1 * (Math.sqrt(distanceSq) - this.timeCounter), 10 * relativeAngle);
-                    }
-                }
-            }
-
-            // Smooth the flares (save the result in the blue and alpha channels)
-            for (x = 2; x < this.imageWidth - 2; x++) {
-                for (y = 2; y < this.imageWidth - 2; y++) {
-                    pixel = 4 * (x + y * this.imageWidth);
-                    deltaX = x - center;
-                    deltaY = y - center;
-                    distanceSq = this.p5_instance.sq(deltaX) + this.p5_instance.sq(deltaY);
-                    sumColor = 0;
-                    counter = 0;
-
-                    // Loop over nearby pixels
-                    for (dx = -2; dx <= 2; dx++) {
-                        for (dy = -2; dy <= 2; dy++) {
-                            if (this.p5_instance.sq(deltaX + dx) + this.p5_instance.sq(deltaY + dy) < distanceSq) {
-                                sumColor += this.flares.pixels[pixel + 4 * (dx + dy * this.imageWidth)];
-                                counter++;
-                            }
-                        }
-                    }
-
-                    if (counter > 0) {
-                        this.flares.pixels[pixel] = sumColor / counter;
-                        this.flares.pixels[pixel + 1] = sumColor / counter;
-                        this.flares.pixels[pixel + 2] = sumColor / counter;
-                        this.flares.pixels[pixel + 3] = 360 * (1 - this.fadingFactor) * 0.25 * radiusSq / distanceSq;
-                    } else {
-                        this.flares.pixels[pixel] = 0;
-                        this.flares.pixels[pixel + 1] = 0;
-                        this.flares.pixels[pixel + 2] = 0;
-                        this.flares.pixels[pixel + 3] = 0;
-                    }
-                }
-            }
-
-            // Update the flares image (i.e. the red and green channels)
-            for (var i = 0; i < nPixels; i++) {
-                pixel = 4 * i;
-                // pixelColor = this.flares.pixels[pixel + 2];
-                this.flares.pixels[pixel] = 236;
-                this.flares.pixels[pixel + 1] = 24;
-                this.flares.pixels[pixel + 2] = 1;
-
-            }
-
-            this.flares.updatePixels();
-
-            // Increase the time counter
-            this.timeCounter += this.flaresActivity;
-        };
-
-        //
-        // The paint method
-        //
-        paint = function () {
-            this.p5_instance.push();
-            this.p5_instance.translate(this.position.x - this.imageWidth / 2, this.position.y - this.imageWidth / 2);
-            this.p5_instance.image(this.flares, 0, 0);
-            this.p5_instance.image(this.body, 0, 0);
-            this.p5_instance.pop();
-        };
-
-
-        // Update the position with interpolation
-        //
-        setPosition = function (target) {
-            let deltaY = target - ypos;
-            ypos += deltaY * easing;
-            this.position = this.p5_instance.createVector(this.p5_instance.width / 2, ypos);
-        };
-
-        setSize(target) {
-            this.radiusSq = target*150
-        }
-
+        this.body.updatePixels();
     }
 
+ 
+    //
+    // The paint method
+    //
+    Star.prototype.paint = function (resize_factor) {
+        let new_width = this.flares.width*resize_factor;
+        this.p5_instance.push();
+        this.p5_instance.translate(this.position.x - new_width / 2, this.position.y - new_width / 2);
+        this.p5_instance.image(this.flares, 0, 0, new_width,this.flares.height*resize_factor,0,0);
+        this.p5_instance.image(this.body, 0, 0, this.body.width*resize_factor,this.body.height*resize_factor,0,0);
+        this.p5_instance.pop();
+    };
+
+
+    // Update the position with interpolation
+    //
+    Star.prototype.setPosition = function (target) {
+        let deltaY = target - ypos;
+        ypos += deltaY * easing;
+        this.position = this.p5_instance.createVector(this.p5_instance.width / 2, ypos);
+    };
+
     // mountain functions
-    function mountains(p5_instance, closerColor, furtherColor, mistColor) {
+    function mountains(p5_instance, closerColor, furtherColor, mistColor, width, height) {
         p5_instance.randomSeed(90);
         // Find the reference Y of each mountain
-        let y0 = 0.8 * p5_instance.width; // First reference Y
+        let y0 = 0.8 * height; // First reference Y
         let i0 = 10; // Initial interval
         let cy = []; // Initialize the reference Y array
 
@@ -211,13 +122,13 @@ const Sun = ({ value }) => {
         let dx = 0;
 
         for (let j = 1; j < 10; j++) {
-            let a = p5_instance.random(-p5_instance.width / 2, p5_instance.width / 2); // Random discrepancy between the sin waves
-            let b = p5_instance.random(-p5_instance.width / 2, p5_instance.width / 2); // Random discrepancy between the sin waves
+            let a = p5_instance.random(-width / 2, width / 2); // Random discrepancy between the sin waves
+            let b = p5_instance.random(-width / 2, width / 2); // Random discrepancy between the sin waves
             let c = p5_instance.random(2, 4); // Random amplitude for the second sin wave
             let d = p5_instance.random(40, 50); // Noise function amplitude
-            let e = p5_instance.random(-p5_instance.width / 2, p5_instance.width / 2); // Adds a discrepancy between the noise of each mountain
+            let e = p5_instance.random(-width / 2, width / 2); // Adds a discrepancy between the noise of each mountain
 
-            for (let x = 0; x < p5_instance.width; x++) {
+            for (let x = 0; x < width; x++) {
                 let y = cy[j]; // Y = reference Y
                 y += 10 * j * p5_instance.sin(2 * dx / j + a); // First sin wave oscillates according to j (the closer the mountain, the bigger the amplitude and smaller the frequency)
                 y += c * j * p5_instance.sin(5 * dx / j + b); // Second sin wave has a random medium amplitude (affects more the further mountains) and bigger frequency
@@ -242,14 +153,15 @@ const Sun = ({ value }) => {
             }
         }
     }
+    
+
     const Sketch = (p, value, canvasRef) => {
+
         p.setup = () => {
 
             p.createCanvas(canvasRef.current.offsetWidth, canvasRef.current.offsetHeight);
             p.background(220);
             p.background(0, 20, 80);
-
-
             // Create the sun
             let centerX = p.width / 2;
             let centerY = p.height / 2;
@@ -259,8 +171,7 @@ const Sun = ({ value }) => {
             var fadingFactor = 0.8;
             var flaresActivity = 0.2;
             var imageWidth = Math.max(p.width, p.height);
-            var flaresColor = 165
-
+            var flaresColor = 165;
             let x = centerX;
             let y = centerY;
             let position = p.createVector(x, y);
@@ -299,14 +210,12 @@ const Sun = ({ value }) => {
                 p.stroke(newc);
                 p.line(0, y, p.width, y);
             }
-            sun.setSize(value.current["Size"]);
+
             // update the sun
-            ytarget = p.map(value.current["Sun Position"] * 3, val, 0, 2 / 6 * p.height, 6 / 6 * p.height, true);
+            ytarget = p.map(value.current["Sun Position"] * 3, val, 0, 1 / 6 * p.height, 5 / 6 * p.height, true);
             sun.setPosition(ytarget)
-            //Update the star
-            //sun.update();
             // Paint the star
-            sun.paint();
+            sun.paint(p.map(value.current["Size"],0,1,0.8,1.4));
 
             // draw mountains
             // Define the colors
@@ -314,13 +223,13 @@ const Sun = ({ value }) => {
             let cCloser = p.color(8, 17, 26); // Greeny saturated dark blue for the closer mountains
             let cMist = p.color(200, 200, 200); // White for the mist
             // p.background(230, 25, 90);
-            mountains(p, cCloser, cFurther, cMist);
+            mountains(p, cCloser, cFurther, cMist, canvasRef.current.offsetWidth, canvasRef.current.offsetHeight);
 
         };
-    }
 
+    }
     return (
-        <P5Wrapper sketch={Sketch} params={value} />
+        <P5Wrapper sketch={Sketch} params={value}/>
     )
 };
 
