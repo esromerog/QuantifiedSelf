@@ -56,7 +56,7 @@ export function FileUploader({ show, handleClose }) {
 
     const deviceList = ["EMOTIV"];
     const dropdownMenu = deviceList.map((item) =>
-        <option value={item}>
+        <option value={item} key={item}>
             {item}
         </option>
     )

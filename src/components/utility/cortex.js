@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Quaternion from 'quaternion';
+import store from '../../store';
 
 function computePower(arr) {
     /**
@@ -71,10 +72,10 @@ function log(message) {
     // let logElement = this.logElement
     // const newContent = createSpan(message);
     // logElement.child(newContent);
-    // console.log(message)
+    console.log(message);
 }
 class Cortex {
-    
+
     constructor(user, socketUrl) {
         // create socket
         this.socket = new WebSocket(socketUrl)
@@ -98,9 +99,19 @@ class Cortex {
                 try {
                     let data = message.data;
                     if (JSON.parse(data)['id'] == QUERY_HEADSET_ID) {
-                        log(JSON.parse(data)['result'])
-                        if (JSON.parse(data)['result'].length > 0) {
-                            let headsetId = JSON.parse(data)['result'][0]['id']
+                        const results = JSON.parse(data)['result']
+                        log(results)
+                        if (results.length > 0) {
+                            const state = store.getState();
+                            const other_ids = Object.keys(state.deviceMeta)
+                                .filter((elem) => state.deviceMeta[elem]?.device === "EMOTIV")
+                                .map((elem) => state.deviceMeta[elem]?.id);
+
+                            const diff_ids = results
+                                .map(({ id }) => id)
+                                .filter((id) => !other_ids.includes(id));
+
+                            let headsetId = diff_ids[0]
                             resolve(headsetId)
                         }
                         else {
@@ -463,7 +474,6 @@ class Cortex {
 }
 
 
-import store from '../../store';
 //initialize the output
 let powerVector = [0, 0, 0, 0, 0];
 let motionVector = [0, 0, 0];

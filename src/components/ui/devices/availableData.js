@@ -12,7 +12,7 @@ function PopupItem({item}) {
     const [show, setShow] = useState(false);
     const target = useRef(null);
     return (
-        <div className="col border border-primary-subtle rounded-pill me-2" onMouseEnter={()=>setShow(true)} onMouseLeave={()=>setShow(false)} key={item.name}>
+        <div className="col border border-primary-subtle rounded-pill me-2 mt-2" onMouseEnter={()=>setShow(true)} onMouseLeave={()=>setShow(false)} key={item.name}>
             <div className='d-flex m-2 justify-content-between align-items-start' key={item.name}>
                 <div  ref={target}>{item.name} </div>
                 <Overlay className="custom-tooltip" target={target.current} show={show} placement="bottom">

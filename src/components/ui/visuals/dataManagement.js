@@ -8,7 +8,6 @@ import { allVisSources } from '../../../App';
 import { useParams } from 'react-router-dom';
 import { createSelector } from 'reselect';
 
-const selectParams = state => state.params;
 const selectStream = state => state.dataStream;
 
 const getDataStreamKeys = createSelector(
@@ -192,7 +191,7 @@ function DataAutoSlider({ dataMappings, parameter }) {
     }
 
     let { visID } = useParams();
-
+ 
     useEffect(() => {
         // Updates the values
         dispatch({

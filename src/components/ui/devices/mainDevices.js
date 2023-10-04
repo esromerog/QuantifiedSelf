@@ -1,10 +1,9 @@
 import React, {useState} from 'react';
 import { useSelector } from "react-redux";
+import Modal from 'react-bootstrap/Modal';
 
 import RenderDevices from "./devicesTab";
-
 import { EmotivConnection } from './stream_functions/emotiv';
-
 import AvailableDataInformation from "./availableData";
 
 import DataManagement from '../visuals/dataManagement';
@@ -14,6 +13,15 @@ import { createSelector } from 'reselect';
 
 const selectData = state => state.dataStream;
 const selectDeviceMeta = state => state.deviceMeta;
+
+const getDataIDs = createSelector(
+    [selectDeviceMeta],
+    (deviceMeta) => {
+        return Object.keys(deviceMeta)
+            .filter((name) =>deviceMeta[name]?.id?.includes("EPOC"));
+    }
+)
+
 
 export const selectDevices = createSelector(
     [selectData, selectDeviceMeta],
@@ -31,6 +39,8 @@ export function DeviceSelectionWindow() {
 
     const [modalDevice, setModalDevice] = useState("");
     const [show, setShow] = useState(false);
+    
+
     const handleClose = () => { setShow(false); setModalDevice("")}
     function handleShow(device) { setShow(true); setModalDevice(device)};
 
@@ -38,6 +48,13 @@ export function DeviceSelectionWindow() {
     const deviceModals = {
         "EMOTIV": <EmotivConnection show={show} handleClose={handleClose}/>,
         "Upload": <FileUploader show={show} handleClose={handleClose}/>
+    }
+    
+    // Check if you have more than two EPOC or EPOC+ headsets. If you do, the connectivity option becomes available
+    const emotivIDs = useSelector(getDataIDs);
+    let showConn = false;
+    if (emotivIDs.length>1) {
+        showConn = true;
     }
 
     return (
@@ -59,6 +76,9 @@ export function DeviceSelectionWindow() {
                         <ul className="dropdown-menu">
                             <li><a className="dropdown-item" href="#" onClick={()=>handleShow("EMOTIV")}>EMOTIV</a></li>
                             <li><a className="dropdown-item" href="#" onClick={()=>handleShow("Upload")}>Upload a file</a></li>
+                            {showConn?
+                            <li><a className="dropdown-item" href="#" onClick={()=>handleShow("")}>Hyperscanning</a></li>
+                            :null}
                         </ul>
                     </div>
                     {deviceModals[modalDevice]}

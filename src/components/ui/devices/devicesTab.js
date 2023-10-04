@@ -5,7 +5,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { EmotivConnection } from './stream_functions/emotiv';
 import { RecordedDataButton } from './stream_functions/file_upload';
 import { selectDevices } from './mainDevices';
-
+import { Modal } from 'react-bootstrap';
+import { ModalDataInformation } from './availableData';
 
 function EmotivDeviceButton({ data, name, handleShow }) {
 
@@ -110,7 +111,7 @@ export default function RenderDevices() {
     });
 
     const deviceModal = {
-        "EMOTIV": <EmotivConnection show={show} handleClose={handleClose} />
+        "EMOTIV": <EmotivDeviceModal show={show} handleClose={handleClose} />
     }
 
 
@@ -128,3 +129,25 @@ export default function RenderDevices() {
     );
 }
 
+
+function EmotivDeviceModal({ show, handleClose }) {
+    // Modal to view the Emotiv Headset
+    const device = devicesRaw.find(({ heading }) => heading === "EMOTIV");
+    const source = ["EMOTIV"];
+
+    return (
+        <Modal show={show} onHide={handleClose} centered size="lg">
+            <Modal.Header closeButton>
+                <Modal.Title>{device.heading}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                {device.description}
+                <div className='mt-3'>
+                    <h5>Available data streams</h5>
+                    <p>This device can stream the following data to a visualization. Hover to learn more.</p>
+                    <ModalDataInformation source={source} popupInfo={[device]} groupData={true} />
+                </div>
+            </Modal.Body>
+        </Modal>
+    )
+}

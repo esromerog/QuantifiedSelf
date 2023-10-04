@@ -11,7 +11,7 @@ const device = devicesRaw.find(({ heading }) => heading === "EMOTIV");
 
 export function EmotivConnection({ show, handleClose }) {
     // Modal to connect to the Emotiv headset
-    
+
     const dispatch = useDispatch();
 
     const [connText, setConnText] = useState({ text: "", type: "" });
@@ -40,7 +40,10 @@ export function EmotivConnection({ show, handleClose }) {
                     type: 'devices/create',
                     payload: {
                         id: id,
-                        metadata: { device: "EMOTIV" }
+                        metadata: {
+                            device: "EMOTIV",
+                            id: id
+                        }
                     }
                 })
             } else {
