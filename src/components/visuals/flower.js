@@ -77,12 +77,12 @@ const Flower = ({ value }) => {
 	}
 
     const Sketch = (p, value, canvasRef) => {
-    	let theta = p.color(72, 50, 133); //blue
-		let alpha = p.color(37, 167, 0); //green
-		let beta1 = p.color(247, 213, 30); //bright yellow
-		let beta2 = p.color(247, 148, 30); //orange
-		let gamma = p.color(237, 25, 33); //gamma
-		let colors = [theta, alpha, beta1, beta2, gamma]
+    	let theta = p.color(72, 50, 133); // Blue
+		let alpha = p.color(37, 17, 30); // Dark purple
+		let beta1 = p.color(247, 213, 30); // Yellow
+		let beta2 = p.color(247, 148, 30); // Orange
+		let gamma = p.color(207, 25, 73); // Red
+		let colors = [theta, alpha, beta1, beta2, gamma];
         p.setup = () => {
         	p.createCanvas(canvasRef.current.offsetWidth, canvasRef.current.offsetHeight);
         };

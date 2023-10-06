@@ -46,8 +46,8 @@ const PowerBars = ({value}) => {
         let width = canvasRef.current.offsetWidth;
         let height = canvasRef.current.offsetHeight;
         let ts = [];
-        let ts_key = 'time series';
-        var keys = ['val1','val2','val3','val4','val5'];
+        let ts_key = 'Time Series';
+        var keys = ['Theta','Alpha',"Low beta","High beta","Gamma"];
         var xlabels = ['Theta','Alpha',"Low beta","High beta","Gamma"]; //data for the x axis
         var colors = ["#f9b820","#f9b820","#f9b820","#f9b820","#f9b820"];
 

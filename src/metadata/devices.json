@@ -29,6 +29,18 @@
         { "name": "F8", "description": "F8 channel of raw EEG", "type": "Raw EEG channels"},
         { "name": "AF4", "description": "AF4 channel of raw EEG", "type": "Raw EEG channels"}
       ]
+    },
+    {
+      "heading": "Muse",
+      "description": "The Muse is another consumer EEG grade-headset. This one is generally intended for sleep studies, and meditation. It mainly acquires signals from the frontal lobe.",
+      "type": "EEG device",
+      "sampling_rate": 256,
+      "data": [
+        { "name": "TP9", "description": "EEG activity from the left temporal lobe."},
+        { "name": "TP10", "description": "EEG activity from the right temporal lobe."},
+        { "name": "AF7", "description": "EEG activity from the left frontal lobe."},
+        { "name": "AF8", "description": "EEG activity from the right temporal lobe"}
+      ]
     }
 ]
 

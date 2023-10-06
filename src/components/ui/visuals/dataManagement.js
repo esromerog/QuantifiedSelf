@@ -7,6 +7,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { allVisSources } from '../../../App';
 import { useParams } from 'react-router-dom';
 import { createSelector } from 'reselect';
+import visualsRaw from './../../../metadata/vis'
+
 
 const selectStream = state => state.dataStream;
 
@@ -126,7 +128,6 @@ function DataAutoSlider({ dataMappings, parameter }) {
     let source; // Extracts the value from that dataSource
 
     // Logic that fetches the data from the device stream based on your selection in the dropdown
-    // I could also change or make this logic more complicated if I end up going for an LSL format in the stream
     try {
         source = stream[select[0]][select[1]];
     } catch (error) {
@@ -191,7 +192,8 @@ function DataAutoSlider({ dataMappings, parameter }) {
     }
 
     let { visID } = useParams();
- 
+
+    /*
     useEffect(() => {
         // Updates the values
         dispatch({
@@ -202,6 +204,7 @@ function DataAutoSlider({ dataMappings, parameter }) {
             }
         })
     }, [source]);
+    */
 
     useEffect(() => {
         // Actual autorange function.
@@ -289,11 +292,11 @@ function DataAutoSlider({ dataMappings, parameter }) {
 }
 
 
-function ParameterDropDown({ claves, parameter, dataMappings, setDataMappings, displayName }) {
+function ParameterDropDown({ claves, parameter, dataMappings, displayName }) {
 
     const [show, setShow] = useState(true);
 
-    const suggestedClass = (option) => {
+    const defaultClass = (option) => {
         // Checks to see if the parameter has a suggested class. If that suggested class is equal to the option, changes styling.
         if ('suggested' in parameter && parameter.suggested === option) {
             return "dropdown-item text-primary";
@@ -305,7 +308,7 @@ function ParameterDropDown({ claves, parameter, dataMappings, setDataMappings, d
     // Display text on the card. Upon creation, it checks the status
     const [display, setDisplay] = useState(() => {
         let disp = dataMappings[parameter.name];
-
+        console.log(disp)
         if (disp === "Manual") disp = [0, "Manual"];
         if (displayName !== undefined) disp = (parameter.name + ": " + disp);
         else disp = (disp[1]);
@@ -313,9 +316,23 @@ function ParameterDropDown({ claves, parameter, dataMappings, setDataMappings, d
     });
 
     let { visID } = useParams();
+    const dispatch = useDispatch();
+
 
     // Changes the data source
     function selectNewSource(sourceName) {
+        
+        dispatch(
+            {
+                type: "params/updateMappings", 
+                payload: {
+                    parameter: parameter.name,
+                    stream: sourceName,
+                    vis: visID
+                }
+            })
+
+        /*
         const maps = Object.assign({}, dataMappings);
         maps[parameter.name] = sourceName;
         setDataMappings(maps); // Changes datamappings
@@ -324,11 +341,12 @@ function ParameterDropDown({ claves, parameter, dataMappings, setDataMappings, d
             ...currMappings,
             [visID]: maps
         }
-        
         sessionStorage.setItem("dataMappings", JSON.stringify(updatedMappings));
+        */
 
         // Changes the display text when the data source/dataMappings change
-        let disp = maps[parameter.name];
+
+        let disp = sourceName;
 
         if (sourceName === "Manual") disp = [0, "Manual"];
         if (displayName !== undefined) setDisplay(parameter.name + ": " + disp[1]);
@@ -354,7 +372,7 @@ function ParameterDropDown({ claves, parameter, dataMappings, setDataMappings, d
                                 {option.data.map((data) => {
                                     return (
                                         <li key={data}>
-                                            <button className={suggestedClass(data)} onClick={() => selectNewSource([option.device, data])}>
+                                            <button className={"dropdown-item"} onClick={() => selectNewSource([option.device, data])}>
                                                 {data}
                                             </button>
                                         </li>)
@@ -368,7 +386,7 @@ function ParameterDropDown({ claves, parameter, dataMappings, setDataMappings, d
         </div>)
 }
 
-function ParameterManager({ claves, parameter, dataMappings, setDataMappings }) {
+function ParameterManager({ claves, parameter, dataMappings }) {
 
     const manual = dataMappings[parameter.name] === "Manual";
 
@@ -377,7 +395,6 @@ function ParameterManager({ claves, parameter, dataMappings, setDataMappings }) 
         claves={claves}
         parameter={parameter}
         dataMappings={dataMappings}
-        setDataMappings={setDataMappings}
     />);
 
     return (
@@ -395,7 +412,7 @@ function ParameterManager({ claves, parameter, dataMappings, setDataMappings }) 
     )
 }
 
-function DataCard({ visParameter, dataMappings, setDataMappings }) {
+function DataCard({ visParameter, dataMappings }) {
 
     // claves is the object returned from the getDataStreamKeys that provides the devices & their streams as a list
     const claves = useSelector(getDataStreamKeys)
@@ -405,8 +422,7 @@ function DataCard({ visParameter, dataMappings, setDataMappings }) {
         return <ParameterManager
             claves={claves}
             parameter={visParameter}
-            dataMappings={dataMappings}
-            setDataMappings={setDataMappings} />;
+            dataMappings={dataMappings} />;
 
     }
 
@@ -419,8 +435,7 @@ function DataCard({ visParameter, dataMappings, setDataMappings }) {
             <ParameterDropDown
                 claves={claves}
                 parameter={visParameter}
-                dataMappings={dataMappings}
-                setDataMappings={setDataMappings} />
+                dataMappings={dataMappings} />
         </div>
     );
 
@@ -470,6 +485,7 @@ export default function DataManagement() {
 
     const visInfo = allVisSources.find(x => x.name === visID);
 
+    /*
     const [dataMappings, setDataMappings] = useState(() => {
         const storedMappings = sessionStorage.getItem("dataMappings");
         console.log(JSON.parse(storedMappings));
@@ -486,14 +502,16 @@ export default function DataManagement() {
             return defaultMappings
         }
     });
+*/
+
+    const dataMappings = useSelector(state => state.paramsMappings);
 
     // Generates the cards with the parameters
     const dataCards = visInfo.properties?.map((parameter) => (
         <DataCard
             visParameter={parameter}
             key={parameter.name}
-            dataMappings={dataMappings}
-            setDataMappings={setDataMappings} />));
+            dataMappings={dataMappings} />));
 
     return (
         <div>

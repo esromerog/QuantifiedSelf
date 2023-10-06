@@ -419,7 +419,7 @@ function VisualWindow({ visMetadata }) {
         "Signal View": <SignalView value={paramsRef} />,
         "Power Bars": <PowerBars value={paramsRef} />,
         "Custom": <P5Visuals value={paramsRef} code={code} />,
-        // "Flower": <Flower value={paramsRef} />
+        "Flower": <Flower value={paramsRef} />
     };
 
     const fullScreenHandle = useFullScreenHandle();

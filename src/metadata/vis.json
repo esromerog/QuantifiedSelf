@@ -16,20 +16,20 @@
   },
   {
       "properties": [
-        {"name": "signal1", "value": 0},
-        {"name": "signal2", "value": 0},
-        {"name": "signal3", "value": 0},
-        {"name": "signal4", "value": 0},
-        {"name": "signal5", "value": 0},
-        {"name": "signal6", "value": 0},
-        {"name": "signal7", "value": 0},
-        {"name": "signal8", "value": 0},
-        {"name": "signal9", "value": 0},
-        {"name": "signal10", "value": 0},
-        {"name": "signal11", "value": 0},
-        {"name": "signal12", "value": 0},
-        {"name": "signal13", "value": 0},
-        {"name": "signal14", "value": 0}
+        {"name": "Signal 1", "value": 0},
+        {"name": "Signal 2", "value": 0},
+        {"name": "Signal 3", "value": 0},
+        {"name": "Signal 4", "value": 0},
+        {"name": "Signal 5", "value": 0},
+        {"name": "Signal 6", "value": 0},
+        {"name": "Signal 7", "value": 0},
+        {"name": "Signal 8", "value": 0},
+        {"name": "Signal 9", "value": 0},
+        {"name": "Signal 10", "value": 0},
+        {"name": "Signal 11", "value": 0},
+        {"name": "Signal 12", "value": 0},
+        {"name": "Signal 13", "value": 0},
+        {"name": "Signal 14", "value": 0}
 
       ],
       "name": "Signal View",
@@ -37,12 +37,12 @@
   },
   {
       "properties": [
-        {"name": "val1", "value": 0},
-        {"name": "val2", "value": 0},
-        {"name": "val3", "value": 0},
-        {"name": "val4", "value": 0},
-        {"name": "val5", "value": 0},
-        {"name": "time series", "value": 0}
+        {"name": "Theta", "value": 0, "default": "Theta"},
+        {"name": "Alpha", "value": 0, "default": "Alpha"},
+        {"name": "Low Beta", "value": 0, "default": "Low beta"},
+        {"name": "High Beta", "value": 0, "default": "High beta"},
+        {"name": "Gamma", "value": 0, "default": "Gamma"},
+        {"name": "Time Series", "value": 0}
       ],
       "name": "Power Bars",
       "img_src": "power.png"
@@ -64,11 +64,11 @@
   },
   {
       "properties": [
-        {"name": "val1", "value": 0},
-        {"name": "val2", "value": 0},
-        {"name": "val3", "value": 0},
-        {"name": "val4", "value": 0},
-        {"name": "val5", "value": 0}
+        {"name": "Blue", "value": 0},
+        {"name": "Purple", "value": 0},
+        {"name": "Yellow", "value": 0},
+        {"name": "Orange", "value": 0},
+        {"name": "Red", "value": 0}
       ],
       "name": "Flower",
       "img_src": "sun.png"

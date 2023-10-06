@@ -22,6 +22,8 @@
     "install": "^0.13.0",
     "mathjs": "^11.11.1",
     "monaco-jsx-highlighter": "^2.0.4",
+    "muse-js": "^3.3.0",
+    "musejs": "^1.0.2",
     "npm": "^9.8.1",
     "p5": "^1.7.0",
     "papaparse": "^5.4.1",
@@ -64,5 +66,10 @@
   "devDependencies": {
     "gh-pages": "^5.0.0",
     "sass": "^1.63.6"
-  }
+  },
+  "description": "This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }

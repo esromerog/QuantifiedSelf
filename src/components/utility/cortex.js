@@ -489,6 +489,7 @@ class CortexPower extends Cortex {
     // Add error handling functino using parsedData to check if there's data. I could also throw a return value from the sub?
     // 'eeg' contains ['COUNTER', 'INTERPOLATED', 'AF3', 'F7', 'F3', 'FC5', 'T7', 'P7', 'O1', 'O2', 'P8', 'T8', 'FC6', 'F4', 'F8', 'AF4', 'RAW_CQ', 'MARKER_HARDWARE', 'MARKERS']
     manipulate(parsedData) {
+   
         // resolving power data
         try {
             let power = parsedData['pow'];
@@ -518,18 +519,19 @@ class CortexPower extends Cortex {
             "Low beta": powerVector[2],
             "High beta": powerVector[3],
             "Gamma": powerVector[4],
-            'X': motionVector[0],
-            'Y': motionVector[1],
-            'Z': motionVector[2],
+            //'X': motionVector[0],
+            //'Y': motionVector[1],
+            //'Z': motionVector[2],
             'time': time,
         };
 
+        /*
         //append the raw channels
         for (let i = 0; i < chns.length; i++) {
             let key = chns[i];
             let val = rawVector[i];
             newData[key] = val;
-        }
+        }*/
         store.dispatch({ type: 'devices/streamUpdate', payload: { id: this.headsetId, data: newData } })
     }
 }
