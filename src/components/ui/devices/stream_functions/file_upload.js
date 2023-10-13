@@ -5,10 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import Modal from 'react-bootstrap/Modal';
 import store from '../../../../store';
-import { toHaveFormValues } from '@testing-library/jest-dom/dist/matchers';
 import { createSelector } from 'reselect';
-
-
 
 const getDataIDs = createSelector(
     [state=>state.deviceMeta],

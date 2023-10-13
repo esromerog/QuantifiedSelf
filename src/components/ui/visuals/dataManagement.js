@@ -8,6 +8,7 @@ import { allVisSources } from '../../../App';
 import { useParams } from 'react-router-dom';
 import { createSelector } from 'reselect';
 import visualsRaw from './../../../metadata/vis'
+import { create } from 'mathjs';
 
 
 const selectStream = state => state.dataStream;
@@ -29,6 +30,18 @@ const getDataStreamKeys = createSelector(
     }
 )
 
+const selectDataMappings = createSelector(
+    [state => state.paramsMeta],
+    (metadata) => {
+        return Object.keys(metadata).reduce((acc, curr)=>{
+            acc[curr]=metadata[curr]["mapping"]
+            return acc
+        }, {})
+    }
+)
+
+
+
 
 function DataManualSlider({ parameter }) {
     // This function is the list item when it is connected not connected to a datastream
@@ -39,7 +52,6 @@ function DataManualSlider({ parameter }) {
     // I can rework this to use the store state.params initial state/default values. 
     // May also loop through the visParameters JSON using the keys of the state.params object
 
-    let { visID } = useParams();
 
     const params = useSelector(state => state.params);
 
@@ -70,6 +82,7 @@ function DataManualSlider({ parameter }) {
 
     // Handles changing the values of the input
     const handleFormChange = (e) => {
+        e.preventDefault();
         let formValue = e.target.value;
         if (formValue > max) {
             formValue = max;
@@ -90,7 +103,7 @@ function DataManualSlider({ parameter }) {
         <div className="row justify-content-start">
             <div className="col-xxl-5 col-xl-4 col-lg-5">
                 <div className="input-group">
-                    <form className="form-floating">
+                    <form className="form-floating" autocomplete="off">
                         <input type="text" className="form-control" id="valorManualInput" value={Math.round(valor * 1000) / 1000 || 0} onChange={handleFormChange} />
                         <label htmlFor='valorManualInput'>Value</label>
                     </form>
@@ -102,6 +115,7 @@ function DataManualSlider({ parameter }) {
                     className="form-range align-self-center"
                     onChange={handleInputChange}
                     id="customRange1"
+                    autoComplete='off'
                     value={valor || 0}
                     step={0.01}
                     min={min}
@@ -117,6 +131,7 @@ function DataAutoSlider({ dataMappings, parameter }) {
     // This function is the list item when it is connected to a data stream.
     // It contains the logic to handle changing into manual mode, setting auto-range, and setting the value of the parameter, to the stream value.
 
+    const range = useSelector(state => state.paramsMeta[parameter]["range"]);
 
     const dispatch = useDispatch();
     const stream = useSelector(selectStream);
@@ -135,10 +150,10 @@ function DataAutoSlider({ dataMappings, parameter }) {
     }
 
     // Min & Max values.
-    const [min, setMin] = useState(0); // Actual values used by the mapping
-    const [max, setMax] = useState(1);
-    const [formMin, setFormMin] = useState(0); // Values to be shown when the user edits the form
-    const [formMax, setFormMax] = useState(1);
+    const [min, setMin] = useState(range[0]); // Actual values used by the mapping
+    const [max, setMax] = useState(range[1]);
+    const [formMin, setFormMin] = useState(range[0]); // Values to be shown when the user edits the form
+    const [formMax, setFormMax] = useState(range[1]);
 
     const [disabled, setDisabled] = useState(false); // Defines if items are disabled (ex, when autoranging)
 
@@ -158,6 +173,13 @@ function DataAutoSlider({ dataMappings, parameter }) {
             return
         }
         setMin(formMin);
+        dispatch({
+            type: 'params/updateRange',
+            payload: {
+                parameter: parameter,
+                range: [min, max]
+            }
+        })
     }
 
     function looseFocusMax() {
@@ -176,11 +198,13 @@ function DataAutoSlider({ dataMappings, parameter }) {
             return
         }
         setMax(parseFloat(formMax));
-    }
-
-    function normalizeValue(value, minimum, maximum) {
-        const normalizedValue = (value - minimum) / (maximum - minimum);
-        return normalizedValue;
+        dispatch({
+            type: 'params/updateRange',
+            payload: {
+                parameter: parameter,
+                range: [min, max]
+            }
+        })
     }
 
     const [buffer, setBuffer] = useState([false]); // Data buffer for autorange
@@ -190,21 +214,6 @@ function DataAutoSlider({ dataMappings, parameter }) {
         setBuffer([])
         setDisabled(true);
     }
-
-    let { visID } = useParams();
-
-    /*
-    useEffect(() => {
-        // Updates the values
-        dispatch({
-            type: 'params/update',
-            payload: {
-                name: parameter,
-                newValue: normalizeValue(source, min, max)
-            }
-        })
-    }, [source]);
-    */
 
     useEffect(() => {
         // Actual autorange function.
@@ -223,13 +232,21 @@ function DataAutoSlider({ dataMappings, parameter }) {
             setMax(maximo);
             setFormMax(maximo);
 
+            dispatch({
+                type: 'params/updateRange',
+                payload: {
+                    parameter: parameter,
+                    range: [min, max]
+                }
+            })
+
             setBuffer([false])
         }
     }, [source])
 
     /// function to change the form value
-    const formMinChange = useCallback((e) => { setFormMin(e.target.value) }, []);
-    const formMaxChange = useCallback((e) => { setFormMax(e.target.value) }, []);
+    const formMinChange = useCallback((e) => { e.preventDefault(); setFormMin(e.target.value) }, []);
+    const formMaxChange = useCallback((e) => { e.preventDefault(); setFormMax(e.target.value) }, []);
 
 
     const rangeToolTip = (
@@ -241,6 +258,7 @@ function DataAutoSlider({ dataMappings, parameter }) {
                         <input
                             type="text"
                             className="form-control"
+                            autoComplete='off'
                             inputMode='decimal'
                             id="max"
                             value={formMin}
@@ -253,6 +271,7 @@ function DataAutoSlider({ dataMappings, parameter }) {
                     <div className="form-floating">
                         <input
                             type="text"
+                            autoComplete='off'
                             className="form-control"
                             id="max"
                             value={formMax}
@@ -274,7 +293,7 @@ function DataAutoSlider({ dataMappings, parameter }) {
         <div className="row justify-content-start">
             <div className="col-4">
                 <div className="input-group">
-                    <form className="form-floating">
+                    <form className="form-floating" autocomplete="off">
                         <input type="text" className="form-control" id="valueAutoInput" value={Math.round(source * 1000) / 1000} disabled></input>
                         <label htmlFor='valueAutoInput'>Value</label>
                     </form>
@@ -296,20 +315,12 @@ function ParameterDropDown({ claves, parameter, dataMappings, displayName }) {
 
     const [show, setShow] = useState(true);
 
-    const defaultClass = (option) => {
-        // Checks to see if the parameter has a suggested class. If that suggested class is equal to the option, changes styling.
-        if ('suggested' in parameter && parameter.suggested === option) {
-            return "dropdown-item text-primary";
-        } else {
-            return "dropdown-item";
-        }
-    }
-
     // Display text on the card. Upon creation, it checks the status
     const [display, setDisplay] = useState(() => {
         let disp = dataMappings[parameter.name];
-        console.log(disp)
+        console.log(dataMappings);
         if (disp === "Manual") disp = [0, "Manual"];
+        console.log(disp);
         if (displayName !== undefined) disp = (parameter.name + ": " + disp);
         else disp = (disp[1]);
         return disp
@@ -332,27 +343,13 @@ function ParameterDropDown({ claves, parameter, dataMappings, displayName }) {
                 }
             })
 
-        /*
-        const maps = Object.assign({}, dataMappings);
-        maps[parameter.name] = sourceName;
-        setDataMappings(maps); // Changes datamappings
-        const currMappings = JSON.parse(sessionStorage.getItem("dataMappings"));
-        const updatedMappings = {
-            ...currMappings,
-            [visID]: maps
-        }
-        sessionStorage.setItem("dataMappings", JSON.stringify(updatedMappings));
-        */
-
         // Changes the display text when the data source/dataMappings change
-
         let disp = sourceName;
 
         if (sourceName === "Manual") disp = [0, "Manual"];
         if (displayName !== undefined) setDisplay(parameter.name + ": " + disp[1]);
         else setDisplay(disp[1]);
         setShow(false);
-
     }
 
     // Changes the color of the button as dataMappings changes
@@ -439,8 +436,6 @@ function DataCard({ visParameter, dataMappings }) {
         </div>
     );
 
-    // const dropDownClassName = expanded ? "btn-map-transition expanded col align-items-right" : "btn-map-transition closed col align-items-right";
-
     return (
         <div className="list-group-item" key={visParameter.name}>
             <div className="d-flex align-items-center pt-1 pb-1" key={visParameter.name}>
@@ -485,26 +480,7 @@ export default function DataManagement() {
 
     const visInfo = allVisSources.find(x => x.name === visID);
 
-    /*
-    const [dataMappings, setDataMappings] = useState(() => {
-        const storedMappings = sessionStorage.getItem("dataMappings");
-        console.log(JSON.parse(storedMappings));
-        if (storedMappings !== null && visInfo.name in JSON.parse(storedMappings)) {
-            const mappings = JSON.parse(storedMappings)
-            return mappings[visID];
-        } else {
-            const defaultMappings = visInfo.properties?.reduce((acc, datos) => {
-                acc[datos.name] = "Manual";
-                return acc
-            }, {})
-            
-
-            return defaultMappings
-        }
-    });
-*/
-
-    const dataMappings = useSelector(state => state.paramsMappings);
+    const dataMappings = useSelector(selectDataMappings);
 
     // Generates the cards with the parameters
     const dataCards = visInfo.properties?.map((parameter) => (
@@ -522,5 +498,7 @@ export default function DataManagement() {
         </div>
     );
 }
+
+
 
 

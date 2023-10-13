@@ -9,19 +9,21 @@ import { AccessorNodeDependencies } from "mathjs";
 
 let pathname = window.location.pathname;
 pathname = pathname.split("/")[1].replace("%20", " ");
-const params = visualsRaw.find(({name}) => name===pathname)?.properties;
-console.log(params)
+const params = visualsRaw.find(({ name }) => name === pathname)?.properties;
 
-const loadMappings = () => {
-    const storedMappings = sessionStorage.getItem("dataMappings");
+const loadMeta = () => {
+    const storedMetaData = sessionStorage.getItem("paramsMeta");
 
-    if (params!==undefined) {
-        if (storedMappings !== null && pathname in JSON.parse(storedMappings)) {
-            const maps = JSON.parse(storedMappings)
-            return maps[pathname];  
+    if (params !== undefined) {
+        if (storedMetaData !== null && pathname in JSON.parse(storedMetaData)) {
+            const maps = JSON.parse(storedMetaData)
+            return maps[pathname];
         } else {
-            return params.reduce((acc, curr)=>{
-                acc[curr.name] = "Manual"
+            return params.reduce((acc, curr) => {
+                acc[curr.name] = {
+                    "mapping": "Manual",
+                    "range": [0, 1]
+                }
                 return acc
             }, {})
         }
@@ -31,8 +33,8 @@ const loadMappings = () => {
 }
 
 const loadParameters = () => {
-    if (params!==undefined) {
-        return params.reduce((acc, curr)=>{
+    if (params !== undefined) {
+        return params.reduce((acc, curr) => {
             acc[curr.name] = 0
             return acc
         }, {})
@@ -41,12 +43,16 @@ const loadParameters = () => {
     }
 }
 
+function normalizeValue(value, minimum, maximum) {
+    const normalizedValue = (value - minimum) / (maximum - minimum);
+    return normalizedValue;
+}
 
 const initialState = {
     params: loadParameters(),
     dataStream: {},
     deviceMeta: {},
-    paramsMappings: loadMappings(),
+    paramsMeta: loadMeta()
 };
 
 // React Redux Store to manage the data that moves throghout the entire app
@@ -65,31 +71,42 @@ function rootReducer(state = initialState, action) {
 
 
         case 'params/load':
-            const storedMappings = sessionStorage.getItem("dataMappings");
+            const storedMappings = sessionStorage.getItem("paramsMeta");
             let params = {};
             const selection = action.payload
-            let mappings = {};
-            
+            let meta = {};
+
             if (storedMappings !== null && selection.name in JSON.parse(storedMappings)) {
                 const maps = JSON.parse(storedMappings)
                 params = Object.keys(maps[selection.name]).reduce((acc, parameter) => {
                     acc[parameter] = 0;
                     return acc;
                 }, {})
-                mappings = maps[selection.name];
+                meta = maps[selection.name];
             } else {
                 params = selection.properties.reduce((acc, parameter) => {
                     acc[parameter.name] = parameter.value;
                     return acc;
                 }, {});
-                mappings = selection.properties.reduce((acc, parameter) => {
+                meta = selection.properties.reduce((acc, parameter) => {
                     if ('default' in parameter) {
                         const foundDevice = Object.keys(state.dataStream).find((obj) => parameter.default in state.dataStream[obj])
                         if (foundDevice) {
-                            acc[parameter.name] = [foundDevice, parameter.default];
+                            acc[parameter.name] = {
+                                "mapping": [foundDevice, parameter.default],
+                                "range": [0, 1]
+                            }
+                        } else {
+                            acc[parameter.name] = {
+                                "mapping": "Manual",
+                                "range": [0, 1]
+                            }
                         }
                     } else {
-                        acc[parameter.name] = "Manual";
+                        acc[parameter.name] = {
+                            "mapping": "Manual",
+                            "range": [0, 1]
+                        }
                     }
                     return acc;
                 }, {});
@@ -99,27 +116,54 @@ function rootReducer(state = initialState, action) {
             return {
                 ...state,
                 params: params,
-                paramsMappings: mappings
+                paramsMeta: meta
             }
 
         case 'params/updateMappings':
-            const currMappings = JSON.parse(sessionStorage.getItem("dataMappings"));
+            const currMappings = JSON.parse(sessionStorage.getItem("paramsMeta"));
+
             const newState = {
                 ...state,
-                paramsMappings: {
-                    ...state.paramsMappings,
-                    [action.payload.parameter]: action.payload.stream
+                paramsMeta: {
+                    ...state.paramsMeta,
+                    [action.payload.parameter]: {
+                        ...state.paramsMeta[action.payload.parameter],
+                        ["mapping"]: action.payload.stream
+                    }
                 }
             }
 
             const saveMappings = {
                 ...currMappings,
-                [action.payload.vis]: newState.paramsMappings
+                [action.payload.vis]: newState.paramsMeta
             }
 
-            sessionStorage.setItem("dataMappings", JSON.stringify(saveMappings));
+            sessionStorage.setItem("paramsMeta", JSON.stringify(saveMappings));
 
             return newState
+
+        case 'params/updateRange':
+            const curr = JSON.parse(sessionStorage.getItem("paramsMeta"));
+
+            const nextState = {
+                ...state,
+                paramsMeta: {
+                    ...state.paramsMeta,
+                    [action.payload.parameter]: {
+                        ...state.paramsMeta[action.payload.parameter],
+                        ["range"]: action.payload.range
+                    }
+                }
+            }
+
+            const saveState = {
+                ...curr,
+                [action.payload.vis]: nextState.paramsMeta
+            }
+
+            sessionStorage.setItem("paramsMeta", JSON.stringify(saveState));
+
+            return nextState
 
         case 'devices/create':
             // Logic to handle creation of a new device
@@ -157,10 +201,11 @@ function rootReducer(state = initialState, action) {
             // If it's mapped to something, update the parameter
             const updatedData = { ...state.params };
 
-            for (const item in state.paramsMappings) {
-                const src = state.paramsMappings[item]
-                if (src[0]===action.payload.id) {
-                    updatedData[item] = action.payload.data[src[1]]
+            for (const item in state.paramsMeta) {
+                const src = state.paramsMeta[item]["mapping"];
+                const range = state.paramsMeta[item]["range"];
+                if (src[0] === action.payload.id) {
+                    updatedData[item] = normalizeValue(action.payload.data[src[1]], range[0], range[1]);
                 }
             }
 
@@ -168,7 +213,7 @@ function rootReducer(state = initialState, action) {
                 ...state,
                 dataStream: {
                     ...state.dataStream,
-                    [action.payload.id]: action.payload.data
+                    [action.payload.id]: { ...state.dataStream[action.payload.id], ...action.payload.data }
                 },
                 params: updatedData
             }
@@ -182,3 +227,4 @@ const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const store = createStore(rootReducer, composeEnhancers(applyMiddleware()));
 
 export default store;
+

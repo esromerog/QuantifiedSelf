@@ -36,10 +36,13 @@
       "type": "EEG device",
       "sampling_rate": 256,
       "data": [
-        { "name": "TP9", "description": "EEG activity from the left temporal lobe."},
-        { "name": "TP10", "description": "EEG activity from the right temporal lobe."},
-        { "name": "AF7", "description": "EEG activity from the left frontal lobe."},
-        { "name": "AF8", "description": "EEG activity from the right temporal lobe"}
+        { "name": "Theta", "description": "Band power from (4-8Hz)", "type": "EEG Metrics"},
+        { "name": "Alpha", "description": "Band power from (8-12Hz)", "type": "EEG Metrics"},
+        { "name": "Beta", "description": "Band power from (16-25Hz)", "type": "EEG Metrics"},
+        { "name": "TP9", "description": "EEG activity from the left temporal lobe.", "type": "Raw EEG channels"},
+        { "name": "TP10", "description": "EEG activity from the right temporal lobe.", "type": "Raw EEG channels"},
+        { "name": "AF7", "description": "EEG activity from the left frontal lobe.", "type": "Raw EEG channels"},
+        { "name": "AF8", "description": "EEG activity from the right temporal lobe", "type": "Raw EEG channels"}
       ]
     }
 ]

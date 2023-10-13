@@ -5,7 +5,7 @@ import Modal from 'react-bootstrap/Modal';
 import { useDispatch, useSelector } from 'react-redux';
 import { ModalDataInformation } from '../availableData';
 import devicesRaw from '../../../../metadata/devices.json'
-import { selectDevices } from '../mainDevices';
+
 
 const device = devicesRaw.find(({ heading }) => heading === "EMOTIV");
 

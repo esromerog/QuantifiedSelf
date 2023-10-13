@@ -3,8 +3,7 @@ import React, { useState, useRef } from 'react';
 import devicesRaw from '../../../metadata/devices';
 import { useDispatch, useSelector } from 'react-redux';
 import { EmotivConnection } from './stream_functions/emotiv';
-import { RecordedDataButton } from './stream_functions/file_upload';
-import { selectDevices } from './mainDevices';
+
 import { Modal } from 'react-bootstrap';
 import { ModalDataInformation } from './availableData';
 
@@ -19,6 +18,7 @@ function EmotivDeviceButton({ data, name, handleShow }) {
         </div>
     );
 }
+
 
 
 
@@ -70,6 +70,7 @@ function FileDeviceButton({ data, name, handleShow }) {
 function DeviceList({ data, name, handleShow, uploaded }) {
     const deviceButton = {
         "EMOTIV": <EmotivDeviceButton data={data} name={name} handleShow={handleShow} />,
+        "Muse": <EmotivDeviceButton data={data} name = {name} handleShow={handleShow} />,
         "Upload": <FileDeviceButton data={data} name={name} handleShow={handleShow} />
     }
 
@@ -109,9 +110,9 @@ export default function RenderDevices() {
     });
 
     const deviceModal = {
-        "EMOTIV": <EmotivDeviceModal show={show} handleClose={handleClose} />
+        "EMOTIV": <EmotivDeviceModal show={show} handleClose={handleClose} />,
+        "Muse": <></>
     }
-
 
     function getDeviceModal(id) {
         return (

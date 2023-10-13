@@ -10,7 +10,7 @@ import DataManagement from '../visuals/dataManagement';
 import { Link, useParams } from 'react-router-dom';
 import { FileUploader, RecordedDataButton } from './stream_functions/file_upload';
 import { createSelector } from 'reselect';
-// import { MuseConnection } from './stream_functions/muse';
+import { MuseConnection } from './stream_functions/muse';
 
 const selectData = state => state.dataStream;
 const selectDeviceMeta = state => state.deviceMeta;
@@ -48,7 +48,7 @@ export function DeviceSelectionWindow() {
 
     const deviceModals = {
         "EMOTIV": <EmotivConnection show={show} handleClose={handleClose}/>,
-        // "Muse": <MuseConnection show={show} handleClose={handleClose}/>,
+        "Muse": <MuseConnection show={show} handleClose={handleClose}/>,
         "Upload": <FileUploader show={show} handleClose={handleClose}/>
     }
     
@@ -77,9 +77,8 @@ export function DeviceSelectionWindow() {
                         </a>
                         <ul className="dropdown-menu">
                             <li><a className="dropdown-item" href="#" onClick={()=>handleShow("EMOTIV")}>EMOTIV</a></li>
-                            {/*<li><a className="dropdown-item" href="#" onClick={()=>handleShow("Muse")}>Muse</a></li>*/}
+                            <li><a className="dropdown-item" href="#" onClick={()=>handleShow("Muse")}>Muse</a></li>
                             <li><a className="dropdown-item" href="#" onClick={()=>handleShow("Upload")}>Upload a file</a></li>
-                            
                             {showConn?
                             <li><a className="dropdown-item" href="#" onClick={()=>handleShow("")}>Hyperscanning</a></li>
                             :null}
@@ -105,11 +104,6 @@ export function DataManagementWindow() {
                 </Link>
                 <h5 className="m-0">Data Management</h5>
             </div>
-            {/*<div className="mt-3">
-                <h6>Available Data</h6>
-                <p className='mb-2'>The devices are currently streaming the following data. Hover over a data source to learn more.</p>
-                <AvailableDataInformation />
-             </div> */}
             <p className='mb-2 mt-2'>Tune the parameters of the visualization! If there is a stream of data, you'll be able to map the parameters to the stream</p>
             {!(mainMenu) ?
                 <DataManagement /> : null}
