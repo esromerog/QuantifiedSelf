@@ -3,10 +3,10 @@ This project aims to promote data literacy through the creative representation o
 
 This is a simple web app built using React and Node.js. It leverages multiple frameworks for working with different devices. Currently, it has support for the following devices.
 
-###### Muse 2
+#### Muse 2
 EEG sensing headband. The application interfaces with the Muse using the Chrome's Bluetooth API thanks to the [muse-js](https://github.com/urish/muse-js) module.
 
-###### EMOTIV
+### EMOTIV
 A variety of wireless EEG headsets. EMOTIV provides access to derived EEG metrics using their launcher and the [Cortex API](https://github.com/Emotiv/cortex-example). Raw EEG metrics require a paid license in the EMOTIV launcher. Currently, the API keys and the license information can be specified in your own .env file.
 
 
