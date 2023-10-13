@@ -12,11 +12,11 @@ A variety of wireless EEG headsets. EMOTIV provides access to derived EEG metric
 
 ## Installing and running the App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app). To install the required dependencies, navigate to the project directory and run:
 
-### Available Scripts
+#### `npm install`
 
-In the project directory, you can run:
+Afterwards, you can run:
 
 #### `npm start`
 
