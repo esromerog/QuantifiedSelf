@@ -1,4 +1,4 @@
-# Creative Representation Through the Quantified Self
+# Creative Representation of the Quantified Self
 This project aims to promote data literacy through the creative representation of the Quantified Self. It's meant to serve as a learning resource for students seeking to understand, play around, collect and visualize their physiological signals. The project uses P5.js as the basis for the creative visualizations. In the code base, you will also find a React implementation of [three-js](https://github.com/mrdoob/three.js) and [Shaderpark](https://github.com/shader-park/shader-park-docs).
 
 ## Devices
