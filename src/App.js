@@ -70,7 +70,7 @@ export default function App() {
           <Route path="/devices" element={<DeviceSelectionWindow />} />
           <Route path="/visuals" element={<MainMenu />} />
           <Route path="/visuals/:visID" element={<MainView />} />
-          <Route path="/" element={<Navigate to="home" />} />
+          <Route path="/" element={<Navigate to="devices" />} />
         </Routes>
       </div>
     </>
