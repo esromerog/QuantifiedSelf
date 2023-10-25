@@ -10,9 +10,12 @@
         "value": 0
       }
     ],
-    "name": "Sun Visualization",
+    "name": "Sun",
     "description": "2D visualization of a sun rising and setting on a range of mountains. Useful to test simple parameter changes",
-    "img_src": "sun.png"
+    "img_src": "sun.png",
+    "engine": "P5",
+    "code": "sun.js",
+    "id": "sunset"
   },
   {
       "properties": [
@@ -33,7 +36,10 @@
 
       ],
       "name": "Signal View",
-      "img_src": "signal.png"
+      "img_src": "signal.png",
+      "engine": "P5",
+      "code": "signal_display.js",
+      "id": "signal view"
   },
   {
       "properties": [
@@ -45,22 +51,10 @@
         {"name": "Time Series", "value": 0}
       ],
       "name": "Power Bars",
-      "img_src": "power.png"
-  },
-  {
-    "properties": [
-      {
-        "name": "Sun Position",
-        "value": 0
-      },
-      {
-        "name": "Size",
-        "value": 0
-      }
-    ],
-    "name": "Custom",
-    "description": "2D visualization of a sun rising and setting on a range of mountains. Useful to test simple parameter changes",
-    "img_src": "sun.png"
+      "img_src": "power.png",
+      "engine": "P5",
+      "code": "power_bars.js",
+      "id": "power bars"
   },
   {
       "properties": [
@@ -71,6 +65,9 @@
         {"name": "Red", "value": 0}
       ],
       "name": "Flower",
-      "img_src": "sun.png"
+      "description": "Flower visualization. Useful for power values.",
+      "engine": "P5",
+      "code": "flower.js",
+      "id": "flower"
   }
 ]

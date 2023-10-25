@@ -1,10 +1,11 @@
 import "./App.scss";
 import React, { useEffect, useState } from 'react';
-import MainVisualsWindow from "./components/ui/visuals/mainVisuals";
+import {MainMenu, MainView} from "./components/ui/visuals/mainVisuals";
 import visSourcesImport from './metadata/vis'
 import { DeviceSelectionWindow, DataManagementWindow } from "./components/ui/devices/mainDevices";
-import { Routes, Route, Outlet, Navigate, useParams } from 'react-router-dom';
+import { Routes, Route, Navigate, useParams, Link, NavLink } from 'react-router-dom';
 import { RecordComponent } from "./components/ui/recording";
+import { Nav } from "react-bootstrap";
 
 // I could deploy to Netlify - https://www.geeksforgeeks.org/how-to-deploy-react-app-on-netlify-using-github/
 
@@ -17,11 +18,26 @@ import { RecordComponent } from "./components/ui/recording";
 
 export const allVisSources = visSourcesImport.map(
   (visSource) => {
-    return {
-      name: visSource.name,
-      description: visSource.description,
-      img_name: require(`./assets/${visSource.img_src}`),
-      properties: visSource.properties
+    if (visSource.img_src) {
+      return {
+        name: visSource.name,
+        description: visSource.description,
+        img_name: require(`./assets/${visSource.img_src}`),
+        properties: visSource.properties,
+        engine: visSource.engine,
+        code: visSource?.code,
+        id: visSource.id,
+      }
+    }
+    else {
+      return {
+        name: visSource.name,
+        description: visSource.description,
+        properties: visSource.properties,
+        engine: visSource.engine,
+        code: visSource?.code,
+        id: visSource.id,
+      }
     }
   }
 );
@@ -30,45 +46,34 @@ export const allVisSources = visSourcesImport.map(
 const saveObject = [];
 
 function MainUI() {
-  let { visID } = useParams();
-  const visMetadata = allVisSources.find(x => x.name === visID);
   const [recording, setRecording] = useState(false);
 
-  if (visMetadata === undefined && visID != "home") {
-    return <Navigate to="/home/devices" />
-  } else {
-    return (
-      <div className="container-fluid full-width h-100">
-        <div className="row full-width h-100">
-          <div className="col-5 overflow-scroll disable-scrollbar h-100 full-width">
-            <div className="vertical-spacing ms-5 me-5">
-              <Outlet />
-              <div className="mt-5">
-                <RecordComponent saveObject={saveObject} recording={recording} setRecording={setRecording} />
-              </div>
-            </div>
-            {/*<div className="d-flex justify-content-end me-5">
-          <button className="btn btn-link" alt="Pop into another window" onClick={()=>setToggleOtherScreen(true)}><i className="bi bi-box-arrow-up-right"></i></button></div>*/}
-          </div>
-          <div className="col-7 full-width h-100 ">
-            <MainVisualsWindow visMetadata={visMetadata} />
-          </div>
-        </div>
+  return (
+    <nav className="navbar styled-navbar g-0 p-0 d-flex justify-content-between align-items-center">
+      <a className="navbar-brand m-0 ms-4 h5" href="#">Quantified Self</a>
+      <div className="h-100 m-0 g-0 d-flex align-items-center">
+        <NavLink className="btn" to="/devices">Devices</NavLink>
+        <NavLink className="btn" to="/visuals">Visuals</NavLink>
       </div>
-    )
-  }
+      {/*<RecordComponent saveObject={saveObject} recording={recording} setRecording={setRecording} />*/}
+    </nav>
+  )
 }
 
 export default function App() {
 
   return (
-    <Routes>
-      <Route path=":visID/*" element={<MainUI />}>
-        <Route path="devices" element={<DeviceSelectionWindow />} />
-        <Route path="data" element={<DataManagementWindow />} />
-      </Route>
-      <Route path="/" element={<Navigate to="home/devices" />} />
-    </Routes>
+    <>
+      <MainUI />
+      <div className="hv-100">
+        <Routes>
+          <Route path="/devices" element={<DeviceSelectionWindow />} />
+          <Route path="/visuals" element={<MainMenu />} />
+          <Route path="/visuals/:visID" element={<MainView />} />
+          <Route path="/" element={<Navigate to="home" />} />
+        </Routes>
+      </div>
+    </>
   );
 }
 

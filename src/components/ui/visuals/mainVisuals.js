@@ -1,456 +1,255 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from "react-redux";
-import Sun from '../../visuals/sun';
+import React, { useEffect, useRef, useState, useContext } from 'react';
+import { useSelector } from "react-redux";
 import Mirrors from "../../visuals/mirrors";
 import Bagel from "../../visuals/bagel";
 import AudioPlayerWithFilter from "../../visuals/Audio_player";
 import Head from "../../visuals/head_position";
-import SignalView from "../../visuals/signal_display";
-import PowerBars from "../../visuals/relative_power";
-import Flower from "../../visuals/flower";
-
 
 import RenderVisualizationCards from './viscards'
 import { FullScreen, useFullScreenHandle } from 'react-full-screen'
 import { allVisSources } from '../../../App';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, useNavigate, UNSAFE_NavigationContext } from 'react-router-dom';
 import { CodeEditor } from './codeEditor';
-import P5 from 'p5';
+import P5Visuals from './P5Visuals';
+import DataManagement from './dataManagement';
+import SplitPane, { SplitPaneLeft, SplitPaneRight, Divider } from '../../utility/SplitPane';
+import { start } from '@popperjs/core';
 
-const sunCode = `
-var sun;
-var mountain;
-var xpos = 0;
-var ypos = 0;
-var ytarget = 0;
-var gradient = 0;
-var gradient_target = 0;
-var vol = 0;
-var power = 0;
-var easing = 0.1; // Easing value (adjust as needed)
-var fromX, fromY;
-var toX, toY;
-var step = 2.5;
-
-//Xavier's star class
-/*
- * The Star class
- */
-function Star(p5_instance, position, radius, fadingFactor, flaresActivity, flaresColor, imageWidth) {
-    this.position = position;
-    this.radius = radius;
-    this.fadingFactor = fadingFactor;
-    this.flaresActivity = flaresActivity;
-    this.imageWidth = imageWidth;
-    this.body = p5_instance.createImage(this.imageWidth, this.imageWidth);
-    this.flares = p5_instance.createImage(this.imageWidth, this.imageWidth);
-    this.timeCounter = 0;
-    this.flaresColor = flaresColor;
-    this.p5_instance = p5_instance;
-    // Initialize the star's body image
-    var x, y, pixel, distanceSq;
-    var radiusSq = p5_instance.sq(this.radius);
-    var center = this.imageWidth / 2;
-
-    this.body.loadPixels();
-
-    for (x = 0; x < this.imageWidth; x++) {
-        for (y = 0; y < this.imageWidth; y++) {
-            pixel = 4 * (x + y * this.imageWidth);
-            distanceSq = p5_instance.sq(x - center) + p5_instance.sq(y - center);
-            this.body.pixels[pixel] = 236;
-            this.body.pixels[pixel + 1] = 24;
-            this.body.pixels[pixel + 2] = 1;
-            this.body.pixels[pixel + 3] = 255 * (0.95 - distanceSq / radiusSq);
-        }
-    }
-
-    this.body.updatePixels();
+export function MainMenu() {
+    return (
+        <div className="h-100 center-margin overflow-scroll disable-scrollbar">
+            <div className="center-margin text-center align-items-center">
+                <h4 className="mt-5 mb-2">Visuals</h4>
+                <p>These are some of the visuals we have made or selected. <br></br>Feel free to modify the code, create your own visual or explore.</p>
+            </div>
+            <div>
+                <RenderVisualizationCards />
+            </div>
+        </div>)
 }
 
-//
-// The update method
-//
-Star.prototype.update = function () {
+export function MainView() {
 
-    var x, y, deltaX, deltaY, pixel, distanceSq, relativeAngle;
-    var dx, dy, sumColor, counter, pixelColor;
-    var radiusSq = this.p5_instance.sq(this.radius);
-    var center = this.imageWidth / 2;
-    var nPixels = this.p5_instance.sq(this.imageWidth);
+    const { visID } = useParams();
 
-    // Create the flares in the star's body (save the result in the red channel)
-    this.flares.loadPixels();
 
-    for (x = 0; x < this.imageWidth; x++) {
-        for (y = 0; y < this.imageWidth; y++) {
-            deltaX = x - center;
-            deltaY = y - center;
-            distanceSq = this.p5_instance.sq(deltaX) + this.p5_instance.sq(deltaY);
+    function getVisMeta() {
+        let result = allVisSources.find(({ id }) => id == visID);
+        if (typeof result === "undefined") {
+            const customVis = JSON.parse(localStorage.getItem('visuals'));
+            result = customVis.find((x) => x.id == visID);
+        }
+        return result
+    }
 
-            if (distanceSq < radiusSq) {
-                relativeAngle = this.p5_instance.atan2(deltaY, deltaX) / this.p5_instance.TWO_PI;
+    const [visMetadata, setVisMetadata] = useState(getVisMeta());
+    
+    const [visName, setVisName] = useState(visMetadata?.name);
 
-                if (relativeAngle < 0) {
-                    relativeAngle++;
-                }
+    const [custom, setCustom] = useState("custom" in visMetadata);
+    const [startCustomizing, setStartCustomizing] = useState(false);
 
-                pixel = 4 * (x + y * this.imageWidth);
-                this.flares.pixels[pixel] = 255 * this.p5_instance.noise(0.1 * (Math.sqrt(distanceSq) - this.timeCounter), 10 * relativeAngle);
-            }
+
+    // Load the visualizations from the local storage
+    const [dispCode, setDispCode] = useState(false);
+
+    const [code, _setCode] = useState("");
+
+    function getCode() {
+        if ("code" in visMetadata) {
+            import(`../../visuals/p5/${visMetadata.code}`).then((res) => {
+                setCode(res.default);
+            })
+        }
+        else if ("custom" in visMetadata) {
+            const customVisuals = localStorage.getItem(`visuals/${visID}`);
+            setCode(customVisuals);
+        } else {
+            setCode("");
         }
     }
 
-    // Smooth the flares (save the result in the blue and alpha channels)
-    for (x = 2; x < this.imageWidth - 2; x++) {
-        for (y = 2; y < this.imageWidth - 2; y++) {
-            pixel = 4 * (x + y * this.imageWidth);
-            deltaX = x - center;
-            deltaY = y - center;
-            distanceSq = this.p5_instance.sq(deltaX) + this.p5_instance.sq(deltaY);
-            sumColor = 0;
-            counter = 0;
-
-            // Loop over nearby pixels
-            for (dx = -2; dx <= 2; dx++) {
-                for (dy = -2; dy <= 2; dy++) {
-                    if (this.p5_instance.sq(deltaX + dx) + this.p5_instance.sq(deltaY + dy) < distanceSq) {
-                        sumColor += this.flares.pixels[pixel + 4 * (dx + dy * this.imageWidth)];
-                        counter++;
-                    }
-                }
-            }
-
-            if (counter > 0) {
-                this.flares.pixels[pixel] = sumColor / counter;
-                this.flares.pixels[pixel + 1] = sumColor / counter;
-                this.flares.pixels[pixel + 2] = sumColor / counter;
-                this.flares.pixels[pixel + 3] = 360 * (1 - this.fadingFactor) * 0.25 * radiusSq / distanceSq;
-            } else {
-                this.flares.pixels[pixel] = 0;
-                this.flares.pixels[pixel + 1] = 0;
-                this.flares.pixels[pixel + 2] = 0;
-                this.flares.pixels[pixel + 3] = 0;
-            }
-        }
+    function setCode(str) {
+        localStorage.setItem(`visuals/${visID}`, str);
+        _setCode(str);
     }
 
-    // Update the flares image (i.e. the red and green channels)
-    for (var i = 0; i < nPixels; i++) {
-        pixel = 4 * i;
-        // pixelColor = this.flares.pixels[pixel + 2];
-        this.flares.pixels[pixel] = 236;
-        this.flares.pixels[pixel + 1] = 24;
-        this.flares.pixels[pixel + 2] = 1;
 
-    }
+    useEffect(getCode, [visMetadata]);
+    const fullScreenHandle = useFullScreenHandle();
 
-    this.flares.updatePixels();
-
-    // Increase the time counter
-    this.timeCounter += this.flaresActivity;
-};
-
-//
-// The paint method
-//
-Star.prototype.paint = function () {
-    this.p5_instance.push();
-    this.p5_instance.translate(this.position.x - this.imageWidth / 2, this.position.y - this.imageWidth / 2);
-    this.p5_instance.image(this.flares, 0, 0);
-    this.p5_instance.image(this.body, 0, 0);
-    this.p5_instance.pop();
-};
-
-
-// Update the position with interpolation
-//
-Star.prototype.setPosition = function (target) {
-    let deltaY = target - ypos;
-    ypos += deltaY * easing;
-    this.position = this.p5_instance.createVector(this.p5_instance.width / 2, ypos);
-};
-
-// mountain functions
-function mountains(p5_instance, closerColor, furtherColor, mistColor) {
-    p5_instance.randomSeed(90);
-    // Find the reference Y of each mountain
-    let y0 = 0.8 * p5_instance.width; // First reference Y
-    let i0 = 10; // Initial interval
-    let cy = []; // Initialize the reference Y array
-
-    for (let j = 0; j < 10; j++) {
-        cy[9 - j] = y0;
-        y0 -= i0 / p5_instance.pow(1.2, j);
-    }
-
-    let dx = 0;
-
-    for (let j = 1; j < 10; j++) {
-        let a = p5_instance.random(-p5_instance.width / 2, p5_instance.width / 2); // Random discrepancy between the sin waves
-        let b = p5_instance.random(-p5_instance.width / 2, p5_instance.width / 2); // Random discrepancy between the sin waves
-        let c = p5_instance.random(2, 4); // Random amplitude for the second sin wave
-        let d = p5_instance.random(40, 50); // Noise function amplitude
-        let e = p5_instance.random(-p5_instance.width / 2, p5_instance.width / 2); // Adds a discrepancy between the noise of each mountain
-
-        for (let x = 0; x < p5_instance.width; x++) {
-            let y = cy[j]; // Y = reference Y
-            y += 10 * j * p5_instance.sin(2 * dx / j + a); // First sin wave oscillates according to j (the closer the mountain, the bigger the amplitude and smaller the frequency)
-            y += c * j * p5_instance.sin(5 * dx / j + b); // Second sin wave has a random medium amplitude (affects more the further mountains) and bigger frequency
-            y += d * j * p5_instance.noise(1.2 * dx / j + e); // First noise function adds randomness to the mountains, amplitude depends on a random number and increases with j, frequency decreases with j
-            y += 1.7 * j * p5_instance.noise(10 * dx); // Second noise function simulates the canopy, it has high frequency and small amplitude depending on j so it is smoother on the further mountains
-
-            p5_instance.strokeWeight(2); // Mountains look smoother with stroke weight of 2
-            let temp_color = p5_instance.lerpColor(furtherColor, closerColor, j / 9);  //color 
-            let temp_alfa = p5_instance.map(j / 9, 0, 1, 70, 300);;  //alpha
-            p5_instance.stroke(p5_instance.red(temp_color), p5_instance.green(temp_color), p5_instance.blue(temp_color), temp_alfa);
-            p5_instance.line(x, y, x, p5_instance.height);
-
-            dx += 0.02;
+    function startEditing() {
+        let savedData = [];
+        const visMeta = localStorage.getItem('visuals');
+        let prevIDs = [];
+        if (visMeta !== null) {
+            savedData = JSON.parse(visMeta);
+            prevIDs = savedData.map(({ id }) => id);
         }
 
-        for (let i = p5_instance.height; i > cy[j]; i -= 3) {
-            let alfa = p5_instance.map(i, cy[j], p5_instance.height, 0, 360 / (j + 1)); // Alfa begins bigger for the further mountains
-            p5_instance.strokeWeight(3); // Interval of 3 for faster rendering
-            mistColor.setAlpha(alfa);
-            p5_instance.stroke(mistColor);
-            p5_instance.line(0, i, p5_instance.width, i);
-        }
-    }
-}
+        // Generate new metadata that doesn't include the image and has a different ID
+        let newID;
+        do {
+            newID = Math.floor(Math.random() * 1000) + 10
+        } while (prevIDs.includes(newID));
 
-p.setup = () => {
-
-    p.createCanvas(canvasRef.current.offsetWidth, canvasRef.current.offsetHeight);
-    p.background(220);
-    p.background(0, 20, 80);
-
-
-    // Create the sun
-    let centerX = p.width / 2;
-    let centerY = p.height / 2;
-    let distance_radius = 100;
-    let radius = 80;
-
-    var fadingFactor = 0.8;
-    var flaresActivity = 0.2;
-    var imageWidth = Math.max(p.width, p.height);
-    var flaresColor = 165
-
-    let x = centerX;
-    let y = centerY;
-    let position = p.createVector(x, y);
-    sun = new Star(p, position, radius, fadingFactor, flaresActivity, flaresColor, imageWidth);
-    p.colorMode(p.RGB, 255, 255, 255, 360);
-
-};
-
-p.draw = () => {
-
-    // this slider specifies the normalization range
-    let val = 3;
-
-    // draw background that fades stars slowly
-    p.background(220);
-    p.background(0, 20, 80, 1);
-
-    // gradient 
-    gradient_target = p.map(value.current["Sun Position"]["x"] * 3, val, 0, 0, 1);
-    let delta_gradient = gradient_target - gradient;
-    gradient += delta_gradient * easing;
-    // day colors
-    let c1 = p.color(255, 255, 232);  // bright yellow
-    let c2 = p.color(200, 210, 255); //light blue
-    // night colors
-    let c3 = p.color(13, 0, 51); //dark blue
-    let c4 = p.color(191, 31, 2); // sunset red
-
-    let c_up = p.lerpColor(c1, c3, gradient)
-    let c_down = p.lerpColor(c2, c4, gradient)
-
-    // draw gradient
-    for (let y = 0; y < p.height; y++) {
-        let n = p.map(y, 0, p.height, 0, 1);
-        let newc = p.lerpColor(c_up, c_down, n);
-        p.stroke(newc);
-        p.line(0, y, p.width, y);
-    }
-
-    // update the sun
-    ytarget = p.map(value.current["Sun Position"] * 3, val, 0, 2 / 6 * p.height, 6 / 6 * p.height, true);
-    sun.setPosition(ytarget)
-    //Update the star
-    //sun.update();
-    // Paint the star
-    sun.paint();
-
-    // draw mountains
-    // Define the colors
-    let cFurther = p.color(172, 182, 230); // Purplish unsaturated light blue for the further mountains
-    let cCloser = p.color(8, 17, 26); // Greeny saturated dark blue for the closer mountains
-    let cMist = p.color(200, 200, 200); // White for the mist
-    // p.background(230, 25, 90);
-    mountains(p, cCloser, cFurther, cMist);
-
-}
-
-
-;`
-
-
-
-const P5Visuals = ({ value, code }) => {
-    const [error, setError] = useState(false);
-    const blacklist = ['document.', 'http', "/>", "eval", "decode", "window."];
-
-    let cleanCode = "";
-
-    function blacklistCharacters(inputString, blacklist) {
-        // Check if the input string contains any blacklisted characters
-        const utf8Data = inputString.replace(/[^\x20-\x7E]+/g, '');
-
-        for (let i = 0; i < blacklist.length; i++) {
-            if (inputString.includes(blacklist[i])) {
-                throw new Error('Your code contains blacklisted characters');
-            }
+        const newMeta = {
+            "name": visName,
+            "description": `Custom visualization based on the ${visName}`,
+            "engine": "P5",
+            "id": newID,
+            "properties": visMetadata.properties,
+            "custom": true,
         }
 
-        // If no blacklisted characters are found, return the input string
-        return inputString;
+        // Push the new metadata and save it
+        savedData.push(newMeta);
+        localStorage.setItem('visuals', JSON.stringify(savedData));
+        localStorage.setItem(`visuals/${newID}`, code);
+        // Navigate in the browser to the new ID
+        navigate(`/visuals/${newID}`);
+        setCustom(true);
+        setVisMetadata(newMeta);
+        setStartCustomizing(true);
     }
 
-    const regexSetup = /p\.setup\s*=\s*(?:\(\)\s*=>\s*{([^}]+)}|function\s*\(\s*\)\s*{([^}]+)})\s*;\s*p\.draw/g
-    const regexDraw = /p\.draw\s*=\s*(?:\(\)\s*=>\s*{([^]*)}|function\s*\(\s*\)\s*{([^]*)})/s
-
-    cleanCode = code
-        .replace(regexSetup, (match, capturedCode) => `p.setup = () => { \ntry {\n${capturedCode}\n} catch (e) {\nconsole.log(e);\n} \n} \np.draw`)
-        .replace(regexDraw, (match, capturedCode) => `p.draw = () => { \ntry {\n${capturedCode}\n} catch (e) {\nconsole.log(e);\n} \n}`);
-
-    cleanCode = blacklistCharacters(cleanCode, blacklist)
-
-    const canvas = <P5Wrapper value={value} code={cleanCode} setError={setError} />
-
-
-    return canvas
-
-}
-
-const P5Wrapper = ({ value, code, setError }) => {
-
-    const canvasRef = React.useRef();
-    let Q;
+    const navigate = useNavigate();
 
     useEffect(() => {
-        try {
-            const sketch = new Function('p', 'value', 'canvasRef', code);
-            Q = new P5(p => sketch(p, value, canvasRef), canvasRef.current);
-        } catch (e) {
-            Q = new P5(function q() { }, canvasRef.current);
-            setError(e);
-        }
-        canvasRef.current.firstChild.style.visibility = "visible"
-        function updateCanvasDimensions() {
-            Q.createCanvas(canvasRef.current.offsetWidth, canvasRef.current.offsetHeight);
-            Q.redraw();
-        }
+        window.history.pushState('fake-route', document.title, window.location.href);
+        window.addEventListener('popstate', () => {
+            navigate("/visuals", { replace: true })
+        })
+    }, [visMetadata])
 
-        window.addEventListener("resize", updateCanvasDimensions, true);
 
-        // Super important cleanup function
-        return () => {
-            Q.noLoop();
-            Q.remove();
-            window.removeEventListener("resize", updateCanvasDimensions, true);
+    function nameVis(e) {
+
+        // Check if it's an empty value
+        if (e.target.value == "") {
+            e.target.value = visName;
+            return
         }
 
+        const newName = e.target.value;
 
-    }, [code]);
+        // Retrieve data from local storage and assign it to a new object
+        const prevData = JSON.parse(localStorage.getItem('visuals'));
+        const newMeta = JSON.parse(JSON.stringify(visMetadata));
+        newMeta.name = newName;
 
-    //  className="h-100"
-    return (
-        <div ref={canvasRef} className='h-100' />
-    )
+        // Get the previous data and remove the old visName from it
+        const newData = prevData.filter((item) => item.name !== visName);
+        newData.push(newMeta) // Push the new vis into it
+        // Set that new vis into the localStorage
+        localStorage.setItem('visuals', JSON.stringify(newData));
+        
+        setVisMetadata(newMeta);
+        // Change the name
+        setVisName(newName);
+    }
 
-};
+    function deleteCurrentVis() {
+        if (!window.confirm("Do you really want to delete the current vis?")) {
+            return;
+        }
+        navigate("/visuals", { replace: true });
+        localStorage.removeItem(`visuals/${visID}`);
 
-export default function MainVisualsWindow({ visMetadata }) {
+        const prevData = JSON.parse(localStorage.getItem('visuals'));
 
-    const mainMenu = visMetadata === undefined;
+        // Get the previous data and remove the old visName from it
+        const newData = prevData.filter((item) => item.id != visID);
+        localStorage.setItem('visuals', JSON.stringify(newData));
+    }
 
     return (
         <div className='h-100'>
-            {mainMenu ?
-                <MainMenu /> :
-                <VisualWindow visMetadata={visMetadata} />}
+            <div className="d-flex justify-content-between align-items-center align-text-center mt-1">
+                <div className="d-flex align-items-center">
+                    <div className='align-self-center me-3'>
+                        {(!custom) ?
+                            <button className="btn btn-outline-secondary align-items-center rounded-0 edit-button" onClick={startEditing}>
+                                <i className="bi bi-pencil-fill"></i> Edit
+                            </button> :
+                            <button className={`btn btn-link edit-button text-start ${(dispCode?"active":"")}`} onClick={() => setDispCode(!dispCode)}>
+                                <b><i className="bi bi-code-slash" alt="code"></i></b>
+                            </button>
+                        }
+                    </div>
+                </div>
+                {(startCustomizing) ?
+                    <input type="text" className={`h4 m-0 align-self-center invisible-input text-center w-100`} placeholder={visName} onBlur={nameVis}></input> :
+                    <h4 className="align-self-center m-0 text-center">{visMetadata.name}</h4>
+                }
+                <div className='d-flex justify-content-end w-double'>
+                    {(custom) ?
+                        <button className='btn btn-link' onClick={deleteCurrentVis} alt="Delete"><i className="bi bi-trash"></i></button>
+                        : null
+                    }
+                    <button className="btn btn-link " onClick={fullScreenHandle.enter}><b><i className="bi bi-arrows-fullscreen" alt="full-screen"></i></b></button>
+                </div>
+            </div>
+            <SplitPane className="split-pane-row">
+                <SplitPaneLeft>
+                    {(dispCode) ?
+                        <div className='h-100' style={{ backgroundColor: '#1A1A1A' }} >
+                            <h5 className='ms-2 p-2 pt-3 align-self-center' style={{ color: 'white', backgroundColor: '#1A1A1A' }}>Code</h5>
+                            <CodeEditor code={code} setCode={setCode} />
+                        </div> :
+                        <DataManagementWindow visInfo={visMetadata} custom={custom} setVisInfo={setVisMetadata} />
+                    }
+                </SplitPaneLeft>
+                <Divider />
+                <SplitPaneRight>
+                    <VisualsWindow visMetadata={visMetadata} fullScreenHandle={fullScreenHandle} code={code} />
+                </SplitPaneRight>
+            </SplitPane>
+        </div>
+    )
+}
+
+function DataManagementWindow({ setVisInfo, visInfo, custom}) {
+
+    return (
+        <div className="h-100 ms-5 me-5 overflow-auto disable-scrollbar">
+            <h5 className='mt-5'>Data Mappings</h5>
+            <p >Map the parameters to the data received from your device.</p>
+            <DataManagement visInfo={visInfo} custom={custom} setVisInfo={setVisInfo}/>
         </div>
     )
 }
 
 
-function MainMenu() {
-    return (
-        <div className='h-100 big-right-margin'>
-            <div className="h-100">
-                <div className="d-flex justify-content-between align-items-center align-text-center mb-3 mt-3">
-                    <h4 className="text-left text-transition align-self-center m-0">Visualization</h4>
-                </div>
-                <div className="full-width h-100 overflow-scroll disable-scrollbar">
-                    <RenderVisualizationCards />
-                </div>
-            </div>
-        </div>)
-}
+function VisualsWindow({ visMetadata, code, fullScreenHandle }) {
 
-function VisualWindow({ visMetadata }) {
-
-    const [code, setCode] = useState(sunCode);
 
     const params = useSelector(state => state.params);
 
     const paramsRef = useRef(params);
     paramsRef.current = params;
 
+
     const visStreamFunctions = {
-        "Sun Visualization": <Sun value={paramsRef} />,
         "Abstract Colors": <Mirrors value={paramsRef} />,
         "Circle Visualization": <Bagel value={paramsRef} />,
         "Audio player": <AudioPlayerWithFilter value={paramsRef} />,
         "Head Position": <Head value={paramsRef} />,
-        "Signal View": <SignalView value={paramsRef} />,
-        "Power Bars": <PowerBars value={paramsRef} />,
-        "Custom": <P5Visuals value={paramsRef} code={code} />,
-        "Flower": <Flower value={paramsRef} />
     };
 
-    const fullScreenHandle = useFullScreenHandle();
-    const [dispCode, setDispCode] = useState(false);
+    if (visMetadata.engine === "P5") {
+        visStreamFunctions[visMetadata.name] = <P5Visuals code={code} value={paramsRef} />
+    }
+
+
 
     return (
-        <div className='h-100'>
-            {(dispCode) ?
-                <div className='fixed-top col-5 h-100' style={{ background: '#1E1E1E' }}>
-                    <h5 className='m-2' style={{ color: 'white' }}>Code</h5>
-                    <CodeEditor code={code} setCode={setCode} />
-                </div> : null}
-            <div className="h-100">
-                <div className="d-flex justify-content-between align-items-center align-text-center mt-1">
-                    <div className="d-flex align-items-center">
-                        <Link to="/home/devices" className="btn btn-link" ><b><i className="bi bi-arrow-left" alt="back"></i></b></Link>
-                        <h4 className="text-left text-transition align-self-center m-0">Visualization</h4>
-                    </div>
-                    <div className="d-flex align-items-center">
-                        <div className='align-self-center me-3'>
-                            <button className="btn btn-link " onClick={fullScreenHandle.enter}><b><i className="bi bi-arrows-fullscreen" alt="full-screen"></i></b></button>
-                            <button className="btn btn-link " onClick={() => setDispCode(!dispCode)}><b><i className="bi bi-code-slash" alt="code"></i></b></button>
-                        </div>
-                    </div>
+        <div className="h-100 w-100">
+            <FullScreen handle={fullScreenHandle} className="w-100 h-100">
+                <div className="w-100 h-100">
+                    {params && visStreamFunctions[visMetadata.name]}
                 </div>
-                <FullScreen handle={fullScreenHandle} className="full-width h-100">
-                    <div className="full-width h-100">
-                        {params && visStreamFunctions[visMetadata.name]}
-                    </div>
-                </FullScreen>
-            </div>
+            </FullScreen>
         </div>
     )
 }

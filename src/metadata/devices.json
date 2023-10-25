@@ -38,7 +38,9 @@
       "data": [
         { "name": "Theta", "description": "Band power from (4-8Hz)", "type": "EEG Metrics"},
         { "name": "Alpha", "description": "Band power from (8-12Hz)", "type": "EEG Metrics"},
-        { "name": "Beta", "description": "Band power from (16-25Hz)", "type": "EEG Metrics"},
+        { "name": "Low beta", "description": "Band power from (12-16Hz)", "type": "EEG Metrics"},
+        { "name": "High beta", "description": "Band power from (16-25Hz)", "type": "EEG Metrics"},
+        { "name": "Gamma", "description": "Band power from (25-45Hz)", "type": "EEG Metrics"},
         { "name": "TP9", "description": "EEG activity from the left temporal lobe.", "type": "Raw EEG channels"},
         { "name": "TP10", "description": "EEG activity from the right temporal lobe.", "type": "Raw EEG channels"},
         { "name": "AF7", "description": "EEG activity from the left frontal lobe.", "type": "Raw EEG channels"},

@@ -47,14 +47,14 @@ function FileDeviceButton({ data, name, handleShow }) {
     }
 
     return (
-        <div className='card-group'>
-            <div className='card rounded-0 mb-2 mt-1'>
+        <div className='row'>
+            <div className='card rounded-0 mb-2 mt-1 col-8'>
                 <button className="card-body btn btn-link text-decoration-none text-start" onClick={() => handleShow(name)}>
                     <h5 className="card-title g-0 m-0">{name}</h5>
                     <small className='g-0 m-0'>{data.heading}</small>
                 </button>
             </div>
-            <div className='card rounded-0 mb-2 mt-1'>
+            <div className='card rounded-0 mb-2 mt-1 col-4'>
                 <div className="card-body d-flex align-items-center justify-content-center">
                     <button className='btn btn-link'onClick={restartStreaming}><i className="bi bi-rewind" /></button>
                     {playing?
@@ -81,7 +81,7 @@ function DeviceList({ data, name, handleShow, uploaded }) {
     }
 
     return (
-        <div key={name}>
+        <div key={name} className='button-list'>
             {deviceButton[key]}
         </div>
     )

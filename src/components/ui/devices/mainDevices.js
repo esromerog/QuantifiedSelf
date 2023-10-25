@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { useSelector } from "react-redux";
 import Modal from 'react-bootstrap/Modal';
 
@@ -19,7 +19,7 @@ const getDataIDs = createSelector(
     [selectDeviceMeta],
     (deviceMeta) => {
         return Object.keys(deviceMeta)
-            .filter((name) =>deviceMeta[name]?.id?.includes("EPOC"));
+            .filter((name) => deviceMeta[name]?.id?.includes("EPOC"));
     }
 )
 
@@ -27,9 +27,9 @@ const getDataIDs = createSelector(
 export const selectDevices = createSelector(
     [selectData, selectDeviceMeta],
     (dataStream, deviceMeta) => {
-      const ids = Object.keys(dataStream);
-      const devices = ids.map(id => deviceMeta[id]?.device);
-      return devices.filter(Boolean);
+        const ids = Object.keys(dataStream);
+        const devices = ids.map(id => deviceMeta[id]?.device);
+        return devices.filter(Boolean);
     }
 );
 
@@ -40,35 +40,30 @@ export function DeviceSelectionWindow() {
 
     const [modalDevice, setModalDevice] = useState("");
     const [show, setShow] = useState(false);
-    
 
-    const handleClose = () => { setShow(false); setModalDevice("")}
-    function handleShow(device) { setShow(true); setModalDevice(device)};
+
+    const handleClose = () => { setShow(false); setModalDevice("") }
+    function handleShow(device) { setShow(true); setModalDevice(device) };
 
 
     const deviceModals = {
-        "EMOTIV": <EmotivConnection show={show} handleClose={handleClose}/>,
-        "Muse": <MuseConnection show={show} handleClose={handleClose}/>,
-        "Upload": <FileUploader show={show} handleClose={handleClose}/>
+        "EMOTIV": <EmotivConnection show={show} handleClose={handleClose} />,
+        "Muse": <MuseConnection show={show} handleClose={handleClose} />,
+        "Upload": <FileUploader show={show} handleClose={handleClose} />
     }
-    
+
     // Check if you have more than two EPOC or EPOC+ headsets. If you do, the connectivity option becomes available
     const emotivIDs = useSelector(getDataIDs);
     let showConn = false;
-    if (emotivIDs.length>1) {
+    if (emotivIDs.length > 1) {
         showConn = true;
     }
 
     return (
-        <div>
-            <div className="d-flex justify-content-between align-items-center">
-                <h5 className="m-0 pb-2 pt-2">Data Sources</h5>
-                {(!mainMenu) ?
-                    <Link className="btn btn-link text-decoration-none" to="../data">
-                        <small className="m-0 ">Data Management  </small><i className="bi bi-arrow-right" alt="Go to data management"></i>
-                    </Link> : null}
-            </div>
-            <div>
+        <div className='center-margin text-center align-items-center'>
+            <h4 className="mt-5 mb-2">Data Sources</h4>
+            <p className='center-margin' style={{overflowWrap: 'nowrap'}}>Here you can connect to different devices, manage them, and upload files from previous recordings.</p>
+            <div className='ms-5 me-5'>
                 <RenderDevices />
                 <div className='d-flex justify-content-center'>
                     <div className="dropdown-center">
@@ -76,12 +71,12 @@ export function DeviceSelectionWindow() {
                             <i className="bi bi-plus-circle h5"></i>
                         </a>
                         <ul className="dropdown-menu">
-                            <li><a className="dropdown-item" href="#" onClick={()=>handleShow("EMOTIV")}>EMOTIV</a></li>
-                            <li><a className="dropdown-item" href="#" onClick={()=>handleShow("Muse")}>Muse</a></li>
-                            <li><a className="dropdown-item" href="#" onClick={()=>handleShow("Upload")}>Upload a file</a></li>
-                            {showConn?
-                            <li><a className="dropdown-item" href="#" onClick={()=>handleShow("")}>Hyperscanning</a></li>
-                            :null}
+                            <li><a className="dropdown-item" onClick={() => handleShow("EMOTIV")}>EMOTIV</a></li>
+                            <li><a className="dropdown-item" onClick={() => handleShow("Muse")}>Muse</a></li>
+                            <li><a className="dropdown-item" onClick={() => handleShow("Upload")}>Upload a file</a></li>
+                            {showConn ?
+                                <li><a className="dropdown-item" onClick={() => handleShow("")}>Hyperscanning</a></li>
+                                : null}
                         </ul>
                     </div>
                     {deviceModals[modalDevice]}

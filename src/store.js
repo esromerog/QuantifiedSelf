@@ -8,32 +8,39 @@ import { AccessorNodeDependencies } from "mathjs";
 
 
 let pathname = window.location.pathname;
-pathname = pathname.split("/")[1].replace("%20", " ");
-const params = visualsRaw.find(({ name }) => name === pathname)?.properties;
+pathname = pathname.split("/")[2]?.replace(/%20/g, " ");
+let params = visualsRaw.find(({ id }) => id == pathname)?.properties;
+
+if (params == undefined) {
+    const visMeta = localStorage.getItem('visuals');
+    if (visMeta != null) {
+        const localData = JSON.parse(visMeta).find(({ id }) => id == pathname);
+        console.log(localData);
+        if (localData != null) {
+            params = localData.properties;
+        }
+    }
+}
 
 const loadMeta = () => {
-    const storedMetaData = sessionStorage.getItem("paramsMeta");
-
-    if (params !== undefined) {
-        if (storedMetaData !== null && pathname in JSON.parse(storedMetaData)) {
-            const maps = JSON.parse(storedMetaData)
-            return maps[pathname];
-        } else {
-            return params.reduce((acc, curr) => {
-                acc[curr.name] = {
-                    "mapping": "Manual",
-                    "range": [0, 1]
-                }
-                return acc
-            }, {})
-        }
+    const storedMetaData = sessionStorage.getItem(`paramsMeta/${pathname}`);
+    if (storedMetaData != null) {
+        return JSON.parse(storedMetaData);
+    } else if (params != undefined) {
+        return params.reduce((acc, curr) => {
+            acc[curr.name] = {
+                "mapping": "Manual",
+                "range": [0, 1]
+            }
+            return acc
+        }, {})
     } else {
         return {}
     }
 }
 
 const loadParameters = () => {
-    if (params !== undefined) {
+    if (params != undefined) {
         return params.reduce((acc, curr) => {
             acc[curr.name] = 0
             return acc
@@ -57,6 +64,35 @@ const initialState = {
 
 // React Redux Store to manage the data that moves throghout the entire app
 function rootReducer(state = initialState, action) {
+
+    function updateWithLocalStorage(mode) {
+        const prevMappings = JSON.parse(sessionStorage.getItem("paramsMeta"));
+
+        const { parameter } = action.payload;
+
+        const newState = { ...state };
+        newState.paramsMeta = { ...state.paramsMeta };
+
+        if (mode === "delete") {
+            delete newState.paramsMeta[parameter];
+        } else {
+            newState.paramsMeta[parameter] = {
+                ...newState.paramsMeta[parameter],
+                ...(mode === "create" ? { range: [0, 1], mapping: "Manual" } : {}),
+                ...(mode === "update" ? { mapping: action.payload.stream } : {}),
+                ...(mode === "range" ? { range: action.payload.range } : {}),
+            };
+        }
+
+        const mapsToSave = {
+            ...prevMappings,
+            [action.payload.vis]: newState.paramsMeta
+        }
+
+        sessionStorage.setItem("paramsMeta", JSON.stringify(mapsToSave));
+        return newState;
+    }
+
     switch (action.type) {
         case 'params/update':
             // Logic to handle parameter updates
@@ -71,18 +107,18 @@ function rootReducer(state = initialState, action) {
 
 
         case 'params/load':
-            const storedMappings = sessionStorage.getItem("paramsMeta");
+            const storedMappings = sessionStorage.getItem(`paramsMeta/${pathname}`);
             let params = {};
             const selection = action.payload
             let meta = {};
 
-            if (storedMappings !== null && selection.name in JSON.parse(storedMappings)) {
+            if (storedMappings != null) {
                 const maps = JSON.parse(storedMappings)
-                params = Object.keys(maps[selection.name]).reduce((acc, parameter) => {
+                params = Object.keys(maps).reduce((acc, parameter) => {
                     acc[parameter] = 0;
                     return acc;
                 }, {})
-                meta = maps[selection.name];
+                meta = maps;
             } else {
                 params = selection.properties.reduce((acc, parameter) => {
                     acc[parameter.name] = parameter.value;
@@ -120,50 +156,13 @@ function rootReducer(state = initialState, action) {
             }
 
         case 'params/updateMappings':
-            const currMappings = JSON.parse(sessionStorage.getItem("paramsMeta"));
+            return updateWithLocalStorage("update");
 
-            const newState = {
-                ...state,
-                paramsMeta: {
-                    ...state.paramsMeta,
-                    [action.payload.parameter]: {
-                        ...state.paramsMeta[action.payload.parameter],
-                        ["mapping"]: action.payload.stream
-                    }
-                }
-            }
-
-            const saveMappings = {
-                ...currMappings,
-                [action.payload.vis]: newState.paramsMeta
-            }
-
-            sessionStorage.setItem("paramsMeta", JSON.stringify(saveMappings));
-
-            return newState
+        case 'params/create':
+            return updateWithLocalStorage("create");
 
         case 'params/updateRange':
-            const curr = JSON.parse(sessionStorage.getItem("paramsMeta"));
-
-            const nextState = {
-                ...state,
-                paramsMeta: {
-                    ...state.paramsMeta,
-                    [action.payload.parameter]: {
-                        ...state.paramsMeta[action.payload.parameter],
-                        ["range"]: action.payload.range
-                    }
-                }
-            }
-
-            const saveState = {
-                ...curr,
-                [action.payload.vis]: nextState.paramsMeta
-            }
-
-            sessionStorage.setItem("paramsMeta", JSON.stringify(saveState));
-
-            return nextState
+            return updateWithLocalStorage("range");
 
         case 'devices/create':
             // Logic to handle creation of a new device

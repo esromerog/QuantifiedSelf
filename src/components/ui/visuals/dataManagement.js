@@ -7,9 +7,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { allVisSources } from '../../../App';
 import { useParams } from 'react-router-dom';
 import { createSelector } from 'reselect';
-import visualsRaw from './../../../metadata/vis'
-import { create } from 'mathjs';
-
 
 const selectStream = state => state.dataStream;
 
@@ -33,8 +30,8 @@ const getDataStreamKeys = createSelector(
 const selectDataMappings = createSelector(
     [state => state.paramsMeta],
     (metadata) => {
-        return Object.keys(metadata).reduce((acc, curr)=>{
-            acc[curr]=metadata[curr]["mapping"]
+        return Object.keys(metadata).reduce((acc, curr) => {
+            acc[curr] = metadata[curr]["mapping"]
             return acc
         }, {})
     }
@@ -103,7 +100,7 @@ function DataManualSlider({ parameter }) {
         <div className="row justify-content-start">
             <div className="col-xxl-5 col-xl-4 col-lg-5">
                 <div className="input-group">
-                    <form className="form-floating" autocomplete="off">
+                    <form className="form-floating" autoComplete="off">
                         <input type="text" className="form-control" id="valorManualInput" value={Math.round(valor * 1000) / 1000 || 0} onChange={handleFormChange} />
                         <label htmlFor='valorManualInput'>Value</label>
                     </form>
@@ -222,6 +219,9 @@ function DataAutoSlider({ dataMappings, parameter }) {
             setBuffer(buff);
         }
         if (buffer.length > 20) {
+
+            setBuffer([false])
+
             setDisabled(false);
 
             const minimo = Math.min(...buffer);
@@ -236,11 +236,10 @@ function DataAutoSlider({ dataMappings, parameter }) {
                 type: 'params/updateRange',
                 payload: {
                     parameter: parameter,
-                    range: [min, max]
+                    range: [minimo, maximo]
                 }
             })
 
-            setBuffer([false])
         }
     }, [source])
 
@@ -300,7 +299,7 @@ function DataAutoSlider({ dataMappings, parameter }) {
                 </div>
             </div>
             <div className='col-6 align-self-center'>
-                <OverlayTrigger trigger="click" placement="right" overlay={rangeToolTip}>
+                <OverlayTrigger trigger="click" placement="right" rootClose overlay={rangeToolTip}>
                     <button className={!rangeTrigger ? "btn btn-sm btn-outline-primary" : "btn btn-sm btn-primary"} onClick={() => setRangeTrigger(!rangeTrigger)}>
                         Range
                     </button>
@@ -318,9 +317,7 @@ function ParameterDropDown({ claves, parameter, dataMappings, displayName }) {
     // Display text on the card. Upon creation, it checks the status
     const [display, setDisplay] = useState(() => {
         let disp = dataMappings[parameter.name];
-        console.log(dataMappings);
         if (disp === "Manual") disp = [0, "Manual"];
-        console.log(disp);
         if (displayName !== undefined) disp = (parameter.name + ": " + disp);
         else disp = (disp[1]);
         return disp
@@ -332,10 +329,10 @@ function ParameterDropDown({ claves, parameter, dataMappings, displayName }) {
 
     // Changes the data source
     function selectNewSource(sourceName) {
-        
+
         dispatch(
             {
-                type: "params/updateMappings", 
+                type: "params/updateMappings",
                 payload: {
                     parameter: parameter.name,
                     stream: sourceName,
@@ -353,8 +350,8 @@ function ParameterDropDown({ claves, parameter, dataMappings, displayName }) {
     }
 
     // Changes the color of the button as dataMappings changes
-    const dispColor = useMemo(() => (display.includes("Manual")) ? "btn btn-mapping ms-2" : "btn btn-mapping ms-2", [dataMappings])
-
+    const dispColor = useMemo(() => (display.includes("Manual")) ? "btn btn-mapping ms-2 rounded-0" : "btn btn-mapping ms-2 rounded-0", [dataMappings])
+    console.log(claves);
 
     return (
         <div>
@@ -399,28 +396,27 @@ function ParameterManager({ claves, parameter, dataMappings }) {
             {manual ?
                 <DataManualSlider
                     parameter={parameter.name}
-                    dropDown={dropDown} /> :
+                /> :
                 <DataAutoSlider
                     parameter={parameter.name}
                     dataMappings={dataMappings}
-                    dropDown={dropDown} />
+                />
             }
         </li>
     )
 }
 
-function DataCard({ visParameter, dataMappings }) {
+function DataCard({ visParameter, dataMappings, custom, deleteParameter }) {
 
     // claves is the object returned from the getDataStreamKeys that provides the devices & their streams as a list
     const claves = useSelector(getDataStreamKeys)
 
-    // Generates the drop-downs that hold subparameters (if any), provide a slider, and range functions
+    // Generates the drop-downs that provide a slider and range functions
     const mapeo = () => {
         return <ParameterManager
             claves={claves}
             parameter={visParameter}
             dataMappings={dataMappings} />;
-
     }
 
     const [expanded, setExpanded] = React.useState(false); // Used for styling, checks to see if accordion is collapsed or not
@@ -436,9 +432,12 @@ function DataCard({ visParameter, dataMappings }) {
         </div>
     );
 
+    const dispatch = useDispatch();
+
     return (
         <div className="list-group-item" key={visParameter.name}>
             <div className="d-flex align-items-center pt-1 pb-1" key={visParameter.name}>
+                {custom ? <button className='btn btn-link text-center p-0 me-2 ms-n1 delete-btn' onClick={()=>{deleteParameter(visParameter.name)}}><i className="h5 p-0 bi bi-dash text-danger"></i></button> : null}
                 <div>{visParameter.name}</div>
                 <div className="btn-map-transition closed col align-items-right">
                     <div className='d-flex justify-content-end align-items-center text-center flex-wrap'>
@@ -466,39 +465,162 @@ function DataCard({ visParameter, dataMappings }) {
     );
 }
 
-export default function DataManagement() {
+export default function DataManagement({ setVisInfo, visInfo, custom }) {
     // Some input props: 
     //    activeVisParameters - object that defines the parameters that are being changed by the data stream
     //    visInfo -  the object that contains the selected visualization's metadata
     //    dataStreamObject - contains the data stream in the shape: {Device1: {Metric1: int, Metric2: int}, Device2: ...}
 
-
     // dataMappings is an array that contains the parameters of the visualization and describes what they are mapped to:
     //      It has the shape: {Param1: Device Name/Manual}
 
-    let { visID } = useParams();
-
-    const visInfo = allVisSources.find(x => x.name === visID);
+    const dispatch = useDispatch();
+    const [ newParamName, setNewParamName] = useState("");
+    const [ valid, setValid ] = useState(true);
 
     const dataMappings = useSelector(selectDataMappings);
-
     // Generates the cards with the parameters
-    const dataCards = visInfo.properties?.map((parameter) => (
+
+    const dataCards = visInfo?.properties?.map((parameter) => (
         <DataCard
             visParameter={parameter}
             key={parameter.name}
-            dataMappings={dataMappings} />));
+            dataMappings={dataMappings}
+            deleteParameter={deleteParameter}
+            custom={custom} />));
+
+
+    function deleteParameter(paramName) {
+        // Retrieve data from local storage and assign it to a new object
+        const prevData = JSON.parse(localStorage.getItem('visuals'));
+        const newMeta = JSON.parse(JSON.stringify(visInfo));
+        newMeta.properties = newMeta.properties.filter(({ name }) => name != paramName);
+
+        let newData = [];
+        // Get the previous data and remove the old properties from it
+        if (prevData != undefined) {
+            newData = prevData.filter(({ id }) => id !== visInfo.id);
+        }
+
+        newData.push(newMeta) // Push the new vis into it
+        // Set that new vis into the localStorage
+        localStorage.setItem('visuals', JSON.stringify(newData));
+
+        dispatch({
+            type: "params/delete", payload: {
+                parameter: paramName
+            }
+        })
+        setVisInfo(newMeta);
+    }
+
+
+    function newParameter() {
+        const newText = newParamName;
+        //const utf8Data = newText.replace(/[^\x20-\x7E]+/g, '');
+        const utf8Data = newText;
+
+        const currentProperties = visInfo.properties.map(({ name }) => name);
+        if (currentProperties.includes(utf8Data)) {
+            setValid(false);
+            return;
+        }
+
+        if (utf8Data=="") {
+            setValid(false);
+            return;
+        }
+
+        // Retrieve data from local storage and assign it to a new object
+        const prevData = JSON.parse(localStorage.getItem('visuals'));
+        const newMeta = JSON.parse(JSON.stringify(visInfo));
+        newMeta.properties.push({ "name": utf8Data, "value": 0 });
+
+        let newData = [];
+        // Get the previous data and remove the old properties from it
+        if (prevData != undefined) {
+            newData = prevData.filter(({ id }) => id !== visInfo.id);
+        }
+
+        newData.push(newMeta) // Push the new vis into it
+        // Set that new vis into the localStorage
+        localStorage.setItem('visuals', JSON.stringify(newData));
+
+        dispatch({
+            type: "params/create", payload: {
+                parameter: utf8Data
+            }
+        })
+        setVisInfo(newMeta);
+        setShow(false);
+    }
+
+
+    function useOutsideAlerter(ref) {
+        useEffect(() => {
+            /**
+             * Alert if clicked on outside of element
+             */
+            function handleClickOutside(event) {
+                if (ref.current && !ref.current.contains(event.target)) {
+                    setShow(false);
+                }
+            }
+            // Bind the event listener
+            document.addEventListener("mousedown", handleClickOutside);
+            return () => {
+                // Unbind the event listener on clean up
+                document.removeEventListener("mousedown", handleClickOutside);
+            };
+        }, [ref]);
+    }
+
+
+    const overlayRef = useRef(null);
+
+    useOutsideAlerter(overlayRef);
+    const [show, setShow] = useState(false);
+
+    const newParamToolTip = (
+        <Popover id="popover-basic">
+            <Popover.Header as="h5">Create a new parameter</Popover.Header>
+            <Popover.Body>
+                <div className="input-group" ref={overlayRef}>
+                    <form className="form-floating" autoComplete='off'>
+                        <input
+                            type="text"
+                            className={`form-control ${valid?"":"is-invalid"}`}
+                            autoComplete='off'
+                            id="max"
+                            value={newParamName}
+                            onChange={(e)=>{setNewParamName(e.target.value); setValid(true)}}
+                            
+                        />
+                        <label htmlFor="max">Name</label>
+                    </form>
+                    <button className="btn btn-primary" onClick={newParameter}>Create</button>
+                </div>
+            </Popover.Body>
+        </Popover>
+    )
+
 
     return (
-        <div>
-            <h6>{visInfo.name}</h6>
-            <div className="list-group">
+        <div className='mb-5'>
+            <div className="list-group rounded-0">
                 {dataCards}
             </div>
+            {custom ?
+                <div className='d-flex justify-content-center text-center'>
+                    <OverlayTrigger trigger="click" placement="top" rootClose overlay={newParamToolTip} show={show}>
+                        <button className="btn btn-link" type="button" aria-expanded="false" onClick={() => setShow(!show)}>
+                            <i className="bi bi-plus-circle h5"></i>
+                        </button>
+                    </OverlayTrigger>
+                </div> : null}
         </div>
     );
 }
-
 
 
 

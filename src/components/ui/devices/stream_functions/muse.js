@@ -79,8 +79,10 @@ class MuseDevice {
     // Band powers of EEG. The last index is written inclusively to use all powers less than the last index.
     bandPowers = {
         "Theta": [4, 8],
-        "Alpha": [8, 13],
-        "Beta": [13, 30]
+        "Alpha": [8, 12],
+        "Low beta": [12, 16],
+        "High beta": [16, 25],
+        "Gamma": [25, 45],
     }
 
     constructor() {
@@ -93,7 +95,7 @@ class MuseDevice {
         this.connected = false;
 
 
-        this.numberOfChannels = 4;
+        this.numberOfChannels = 3;
         const arrayLength = this.WINDOW_SIZE * this.sfreq;
 
         this.buffer = new Array(this.numberOfChannels);
@@ -201,7 +203,7 @@ class MuseDevice {
             res[key] = res[key]/this.numberOfChannels;
         }
 
-        console.log(res);
+        console.log(this.buffer);
 
         store.dispatch({
             type: 'devices/streamUpdate',
