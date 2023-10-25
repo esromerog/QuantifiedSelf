@@ -13,7 +13,8 @@ import { CodeEditor } from './codeEditor';
 import P5Visuals from './P5Visuals';
 import DataManagement from './dataManagement';
 import SplitPane, { SplitPaneLeft, SplitPaneRight, Divider } from '../../utility/SplitPane';
-import { start } from '@popperjs/core';
+import downloadCode from '../../utility/codeDownload';
+
 
 export function MainMenu() {
     return (
@@ -43,7 +44,7 @@ export function MainView() {
     }
 
     const [visMetadata, setVisMetadata] = useState(getVisMeta());
-    
+
     const [visName, setVisName] = useState(visMetadata?.name);
 
     const [custom, setCustom] = useState("custom" in visMetadata);
@@ -143,7 +144,7 @@ export function MainView() {
         newData.push(newMeta) // Push the new vis into it
         // Set that new vis into the localStorage
         localStorage.setItem('visuals', JSON.stringify(newData));
-        
+
         setVisMetadata(newMeta);
         // Change the name
         setVisName(newName);
@@ -172,7 +173,7 @@ export function MainView() {
                             <button className="btn btn-outline-secondary align-items-center rounded-0 edit-button" onClick={startEditing}>
                                 <i className="bi bi-pencil-fill"></i> Edit
                             </button> :
-                            <button className={`btn btn-link edit-button text-start ${(dispCode?"active":"")}`} onClick={() => setDispCode(!dispCode)}>
+                            <button className={`btn btn-link edit-button text-start ${(dispCode ? "active" : "")}`} onClick={() => setDispCode(!dispCode)}>
                                 <b><i className="bi bi-code-slash" alt="code"></i></b>
                             </button>
                         }
@@ -194,7 +195,10 @@ export function MainView() {
                 <SplitPaneLeft>
                     {(dispCode) ?
                         <div className='h-100' style={{ backgroundColor: '#1A1A1A' }} >
-                            <h5 className='ms-2 p-2 pt-3 align-self-center' style={{ color: 'white', backgroundColor: '#1A1A1A' }}>Code</h5>
+                            <div className='d-flex justify-content-between align-items-center'>
+                                <h5 className='ms-2 p-2 pt-3 align-self-center' style={{ color: 'white', backgroundColor: '#1A1A1A' }}>Code</h5>
+                                <button className='btn btn-link' onClick={()=>downloadCode(visName,code)}><i className='bi bi-download code-download'></i></button>
+                            </div>
                             <CodeEditor code={code} setCode={setCode} />
                         </div> :
                         <DataManagementWindow visInfo={visMetadata} custom={custom} setVisInfo={setVisMetadata} />
@@ -209,13 +213,13 @@ export function MainView() {
     )
 }
 
-function DataManagementWindow({ setVisInfo, visInfo, custom}) {
+function DataManagementWindow({ setVisInfo, visInfo, custom }) {
 
     return (
         <div className="h-100 ms-5 me-5 overflow-auto disable-scrollbar">
             <h5 className='mt-5'>Data Mappings</h5>
             <p >Map the parameters to the data received from your device.</p>
-            <DataManagement visInfo={visInfo} custom={custom} setVisInfo={setVisInfo}/>
+            <DataManagement visInfo={visInfo} custom={custom} setVisInfo={setVisInfo} />
         </div>
     )
 }

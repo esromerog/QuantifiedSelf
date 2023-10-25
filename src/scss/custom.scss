@@ -386,6 +386,15 @@ input.vis-name-input::placeholder {
     transition: transform 0.1s ease-in;
 }
 
+.code-download {
+    color: white;
+    background-color: #1A1A1A;
+}
+
+.code-download:hover {
+    color: $primary;
+}
+
 .split-pane-top,
 .split-pane-bottom,
 .split-pane-right,

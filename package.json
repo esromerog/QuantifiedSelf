@@ -1,7 +1,7 @@
 {
-  "homepage": "http://esromerog.github.io/esromerog",
-  "name": "example2",
-  "version": "0.1.0",
+  "homepage": "/devices",
+  "name": "quantified-self",
+  "version": "0.9",
   "private": true,
   "dependencies": {
     "@babel/parser": "^7.23.0",

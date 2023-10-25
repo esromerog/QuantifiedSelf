@@ -2,6 +2,19 @@
   {
     "properties": [
       {
+        "name": "Size",
+        "value": 0
+      }
+    ],
+    "name": "Circle Tutorial",
+    "description": "This is a very useful tutorial visualization. It is a simple circle changing size. It is useful to learn how the platform manages and maps parameters inside of a creative visualization.",
+    "engine": "P5",
+    "code": "basic.js",
+    "id": "circle basic"
+  },
+  {
+    "properties": [
+      {
         "name": "Sun Position",
         "value": 0
       },
@@ -18,56 +31,135 @@
     "id": "sunset"
   },
   {
-      "properties": [
-        {"name": "Signal 1", "value": 0},
-        {"name": "Signal 2", "value": 0},
-        {"name": "Signal 3", "value": 0},
-        {"name": "Signal 4", "value": 0},
-        {"name": "Signal 5", "value": 0},
-        {"name": "Signal 6", "value": 0},
-        {"name": "Signal 7", "value": 0},
-        {"name": "Signal 8", "value": 0},
-        {"name": "Signal 9", "value": 0},
-        {"name": "Signal 10", "value": 0},
-        {"name": "Signal 11", "value": 0},
-        {"name": "Signal 12", "value": 0},
-        {"name": "Signal 13", "value": 0},
-        {"name": "Signal 14", "value": 0}
-
-      ],
-      "name": "Signal View",
-      "img_src": "signal.png",
-      "engine": "P5",
-      "code": "signal_display.js",
-      "id": "signal view"
+    "properties": [
+      {
+        "name": "Signal 1",
+        "value": 0
+      },
+      {
+        "name": "Signal 2",
+        "value": 0
+      },
+      {
+        "name": "Signal 3",
+        "value": 0
+      },
+      {
+        "name": "Signal 4",
+        "value": 0
+      },
+      {
+        "name": "Signal 5",
+        "value": 0
+      },
+      {
+        "name": "Signal 6",
+        "value": 0
+      },
+      {
+        "name": "Signal 7",
+        "value": 0
+      },
+      {
+        "name": "Signal 8",
+        "value": 0
+      },
+      {
+        "name": "Signal 9",
+        "value": 0
+      },
+      {
+        "name": "Signal 10",
+        "value": 0
+      },
+      {
+        "name": "Signal 11",
+        "value": 0
+      },
+      {
+        "name": "Signal 12",
+        "value": 0
+      },
+      {
+        "name": "Signal 13",
+        "value": 0
+      },
+      {
+        "name": "Signal 14",
+        "value": 0
+      }
+    ],
+    "name": "Signal View",
+    "img_src": "signal.png",
+    "engine": "P5",
+    "code": "signal_display.js",
+    "id": "signal view"
   },
   {
-      "properties": [
-        {"name": "Theta", "value": 0, "default": "Theta"},
-        {"name": "Alpha", "value": 0, "default": "Alpha"},
-        {"name": "Low Beta", "value": 0, "default": "Low beta"},
-        {"name": "High Beta", "value": 0, "default": "High beta"},
-        {"name": "Gamma", "value": 0, "default": "Gamma"},
-        {"name": "Time Series", "value": 0}
-      ],
-      "name": "Power Bars",
-      "img_src": "power.png",
-      "engine": "P5",
-      "code": "power_bars.js",
-      "id": "power bars"
+    "properties": [
+      {
+        "name": "Theta",
+        "value": 0,
+        "default": "Theta"
+      },
+      {
+        "name": "Alpha",
+        "value": 0,
+        "default": "Alpha"
+      },
+      {
+        "name": "Low Beta",
+        "value": 0,
+        "default": "Low beta"
+      },
+      {
+        "name": "High Beta",
+        "value": 0,
+        "default": "High beta"
+      },
+      {
+        "name": "Gamma",
+        "value": 0,
+        "default": "Gamma"
+      },
+      {
+        "name": "Time Series",
+        "value": 0
+      }
+    ],
+    "name": "Power Bars",
+    "img_src": "power.png",
+    "engine": "P5",
+    "code": "power_bars.js",
+    "id": "power bars"
   },
   {
-      "properties": [
-        {"name": "Blue", "value": 0},
-        {"name": "Purple", "value": 0},
-        {"name": "Yellow", "value": 0},
-        {"name": "Orange", "value": 0},
-        {"name": "Red", "value": 0}
-      ],
-      "name": "Flower",
-      "description": "Flower visualization. Useful for power values.",
-      "engine": "P5",
-      "code": "flower.js",
-      "id": "flower"
+    "properties": [
+      {
+        "name": "Blue",
+        "value": 0
+      },
+      {
+        "name": "Purple",
+        "value": 0
+      },
+      {
+        "name": "Yellow",
+        "value": 0
+      },
+      {
+        "name": "Orange",
+        "value": 0
+      },
+      {
+        "name": "Red",
+        "value": 0
+      }
+    ],
+    "name": "Flower",
+    "description": "Flower visualization. Useful for power values.",
+    "engine": "P5",
+    "code": "flower.js",
+    "id": "flower"
   }
 ]
