@@ -5,7 +5,8 @@ import visSourcesImport from './metadata/vis'
 import { DeviceSelectionWindow, DataManagementWindow } from "./components/ui/devices/mainDevices";
 import { Routes, Route, Navigate, useParams, Link, NavLink } from 'react-router-dom';
 import { RecordComponent } from "./components/ui/recording";
-import { Nav } from "react-bootstrap";
+import { useSelector } from "react-redux";
+import { createSelector } from 'reselect';
 
 // I could deploy to Netlify - https://www.geeksforgeeks.org/how-to-deploy-react-app-on-netlify-using-github/
 
@@ -42,20 +43,29 @@ export const allVisSources = visSourcesImport.map(
   }
 );
 
+const areThereDevices = createSelector(
+  [state=>state.deviceMeta],
+  (deviceMeta) => {
+    return (Object.keys(deviceMeta).length>0)
+  }
+)
+
+
 // Object where recording is temporarily stored
 const saveObject = [];
 
 function MainUI() {
   const [recording, setRecording] = useState(false);
+  const areDevices = useSelector(areThereDevices);
 
   return (
     <nav className="navbar styled-navbar g-0 p-0 d-flex justify-content-between align-items-center">
-      <a className="navbar-brand m-0 ms-4 h5" href="#">Quantified Self</a>
+      <a className="navbar-brand m-0 ms-4 h5" href="https://creative-quantified-self.gitbook.io/docs/">Quantified Self</a>
       <div className="h-100 m-0 g-0 d-flex align-items-center">
+        {areDevices?<RecordComponent saveObject={saveObject} recording={recording} setRecording={setRecording} />:null}
         <NavLink className="btn" to="/devices">Devices</NavLink>
         <NavLink className="btn" to="/visuals">Visuals</NavLink>
       </div>
-      {/*<RecordComponent saveObject={saveObject} recording={recording} setRecording={setRecording} />*/}
     </nav>
   )
 }

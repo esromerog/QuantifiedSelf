@@ -6,7 +6,7 @@ import { subToStore, stopRecording } from '../utility/recorder';
 export function RecordComponent({recording, setRecording, saveObject}) {
     // Save object might be changed to a hook?
 
-    const buttonClassName = (recording != false)?"btn btn-outline-danger":"btn btn-outline-dark";
+    const buttonClassName = (recording != false)?"btn-link text-danger rounded-0":"btn-link rounded-0";
     const iconClassName = (recording != false)?"bi bi-stop-circle":"bi bi-record-circle";
     const recordingText = (recording != false)?"Stop recording":"Record data";
     

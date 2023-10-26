@@ -3,8 +3,9 @@
 
 // Purple - 7749F8; Green - 4AB69B; Yellow - F6C651
 
-$primary: #46eb9c;
-$secondary: #7749F8;
+$primary: #7749F8;
+$secondary: #46eb9c;
+
 $accent: #2bedc7;
 $headings-font-weight: 600;
 $enable-negative-margins: true;
@@ -170,6 +171,21 @@ canvas {
     margin-left: 1px;
     padding-left: 2.5rem;
     padding-right: 2.5rem;
+}
+
+.styled-navbar .btn-link {
+    background-color: white;
+    border-radius: 0;
+    border: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-items: center;
+    margin-left: 1px;
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+    text-decoration: none;
 }
 
 .styled-navbar .btn.active:active {
