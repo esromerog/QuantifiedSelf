@@ -60,7 +60,7 @@ function MainUI() {
 
   return (
     <nav className="navbar styled-navbar g-0 p-0 d-flex justify-content-between align-items-center">
-      <a className="navbar-brand m-0 ms-4 h5" href="https://creative-quantified-self.gitbook.io/docs/">Quantified Self</a>
+      <a className="navbar-brand m-0 ms-4 h5" href="https://creative-quantified-self.gitbook.io/docs/" target="_blank">Quantified Self</a>
       <div className="h-100 m-0 g-0 d-flex align-items-center">
         {areDevices?<RecordComponent saveObject={saveObject} recording={recording} setRecording={setRecording} />:null}
         <NavLink className="btn" to="/devices">Devices</NavLink>
