@@ -170,7 +170,7 @@ export function MainView() {
                 <div className="d-flex align-items-center">
                     <div className='align-self-center me-3'>
                         {(!custom) ?
-                            <button className="btn btn-outline-secondary align-items-center rounded-0 edit-button" onClick={startEditing}>
+                            <button className="btn btn-outline-primary align-items-center rounded-0 edit-button ms-1" onClick={startEditing}>
                                 <i className="bi bi-pencil-fill"></i> Edit
                             </button> :
                             <button className={`btn btn-link edit-button text-start ${(dispCode ? "active" : "")}`} onClick={() => setDispCode(!dispCode)}>
