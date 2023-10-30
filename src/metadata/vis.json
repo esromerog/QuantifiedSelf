@@ -161,5 +161,34 @@
     "engine": "P5",
     "code": "flower.js",
     "id": "flower"
+  },
+  {
+    "name": "Cloud",
+    "description": "Reactive cloud the frequency decomposition of a signal.",
+    "engine": "P5",
+    "code": "waves.js",
+    "id": "cloud",
+    "properties": [
+      {
+        "name": "Brightness",
+        "value": 0
+      },
+      {
+        "name": "Low",
+        "value": 0
+      },
+      {
+        "name": "Low Mid",
+        "value": 0
+      },
+      {
+        "name": "High Mid",
+        "value": 0
+      },
+      {
+        "name": "Highs",
+        "value": 0
+      }
+    ]
   }
 ]
