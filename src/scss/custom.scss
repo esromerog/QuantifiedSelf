@@ -86,8 +86,8 @@ canvas {
 }
 
 .card-margin {
-    margin-right: 13px;
-    margin-left: 13px;
+    padding-left: 12px;
+    padding-right: 12px;
 }
 
 .disable-scrollbar::-webkit-scrollbar {
@@ -143,6 +143,7 @@ canvas {
 
     .dropdown-menu>li:hover>.submenu {
         display: block;
+        z-index: -1;
     }
 }
 
