@@ -108,12 +108,12 @@
         "default": "Alpha"
       },
       {
-        "name": "Low Beta",
+        "name": "Low beta",
         "value": 0,
         "default": "Low beta"
       },
       {
-        "name": "High Beta",
+        "name": "High beta",
         "value": 0,
         "default": "High beta"
       },

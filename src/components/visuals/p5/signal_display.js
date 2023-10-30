@@ -32,13 +32,13 @@ p.draw = () => {
     p.background(220);
     for (let k = 0; k < chn; k++) {
         ts_channels[k].push(value.current[signal_names[k]]);
-        if (ts_channels[k].length > canvasRef.current.offsetWidth) {
+        if (ts_channels[k].length > p.width) {
             ts_channels[k].shift();
         }
         if (ts_channels[k].length >= 2) {
-            p.rect(0, 0, canvasRef.current.offsetWidth, canvasRef.current.offsetHeight);
+            p.rect(0, 0, p.width, p.height);
             p.noFill();
-            drawTimeSeries(p, ts_channels[k], canvasRef.current.offsetWidth, k * canvasRef.current.offsetHeight / chn, (k + 1) * canvasRef.current.offsetHeight / chn);
+            drawTimeSeries(p, ts_channels[k], p.width, k * p.height / chn, (k + 1) * p.height / chn);
         }
     }
 };`

@@ -20,17 +20,15 @@ function EmotivDeviceButton({ data, name, handleShow }) {
 }
 
 
-
-
 function FileDeviceButton({ data, name, handleShow }) {
 
 
-    const streamObject = useSelector(state=>state.deviceMeta[name].object);
+    const streamObject = useSelector(state => state.deviceMeta[name].object);
 
-    const playing = useSelector(state=>state.deviceMeta[name].playing);
-    const looping = useSelector(state=>state.deviceMeta[name].looping);
+    const playing = useSelector(state => state.deviceMeta[name].playing);
+    const looping = useSelector(state => state.deviceMeta[name].looping);
 
-    function startStreaming() {
+    function startStreaming() {
         streamObject.startPlayback();
     }
 
@@ -47,7 +45,7 @@ function FileDeviceButton({ data, name, handleShow }) {
     }
 
     return (
-        <div className='row'>
+        <div className='row card-margin'>
             <div className='card rounded-0 mb-2 mt-1 col-8'>
                 <button className="card-body btn btn-link text-decoration-none text-start" onClick={() => handleShow(name)}>
                     <h5 className="card-title g-0 m-0">{name}</h5>
@@ -56,21 +54,22 @@ function FileDeviceButton({ data, name, handleShow }) {
             </div>
             <div className='card rounded-0 mb-2 mt-1 col-4'>
                 <div className="card-body d-flex align-items-center justify-content-center">
-                    <button className='btn btn-link'onClick={restartStreaming}><i className="bi bi-rewind" /></button>
-                    {playing?
-                    <button className='btn btn-link'><i className="bi bi-pause" onClick={pauseStreaming}/></button>
-                    :<button className='btn btn-link'><i className="bi bi-play" onClick={startStreaming}/></button>}
-                    <button className='btn btn-link'><i className={`bi bi-arrow-repeat ${looping?'text-primary':''}`} onClick={loopStreaming} /></button>
+                    <button className='btn btn-link' onClick={restartStreaming}><i className="bi bi-rewind" /></button>
+                    {playing ?
+                        <button className='btn btn-link'><i className="bi bi-pause" onClick={pauseStreaming} /></button>
+                        : <button className='btn btn-link'><i className="bi bi-play" onClick={startStreaming} /></button>}
+                    <button className='btn btn-link'><i className={`bi bi-arrow-repeat ${looping ? 'text-primary' : ''}`} onClick={loopStreaming} /></button>
                 </div>
             </div>
         </div>
+
     );
 }
 
 function DeviceList({ data, name, handleShow, uploaded }) {
     const deviceButton = {
         "EMOTIV": <EmotivDeviceButton data={data} name={name} handleShow={handleShow} />,
-        "Muse": <EmotivDeviceButton data={data} name = {name} handleShow={handleShow} />,
+        "Muse": <EmotivDeviceButton data={data} name={name} handleShow={handleShow} />,
         "Upload": <FileDeviceButton data={data} name={name} handleShow={handleShow} />
     }
 
