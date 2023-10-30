@@ -362,7 +362,7 @@ function ParameterDropDown({ claves, parameter, dataMappings, displayName }) {
                     return (
                         <li key={option.device}>
                             <button type="button" className="dropdown-item" data-bs-toggle="dropdown-submenu" data-bs-target="#nested-dropdown" aria-expanded="false">{option.device}</button>
-                            <ul className='submenu-right dropdown-menu' id="nested-dropdown">
+                            <ul className='submenu dropdown-menu' id="nested-dropdown">
                                 {option.data.map((data) => {
                                     return (
                                         <li key={data}>

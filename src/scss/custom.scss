@@ -118,6 +118,7 @@ canvas {
 @media all and (min-width: 992px) {
     .dropdown-menu li {
         position: relative;
+        z-index: 100;
     }
 
     li .submenu {
@@ -125,6 +126,7 @@ canvas {
         position: absolute;
         right: 100%;
         top: -7px;
+        z-index: 100;
     }
 
     li .submenu-right {

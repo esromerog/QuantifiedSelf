@@ -164,10 +164,11 @@
   },
   {
     "name": "Cloud",
-    "description": "Reactive cloud the frequency decomposition of a signal.",
+    "description": "Reactive cloud to the different frequencies of a signal.",
     "engine": "P5",
     "code": "waves.js",
     "id": "cloud",
+    "img_src": "cloud.png",
     "properties": [
       {
         "name": "Brightness",
