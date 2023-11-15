@@ -1,14 +1,16 @@
 import "./App.scss";
 import React, { useEffect, useState } from 'react';
-import {MainMenu, MainView} from "./components/ui/visuals/mainVisuals";
+import { MainMenu, MainView } from "./components/ui/visuals/mainVisuals";
 import visSourcesImport from './metadata/vis'
 import { DeviceSelectionWindow, DataManagementWindow } from "./components/ui/devices/mainDevices";
 import { Routes, Route, Navigate, useParams, Link, NavLink } from 'react-router-dom';
 import { RecordComponent } from "./components/ui/recording";
 import { useSelector } from "react-redux";
 import { createSelector } from 'reselect';
+import LSLReceiver from "./components/ui/devices/stream_functions/lslClient";
+import { isMobile } from 'react-device-detect';
+import MobileUnavaiabilityScreen from "./components/ui/mobile";
 
-// I could deploy to Netlify - https://www.geeksforgeeks.org/how-to-deploy-react-app-on-netlify-using-github/
 
 // Some improvements that I need to make (after env):
 // Maybe have the user put his license information in here (?) Otherwise do they access Cortex through our account (?)
@@ -50,11 +52,15 @@ const areThereDevices = createSelector(
   }
 )
 
+const lslReceiver = new LSLReceiver();
+lslReceiver.connect("ws://localhost:8333");
 
 // Object where recording is temporarily stored
 const saveObject = [];
 
-function MainUI() {
+
+
+function NavBar() {
   const [recording, setRecording] = useState(false);
   const areDevices = useSelector(areThereDevices);
 
@@ -70,11 +76,11 @@ function MainUI() {
   )
 }
 
-export default function App() {
+function DesktopApp() {
 
   return (
     <>
-      <MainUI />
+      <NavBar />
       <div className="hv-100">
         <Routes>
           <Route path="/devices" element={<DeviceSelectionWindow />} />
@@ -87,6 +93,16 @@ export default function App() {
   );
 }
 
+export default function App() {
+
+  const renderedContent = isMobile ? <MobileUnavaiabilityScreen /> : <DesktopApp />
+
+  return(
+    <>
+      {renderedContent}
+    </>
+  )
+}
 
 // Notes
 

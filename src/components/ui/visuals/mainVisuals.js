@@ -33,7 +33,6 @@ export function MainView() {
 
     const { visID } = useParams();
 
-
     function getVisMeta() {
         let result = allVisSources.find(({ id }) => id == visID);
         if (typeof result === "undefined") {
