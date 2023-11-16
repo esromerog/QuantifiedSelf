@@ -60,6 +60,19 @@ export function DeviceSelectionWindow() {
     if (emotivIDs.length > 1) {
         showConn = true;
     }
+    
+    const [pressingAlt, setPressingAlt] = useState(false);
+
+    window.addEventListener("keydown", (e) => {
+        if (e.altKey) {
+            setPressingAlt(true);
+        }
+    })
+    window.addEventListener("keyup", (e) => {
+        if (!e.altKey) {
+            setPressingAlt(false);
+        }
+    })
 
     return (
         <div className='center-margin text-center align-items-center'>
@@ -76,7 +89,7 @@ export function DeviceSelectionWindow() {
                             <li><a className="dropdown-item" onClick={() => handleShow("EMOTIV")}>EMOTIV</a></li>
                             <li><a className="dropdown-item" onClick={() => handleShow("Muse")}>Muse</a></li>
                             <li><a className="dropdown-item" onClick={() => handleShow("Upload")}>Upload a file</a></li>
-                            <li><a className="dropdown-item" onClick={() => handleShow("LSL")}>LSL Stream</a></li>
+                            {pressingAlt?<li><a className="dropdown-item" onClick={() => handleShow("LSL")}>LSL Stream</a></li>:null}
                             {showConn ?
                                 <li><a className="dropdown-item" onClick={() => handleShow("")}>Hyperscanning</a></li>
                                 : null}

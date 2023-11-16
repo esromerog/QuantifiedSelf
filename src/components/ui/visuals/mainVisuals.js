@@ -164,13 +164,15 @@ export function MainView() {
             <div className="d-flex justify-content-between align-items-center align-text-center mt-1">
                 <div className="d-flex align-items-center">
                     <div className='align-self-center me-3'>
-                        {(!custom) ?
-                            <button className="btn btn-outline-primary align-items-center rounded-0 edit-button ms-1" onClick={startEditing}>
-                                <i className="bi bi-pencil-fill"></i> Edit
-                            </button> :
-                            <button className={`btn btn-link edit-button text-start ${(dispCode ? "active" : "")}`} onClick={() => setDispCode(!dispCode)}>
-                                <b><i className="bi bi-code-slash" alt="code"></i></b>
-                            </button>
+                        {visMetadata.engine == "P5" ?
+                            (!custom) ?
+                                <button className="btn btn-outline-primary align-items-center rounded-0 edit-button ms-1" onClick={startEditing}>
+                                    <i className="bi bi-pencil-fill"></i> Edit
+                                </button> :
+                                <button className={`btn btn-link edit-button text-start ${(dispCode ? "active" : "")}`} onClick={() => setDispCode(!dispCode)}>
+                                    <b><i className="bi bi-code-slash" alt="code"></i></b>
+                                </button>:
+                                null
                         }
                     </div>
                 </div>
@@ -192,7 +194,7 @@ export function MainView() {
                         <div className='h-100' style={{ backgroundColor: '#1A1A1A' }} >
                             <div className='d-flex justify-content-between align-items-center'>
                                 <h5 className='ms-2 p-2 pt-3 align-self-center' style={{ color: 'white', backgroundColor: '#1A1A1A' }}>Code</h5>
-                                <button className='btn btn-link' onClick={()=>downloadCode(visName,code)}><i className='bi bi-download code-download'></i></button>
+                                <button className='btn btn-link' onClick={() => downloadCode(visName, code)}><i className='bi bi-download code-download'></i></button>
                             </div>
                             <CodeEditor code={code} setCode={setCode} />
                         </div> :
@@ -228,10 +230,10 @@ function VisualsWindow({ visMetadata, code, fullScreenHandle }) {
     const paramsRef = useRef(params);
     paramsRef.current = params;
 
-    
+
     const [component, setComponent] = useState(null);
 
-    useEffect(()=>{
+    useEffect(() => {
         async function importComponent() {
             // Declare in visMetadata the other visualizations and put a path. Also set engine to something different than P5
             const module = await import(`../../../assets/visuals/${visMetadata.path}`);
