@@ -11,6 +11,7 @@ import { Link, useParams } from 'react-router-dom';
 import { FileUploader, RecordedDataButton } from './stream_functions/file_upload';
 import { createSelector } from 'reselect';
 import { MuseConnection } from './stream_functions/muse';
+import LSLConnection from './stream_functions/lsl';
 
 const selectData = state => state.dataStream;
 const selectDeviceMeta = state => state.deviceMeta;
@@ -49,7 +50,8 @@ export function DeviceSelectionWindow() {
     const deviceModals = {
         "EMOTIV": <EmotivConnection show={show} handleClose={handleClose} />,
         "Muse": <MuseConnection show={show} handleClose={handleClose} />,
-        "Upload": <FileUploader show={show} handleClose={handleClose} />
+        "Upload": <FileUploader show={show} handleClose={handleClose} />,
+        "LSL": <LSLConnection show={show} handleClose={handleClose} />
     }
 
     // Check if you have more than two EPOC or EPOC+ headsets. If you do, the connectivity option becomes available
@@ -62,7 +64,7 @@ export function DeviceSelectionWindow() {
     return (
         <div className='center-margin text-center align-items-center'>
             <h4 className="mt-5 mb-2">Data Sources</h4>
-            <p className='center-margin' style={{overflowWrap: 'nowrap'}}>Here you can connect to different devices, manage them, and upload files from previous recordings.</p>
+            <p className='center-margin' style={{ overflowWrap: 'nowrap' }}>Here you can connect to different devices, manage them, and upload files from previous recordings.</p>
             <div className='ms-5 me-5'>
                 <RenderDevices />
                 <div className='d-flex justify-content-center'>
@@ -74,6 +76,7 @@ export function DeviceSelectionWindow() {
                             <li><a className="dropdown-item" onClick={() => handleShow("EMOTIV")}>EMOTIV</a></li>
                             <li><a className="dropdown-item" onClick={() => handleShow("Muse")}>Muse</a></li>
                             <li><a className="dropdown-item" onClick={() => handleShow("Upload")}>Upload a file</a></li>
+                            <li><a className="dropdown-item" onClick={() => handleShow("LSL")}>LSL Stream</a></li>
                             {showConn ?
                                 <li><a className="dropdown-item" onClick={() => handleShow("")}>Hyperscanning</a></li>
                                 : null}

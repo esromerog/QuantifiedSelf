@@ -53,7 +53,6 @@ const P5Wrapper = ({ value, code, setError }) => {
         }
         canvasRef.current.firstChild.style.visibility = "visible"
 
-
         let observer = new ResizeObserver(function () {
             updateCanvasDimensions();
         });
@@ -69,7 +68,7 @@ const P5Wrapper = ({ value, code, setError }) => {
         return () => {
             Q.noLoop();
             Q.remove();
-            observer.disconnect()
+            observer.disconnect();
         }
     }, [code]);
 

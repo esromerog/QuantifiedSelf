@@ -42,6 +42,7 @@ export function EmotivConnection({ show, handleClose }) {
                         id: id,
                         metadata: {
                             device: "EMOTIV",
+                            type: "default",
                             id: id
                         }
                     }

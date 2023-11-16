@@ -191,5 +191,19 @@
         "value": 0
       }
     ]
+  },
+  {
+    "name": "Lava lamp",
+    "description": "Abstract flowing visuals with different colors where you can control the speed.",
+    "engine": "Shaderpark",
+    "path": "mirrors.js",
+    "id": "bagel",
+    "img_src": "round.png",
+    "properties": [
+      {
+        "name": "Speed Change",
+        "value": 0
+      }
+    ]
   }
 ]

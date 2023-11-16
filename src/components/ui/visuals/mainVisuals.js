@@ -1,9 +1,5 @@
 import React, { useEffect, useRef, useState, useContext } from 'react';
 import { useSelector } from "react-redux";
-import Mirrors from "../../visuals/mirrors";
-import Bagel from "../../visuals/bagel";
-import AudioPlayerWithFilter from "../../visuals/Audio_player";
-import Head from "../../visuals/head_position";
 
 import RenderVisualizationCards from './viscards'
 import { FullScreen, useFullScreenHandle } from 'react-full-screen'
@@ -56,8 +52,8 @@ export function MainView() {
     const [code, _setCode] = useState("");
 
     function getCode() {
-        if ("code" in visMetadata) {
-            import(`../../visuals/p5/${visMetadata.code}`).then((res) => {
+        if (visMetadata?.code) {
+            import(`../../../assets/visuals/p5/${visMetadata.code}`).then((res) => {
                 setCode(res.default);
             })
         }
@@ -232,25 +228,30 @@ function VisualsWindow({ visMetadata, code, fullScreenHandle }) {
     const paramsRef = useRef(params);
     paramsRef.current = params;
 
+    
+    const [component, setComponent] = useState(null);
 
-    const visStreamFunctions = {
-        "Abstract Colors": <Mirrors value={paramsRef} />,
-        "Circle Visualization": <Bagel value={paramsRef} />,
-        "Audio player": <AudioPlayerWithFilter value={paramsRef} />,
-        "Head Position": <Head value={paramsRef} />,
-    };
+    useEffect(()=>{
+        async function importComponent() {
+            // Declare in visMetadata the other visualizations and put a path. Also set engine to something different than P5
+            const module = await import(`../../../assets/visuals/${visMetadata.path}`);
+            console.log(module);
+            const CustomComponent = module.default
+            setComponent(<CustomComponent value={paramsRef} />);
+        }
 
-    if (visMetadata.engine === "P5") {
-        visStreamFunctions[visMetadata.name] = <P5Visuals code={code} value={paramsRef} />
-    }
-
-
+        if (visMetadata.engine != "P5") {
+            importComponent()
+        } else {
+            setComponent(<P5Visuals code={code} value={paramsRef} />)
+        }
+    }, [code])
 
     return (
         <div className="h-100 w-100">
             <FullScreen handle={fullScreenHandle} className="w-100 h-100">
                 <div className="w-100 h-100">
-                    {params && visStreamFunctions[visMetadata.name]}
+                    {params && component}
                 </div>
             </FullScreen>
         </div>

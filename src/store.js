@@ -15,7 +15,6 @@ if (params == undefined) {
     const visMeta = localStorage.getItem('visuals');
     if (visMeta != null) {
         const localData = JSON.parse(visMeta).find(({ id }) => id == pathname);
-        console.log(localData);
         if (localData != null) {
             params = localData.properties;
         }

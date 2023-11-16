@@ -7,7 +7,7 @@ import { Routes, Route, Navigate, useParams, Link, NavLink } from 'react-router-
 import { RecordComponent } from "./components/ui/recording";
 import { useSelector } from "react-redux";
 import { createSelector } from 'reselect';
-import LSLReceiver from "./components/ui/devices/stream_functions/lslClient";
+import LSLReceiver from "./components/utility/lslClient";
 import { isMobile } from 'react-device-detect';
 import MobileUnavaiabilityScreen from "./components/ui/mobile";
 
@@ -30,6 +30,7 @@ export const allVisSources = visSourcesImport.map(
         engine: visSource.engine,
         code: visSource?.code,
         id: visSource.id,
+        path: visSource?.path,
       }
     }
     else {
@@ -51,9 +52,6 @@ const areThereDevices = createSelector(
     return (Object.keys(deviceMeta).length>0)
   }
 )
-
-const lslReceiver = new LSLReceiver();
-lslReceiver.connect("ws://localhost:8333");
 
 // Object where recording is temporarily stored
 const saveObject = [];

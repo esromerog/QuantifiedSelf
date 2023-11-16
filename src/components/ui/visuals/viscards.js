@@ -42,7 +42,7 @@ function ImageCard({ visSource }) {
               <img src={p5logo} className='m-0 p-0' />
               <small className='m-2'>P5.js</small>
             </>
-              : null}
+              : <small className='m-2'>{visSource["engine"]}</small>}
           </div>
         </div>
       </div>

@@ -120,7 +120,8 @@ class MuseDevice {
                     metadata: {
                         device: "Muse",
                         connected: true,
-                        id: this.id
+                        id: this.id,
+                        type: "default"
                     }
                 }
             });

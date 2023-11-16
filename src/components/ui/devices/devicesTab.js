@@ -71,10 +71,15 @@ function DeviceList({ data, name, handleShow, uploaded }) {
     const deviceButton = {
         "EMOTIV": <EmotivDeviceButton data={data} name={name} handleShow={handleShow} />,
         "Muse": <EmotivDeviceButton data={data} name={name} handleShow={handleShow} />,
-        "Upload": <FileDeviceButton data={data} name={name} handleShow={handleShow} />
+        "Upload": <FileDeviceButton data={data} name={name} handleShow={handleShow} />,
+        "LSL": <EmotivDeviceButton data={data} name={name} handleShow={handleShow} />
     }
 
     let key = data.heading;
+
+    if (key.includes("LSL")) {
+        key = "LSL"
+    }
 
     if (uploaded) {
         key = "Upload"
@@ -102,8 +107,28 @@ export default function RenderDevices() {
     const deviceMeta = useSelector(state => state.deviceMeta)
 
     const deviceButtonList = Object.keys(deviceMeta)?.map((id) => {
-        const data = devicesRaw.find(({ heading }) => deviceMeta[id].device === heading);
+        const currDev = deviceMeta[id];
+        let data = devicesRaw.find(({ heading }) => currDev.device === heading);
+        // Here I could add another option to get data from the store in case it doesn't find it
+
+        if (data == undefined) {
+            const defaultData = devicesRaw.find(({ heading }) => currDev?.info?.name === heading);
+            if (defaultData) {
+                data = defaultData;
+            } else {
+                data = {
+                    "heading": (currDev?.info?.name != undefined) ? "LSL - " + currDev?.info?.name : "LSL",
+                    "description": "This is a custom LSL stream. LSL devices can have very different properties",
+                    "type": currDev?.info?.type || "custom",
+                    "sampling_rate": currDev?.info?.nominal_srate,
+                }
+            }
+        }
+
+        console.log(data);
+
         const uploaded = "playing" in deviceMeta[id];
+
         return (
             <DeviceList data={data} name={id} handleShow={handleShow} key={id} uploaded={uploaded} />
         )
@@ -111,7 +136,8 @@ export default function RenderDevices() {
 
     const deviceModal = {
         "EMOTIV": <EmotivDeviceModal show={show} handleClose={handleClose} />,
-        "Muse": <></>
+        "Muse": <></>,
+        "LSL Device": <></>
     }
 
     function getDeviceModal(id) {
