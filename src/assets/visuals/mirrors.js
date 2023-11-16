@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { spCode } from "./mirrors_shaderpackcode";
 import { createSculptureWithGeometry } from 'shader-park-core';
 import { OrbitControls } from 'shader-park-core/node_modules/three/examples/jsm/controls/OrbitControls.js';
-import { Scene,  BoxGeometry, SphereGeometry, Vector3, PerspectiveCamera, WebGLRenderer, Color, Clock, MeshBasicMaterial, MeshStandardMaterial, Mesh } from 'shader-park-core/node_modules/three';
+import { Scene, BoxGeometry, SphereGeometry, Vector3, PerspectiveCamera, WebGLRenderer, Color, Clock, MeshBasicMaterial, MeshStandardMaterial, Mesh } from 'shader-park-core/node_modules/three';
 
 const Mirrors = ({ value }) => {
 
@@ -23,7 +23,7 @@ const Mirrors = ({ value }) => {
   useEffect(() => {
     // ------------------------------------------------ Setup ------------------------------------------------
     const canvas = canvasRef.current;
-    
+
     let scene = new Scene();
 
     let camera = new PerspectiveCamera(75, canvas.offsetWidth / canvas.offsetHeight, 0.1, 1000);
@@ -65,11 +65,11 @@ const Mirrors = ({ value }) => {
       camera.updateProjectionMatrix();
       renderer.setSize(canvas.offsetWidth, canvas.offsetHeight);
     }
-    
+
     let id;
     // ------------------------------------------------ Dynamic aspect? ------------------------------------------------
     let render = () => {
-      id=requestAnimationFrame(render);
+      id = requestAnimationFrame(render);
       state.time += clock.getDelta();
       state.currButtonHover = state.currButtonHover * 0.999 + state.buttonHover * 0.001;
       state.currClick = state.currClick * 0.97 + state.click * 0.03;
@@ -77,10 +77,14 @@ const Mirrors = ({ value }) => {
     };
 
     render();
-    window.addEventListener('resize', onWindowResize);
-    
-    return () => {
-      window.removeEventListener('resize', onWindowResize);
+    let observer = new ResizeObserver(function () {
+      onWindowResize();
+    });
+
+    observer.observe(canvas)
+
+    return () => {
+      observer.disconnect();
       cancelAnimationFrame(id);
       renderer.clear();
       renderer.dispose();
