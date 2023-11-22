@@ -205,5 +205,19 @@
         "value": 0
       }
     ]
+  },
+  {
+    "properties": [
+      {
+        "name": "Distance",
+        "value": 0
+      }
+    ],
+    "name": "Synchrony Heads",
+    "description": "This is based on the Mutual Wave Machine installation. It is meant to be used when working with brain-to-brain synchrony.",
+    "engine": "P5",
+    "code": "heads.js",
+    "id": "heads",
+    "img_src": "heads.png"
   }
 ]

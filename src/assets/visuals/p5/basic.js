@@ -5,7 +5,7 @@ p.setup = () => {
     p.createCanvas(canvasRef.current.offsetWidth, canvasRef.current.offsetHeight);
 }
 
-// Code that is constantly being updates
+// Code that is constantly being updated
 p.draw = () => {
     // Sets your background color to black using RGB values
     // The values go from a range between 0 and 255 (8-bit color)
