@@ -212,7 +212,7 @@ p.setup = () => {
     let centerX = p.width / 2;
     let centerY = p.height / 2;
     let distance_radius = 100;
-    let radius = value.current["Size"]*80;
+    let radius = 70;
 
     var fadingFactor = 0.8;
     var flaresActivity = 0.2;

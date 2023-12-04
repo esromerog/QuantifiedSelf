@@ -17,10 +17,6 @@
       {
         "name": "Sun Position",
         "value": 0
-      },
-      {
-        "name": "Size",
-        "value": 0
       }
     ],
     "name": "Sun",
@@ -100,27 +96,27 @@
       {
         "name": "Theta",
         "value": 0,
-        "default": "Theta"
+        "default": ["Theta"]
       },
       {
         "name": "Alpha",
         "value": 0,
-        "default": "Alpha"
+        "default": ["Alpha"]
       },
       {
         "name": "Low beta",
         "value": 0,
-        "default": "Low beta"
+        "default": ["Low beta", "Beta", "Low Beta"]
       },
       {
         "name": "High beta",
         "value": 0,
-        "default": "High beta"
+        "default": ["High beta", "Beta", "High Beta"]
       },
       {
         "name": "Gamma",
         "value": 0,
-        "default": "Gamma"
+        "default": ["Gamma"]
       },
       {
         "name": "Time Series",

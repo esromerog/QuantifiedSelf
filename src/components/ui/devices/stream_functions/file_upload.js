@@ -15,6 +15,9 @@ const getDataIDs = createSelector(
     }
 )
 
+window.recordings = {}
+
+
 export function FileUploader({ show, handleClose }) {
 
     const dispatch = useDispatch();
@@ -48,14 +51,13 @@ export function FileUploader({ show, handleClose }) {
             header: true,
             complete: (results) => {
                 // results.data - contains the uploaded file output
-                const streamObject = new UploadedFile(results.data, recordingDevice, id);
+                window.recordings[id] = new UploadedFile(results.data, recordingDevice, id);
                 dispatch({
                     type: 'devices/create', 
                     payload: { 
                         id: id, 
                         metadata: { 
                             device: recordingDevice, 
-                            object: streamObject, 
                             playing: false,
                             looping: false,
                 }}})

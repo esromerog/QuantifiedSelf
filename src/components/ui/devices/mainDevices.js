@@ -8,7 +8,7 @@ import AvailableDataInformation from "./availableData";
 
 import DataManagement from '../visuals/dataManagement';
 import { Link, useParams } from 'react-router-dom';
-import { FileUploader, RecordedDataButton } from './stream_functions/file_upload';
+import { FileUploader } from './stream_functions/file_upload';
 import { createSelector } from 'reselect';
 import { MuseConnection } from './stream_functions/muse';
 import LSLConnection from './stream_functions/lsl';
@@ -35,9 +35,6 @@ export const selectDevices = createSelector(
 );
 
 export function DeviceSelectionWindow() {
-    const { visID } = useParams();
-
-    const mainMenu = (visID === "home") ? true : false;
 
     const [modalDevice, setModalDevice] = useState("");
     const [show, setShow] = useState(false);

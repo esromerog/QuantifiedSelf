@@ -22,8 +22,7 @@ function EmotivDeviceButton({ data, name, handleShow }) {
 
 function FileDeviceButton({ data, name, handleShow }) {
 
-
-    const streamObject = useSelector(state => state.deviceMeta[name].object);
+    const streamObject = window.recordings[name];
 
     const playing = useSelector(state => state.deviceMeta[name].playing);
     const looping = useSelector(state => state.deviceMeta[name].looping);
