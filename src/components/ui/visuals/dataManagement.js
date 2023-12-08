@@ -434,7 +434,6 @@ function ParameterDropDown({ claves, parameter, dataMappings }) {
     [dataMappings]
   );
 
-  console.log("Re-render");
   return (
     <div>
       <button

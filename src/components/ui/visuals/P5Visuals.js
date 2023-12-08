@@ -1,6 +1,9 @@
 import P5 from 'p5';
 import React, { useEffect, useRef, useState } from 'react';
 
+window.p5 = P5
+require('p5/lib/addons/p5.sound')
+
 const P5Visuals = ({ value, code }) => {
     const [error, setError] = useState(false);
     const blacklist = ['document.', 'http', "/>", "eval", "decode", "window."];

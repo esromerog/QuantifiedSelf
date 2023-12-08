@@ -47,9 +47,10 @@ const loadParameters = () => {
   }
 };
 
-function normalizeValue(value, minimum, maximum) {
-  const normalizedValue = (value - minimum) / (maximum - minimum);
-  return normalizedValue;
+function normalizeValue(value, min, max) {
+
+  // Map the value to the range 0 to 1
+  return (value - min) / (max - min);
 }
 
 const initialState = {
@@ -203,11 +204,12 @@ function rootReducer(state = initialState, action) {
       // Logic to handle device stream updates
       // If it's mapped to something, update the parameter
       const updatedData = { ...state.params };
+      console.log(action.payload.data);
 
       for (const item in state.paramsMeta) {
         const src = state.paramsMeta[item]["mapping"];
         const range = state.paramsMeta[item]["range"];
-        if (src[0] === action.payload.id) {
+        if (src[0] === action.payload.id && action.payload.data[src[1]]) {
           updatedData[item] = normalizeValue(
             action.payload.data[src[1]],
             range[0],
@@ -215,6 +217,8 @@ function rootReducer(state = initialState, action) {
           );
         }
       }
+
+      console.log(updatedData);
 
       return {
         ...state,

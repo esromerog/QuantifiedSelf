@@ -10,6 +10,7 @@
     "description": "This is a very useful tutorial visualization. It is a simple circle changing size. It is useful to learn how the platform manages and maps parameters inside of a creative visualization.",
     "engine": "P5",
     "code": "basic.js",
+    "img_src": "circle.png",
     "id": "circle basic"
   },
   {
@@ -133,23 +134,28 @@
     "properties": [
       {
         "name": "Blue",
-        "value": 0
+        "value": 0,
+        "default": ["Beta", "Alpha", "Gamma", "Low Beta", "High Beta", "Low beta", "High beta", "Theta"]
       },
       {
         "name": "Purple",
-        "value": 0
+        "value": 0,
+        "default": ["Beta", "Alpha", "Gamma", "Low Beta", "High Beta", "Low beta", "High beta", "Theta"]
       },
       {
         "name": "Yellow",
-        "value": 0
+        "value": 0,
+        "default": ["Beta", "Alpha", "Gamma", "Low Beta", "High Beta", "Low beta", "High beta", "Theta"]
       },
       {
         "name": "Orange",
-        "value": 0
+        "value": 0,
+        "default": ["Beta", "Alpha", "Gamma", "Low Beta", "High Beta", "Low beta", "High beta", "Theta"]
       },
       {
         "name": "Red",
-        "value": 0
+        "value": 0,
+        "default": ["Beta", "Alpha", "Gamma", "Low Beta", "High Beta", "Low beta", "High beta", "Theta"]
       }
     ],
     "name": "Flower",
@@ -172,19 +178,23 @@
       },
       {
         "name": "Low",
-        "value": 0
+        "value": 0,
+        "default": ["Alpha"]
       },
       {
         "name": "Low Mid",
-        "value": 0
+        "value": 0,
+        "default": ["Low Beta", "Low beta", "Beta"]
       },
       {
         "name": "High Mid",
-        "value": 0
+        "value": 0,
+        "default": ["Low Beta","Low beta", "Beta"]
       },
       {
         "name": "Highs",
-        "value": 0
+        "value": 0,
+        "default": ["Gamma"]
       }
     ]
   },
@@ -215,5 +225,39 @@
     "code": "heads.js",
     "id": "heads",
     "img_src": "heads.png"
+  },
+  {
+    "properties": [
+      {
+        "name": "Delta",
+        "value": 0,
+        "default": ["Delta"]
+      },
+      {
+        "name": "Theta",
+        "value": 0,
+        "default": ["Theta"]
+      },
+      {
+        "name": "Alpha",
+        "value": 0,
+        "default": ["Alpha"]
+      },
+      {
+        "name": "Beta",
+        "value": 0,
+        "default": ["High beta", "Beta", "High Beta", "Low Beta", "Low beta"]
+      },
+      {
+        "name": "Gamma",
+        "value": 0,
+        "default": ["Gamma"]
+      }
+    ],
+    "name": "Sound",
+    "description": "How are your brain waves related to music? This visualization explores binaural tones, frequency, and waveforms to understand electrophysiology.",
+    "engine": "P5",
+    "code": "sonification.js",
+    "id": "sound"
   }
 ]
