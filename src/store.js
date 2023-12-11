@@ -204,7 +204,6 @@ function rootReducer(state = initialState, action) {
       // Logic to handle device stream updates
       // If it's mapped to something, update the parameter
       const updatedData = { ...state.params };
-      console.log(action.payload.data);
 
       for (const item in state.paramsMeta) {
         const src = state.paramsMeta[item]["mapping"];
@@ -217,8 +216,6 @@ function rootReducer(state = initialState, action) {
           );
         }
       }
-
-      console.log(updatedData);
 
       return {
         ...state,

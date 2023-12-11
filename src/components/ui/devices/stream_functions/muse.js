@@ -179,15 +179,20 @@ class MuseDevice {
                         }
                     })*/
 
-          const dispatchDataArray = this.dataArray.map((data, index) => ({
-            [this.channelNames[data.electrode]]: data.samples[i],
-          }));
-
           for (let i = 0; i < this.dataArray[0].samples.length; i++) {
+            const dispatchDataArray = this.dataArray.map((data, index) => ({
+              [this.channelNames[data.electrode]]: data.samples[i],
+            }));
+
+            console.log(dispatchDataArray);
             const dispatchData = dispatchDataArray.reduce(
-              (acc, data) => ({ ...acc, ...data[i] }),
+              (acc, data) => {
+                acc[Object.keys(data)[0]] = data[Object.keys(data)[0]]
+                return acc
+              },
               {}
             );
+            console.log(dispatchData);
             store.dispatch({
               type: "devices/streamUpdate",
               payload: {
@@ -239,7 +244,6 @@ class MuseDevice {
 
     for (const key in res) {
       res[key] = res[key] / this.numberOfChannels;
-      console.log(res[key]);
     }
 
     store.dispatch({
