@@ -1,6 +1,7 @@
 import "./App.scss";
 import React, { useEffect, useState } from 'react';
-import { MainMenu, MainView } from "./components/ui/visuals/mainVisuals";
+import { MainView } from "./components/ui/visuals/mainVisuals";
+import { MainMenu } from "./components/ui/visuals/mainMenu";
 import visSourcesImport from './metadata/vis'
 import { DeviceSelectionWindow, DataManagementWindow } from "./components/ui/devices/mainDevices";
 import { Routes, Route, Navigate, useParams, Link, NavLink } from 'react-router-dom';

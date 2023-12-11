@@ -34,7 +34,6 @@ let alpha_modulator;
 let beta_modulator;
 let gamma_modulator;
 
-let playButton;
 let isPlaying = false;
 
 // I've just been using mouseover to turn sound on/off but we should map to actual buttons
@@ -49,11 +48,11 @@ function playOscillator() {
   alpha.amp(0.6 * value.current["Alpha"], 0.01);
   alpha_modulator.amp(0.6 * value.current["Alpha"], 0.01);
 
-  //beta.amp(0.4*value.current["Beta"], 0.01);
-  //beta_modulator.amp(0.4*value.current["Beta"], 0.01);
+  beta.amp(0.4*value.current["Beta"], 0.01);
+  beta_modulator.amp(0.4*value.current["Beta"], 0.01);
 
-  //gamma.amp(0.2*value.current["Gamma"], 0.01);
-  //gamma_modulator.amp(0.2*value.current["Gamma"], 0.01);
+  gamma.amp(0.2*value.current["Gamma"], 0.01);
+  gamma_modulator.amp(0.2*value.current["Gamma"], 0.01);
 
   delta.pan(1);
   theta.pan(1);
@@ -83,10 +82,34 @@ function stopOscillator() {
 
   gamma_modulator.amp(0.0, 1.0);
   gamma.amp(0.0, 1.0);
+
+  delta_modulator.stop();
+  theta_modulator.stop();
+  alpha_modulator.stop();
+  beta_modulator.stop();
+  gamma_modulator.stop();
+  delta.stop();
+  theta.stop();
+  alpha.stop();
+  beta.stop();
+  gamma.stop();
+
+
+  delta_modulator.dispose();
+  theta_modulator.dispose();
+  alpha_modulator.dispose();
+  beta_modulator.dispose();
+  gamma_modulator.dispose();
+  delta.dispose();
+  theta.dispose();
+  alpha.dispose();
+  beta.dispose();
+  gamma.dispose();
+
 }
 
-function toggleOscillator() {
-    isPlaying = !isPlaying;
+p.mousePressed = () => {
+    isPlaying = true;
 }
 
 p.setup = () => {
@@ -157,10 +180,12 @@ p.setup = () => {
   */
 };
 
+p.remove = () => {
+  stopOscillator();
+}
+
 p.draw = () => {
   p.background(30);
-
-  playOscillator();
 
   // analyze the waveform
   waveform = analyzer.waveform();
@@ -170,13 +195,25 @@ p.draw = () => {
   p.strokeWeight(10);
   p.beginShape();
   for (let i = 0; i < waveform.length; i++) {
-    let x = p.map(i, 0, waveform.length, 0, p.width);
-    let y = p.map(waveform[i], -1, 1, -p.height / 2, p.height / 2);
-    p.vertex(x, y + p.height / 2);
+      let x = p.map(i, 0, waveform.length, 0, p.width);
+      let y = p.map(waveform[i], -1, 1, -p.height / 2, p.height / 2);
+      p.vertex(x, y + p.height / 2);
   }
   p.endShape();
 
   p.strokeWeight(1);
+
+  if (!isPlaying) {
+    p.fill(0, 0, 0, 200);
+    p.rect(0, 0, p.width, p.height);
+    p.fill(255, 255, 255);
+    p.textAlign(p.CENTER);
+    p.textSize(20);
+    p.strokeWeight(0.5);
+    p.text("Click anywhere on the screen to start the sound system", p.width/2, p.height/2);
+  } else {
+    playOscillator();
+  }
 };
 `
 
