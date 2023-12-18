@@ -11,7 +11,7 @@ import {
 } from "react-router-dom";
 import { CodeEditor } from "./codeEditor";
 import P5Visuals from "./P5Visuals";
-import DataManagement from "./dataManagement";
+import DataManagement from "./dashboard/dataManagement";
 import SplitPane, {
   SplitPaneLeft,
   SplitPaneRight,
@@ -211,23 +211,7 @@ export function MainView() {
       <SplitPane className="split-pane-row">
         <SplitPaneLeft>
           {dispCode ? (
-            <div className="h-100" style={{ backgroundColor: "#1A1A1A" }}>
-              <div className="d-flex justify-content-between align-items-center">
-                <h5
-                  className="ms-2 p-2 pt-3 align-self-center"
-                  style={{ color: "white", backgroundColor: "#1A1A1A" }}
-                >
-                  Code
-                </h5>
-                <button
-                  className="btn btn-link"
-                  onClick={() => downloadCode(visName, code)}
-                >
-                  <i className="bi bi-download code-download"></i>
-                </button>
-              </div>
-              <CodeEditor code={code} setCode={setCode} />
-            </div>
+            <CodePane visName={visName} setCode={setCode} code={code}/>
           ) : (
             <DataManagementWindow
               visInfo={visMetadata}
@@ -245,6 +229,28 @@ export function MainView() {
           />
         </SplitPaneRight>
       </SplitPane>
+    </div>
+  );
+}
+
+function CodePane({code, setCode, visName}) {
+  return (
+    <div className="h-100" style={{ backgroundColor: "#1A1A1A" }}>
+      <div className="d-flex justify-content-between align-items-center">
+        <h5
+          className="ms-2 p-2 pt-3 align-self-center"
+          style={{ color: "white", backgroundColor: "#1A1A1A" }}
+        >
+          Code
+        </h5>
+        <button
+          className="btn btn-link"
+          onClick={() => downloadCode(visName, code)}
+        >
+          <i className="bi bi-download code-download"></i>
+        </button>
+      </div>
+      <CodeEditor code={code} setCode={setCode} />
     </div>
   );
 }

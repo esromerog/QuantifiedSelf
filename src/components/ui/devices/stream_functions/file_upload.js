@@ -4,7 +4,7 @@ import devicesRaw from '../../../../metadata/devices';
 import { useDispatch, useSelector } from 'react-redux';
 
 import Modal from 'react-bootstrap/Modal';
-import store from '../../../../store';
+import store from '../../../../store/store';
 import { createSelector } from 'reselect';
 
 const getDataIDs = createSelector(

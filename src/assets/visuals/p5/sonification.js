@@ -212,6 +212,7 @@ p.draw = () => {
     p.strokeWeight(0.5);
     p.text("Click anywhere on the screen to start the sound system", p.width/2, p.height/2);
   } else {
+    p.fill(0, 0, 0, 0);
     playOscillator();
   }
 };

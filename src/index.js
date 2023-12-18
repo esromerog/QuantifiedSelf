@@ -8,7 +8,7 @@ import './index.scss';
 // import ErrorPage from "./error-page";
 
 import { Provider } from "react-redux";
-import store from "./store";
+import store from "./store/store";
 import { BrowserRouter } from 'react-router-dom';
 
 /*

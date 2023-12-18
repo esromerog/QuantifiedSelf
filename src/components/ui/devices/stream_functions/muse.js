@@ -7,7 +7,7 @@ import devicesRaw from "../../../../metadata/devices.json";
 import { useDispatch, useSelector } from "react-redux";
 import { MuseClient } from "muse-js";
 import { ModalDataInformation } from "../availableData";
-import store from "../../../../store";
+import store from "../../../../store/store";
 import * as math from "mathjs";
 
 const device = devicesRaw.find(({ heading }) => heading === "Muse");

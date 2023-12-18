@@ -6,7 +6,7 @@ import RenderDevices from "./devicesTab";
 import { EmotivConnection } from './stream_functions/emotiv';
 import AvailableDataInformation from "./availableData";
 
-import DataManagement from '../visuals/dataManagement';
+import DataManagement from '../visuals/dashboard/dataManagement';
 import { Link, useParams } from 'react-router-dom';
 import { FileUploader } from './stream_functions/file_upload';
 import { createSelector } from 'reselect';

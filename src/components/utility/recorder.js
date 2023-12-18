@@ -1,5 +1,5 @@
 
-import store from '../../store';
+import store from '../../store/store';
 import Papa from 'papaparse';
 
 
