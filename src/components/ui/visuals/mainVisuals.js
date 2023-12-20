@@ -7,7 +7,6 @@ import { allVisSources } from "../../../App";
 import {
   useParams,
   useNavigate,
-  UNSAFE_NavigationContext,
 } from "react-router-dom";
 import { CodeEditor } from "./codeEditor";
 import P5Visuals from "./P5Visuals";
@@ -20,6 +19,8 @@ import SplitPane, {
 import downloadCode from "../../utility/codeDownload";
 
 export function MainView() {
+  // This function bridges the left pane (code editor/parameters) with the visualization
+
   const { visID } = useParams();
 
   function getVisMeta() {
@@ -234,6 +235,7 @@ export function MainView() {
 }
 
 function CodePane({code, setCode, visName}) {
+  // This is the component that contains the code pane
   return (
     <div className="h-100" style={{ backgroundColor: "#1A1A1A" }}>
       <div className="d-flex justify-content-between align-items-center">
@@ -256,6 +258,7 @@ function CodePane({code, setCode, visName}) {
 }
 
 function DataManagementWindow({ setVisInfo, visInfo, custom }) {
+  // The window with th data mappings
   return (
     <div className="h-100 ms-5 me-5 overflow-auto disable-scrollbar">
       <h5 className="mt-5">Data Mappings</h5>
@@ -270,6 +273,7 @@ function DataManagementWindow({ setVisInfo, visInfo, custom }) {
 }
 
 function VisualsWindow({ visMetadata, code, fullScreenHandle }) {
+  // Window with the visuals. It loads and manages the React components that enter
   const params = useSelector((state) => state.params);
 
   const paramsRef = useRef(params);
@@ -278,8 +282,9 @@ function VisualsWindow({ visMetadata, code, fullScreenHandle }) {
   const [component, setComponent] = useState(null);
 
   useEffect(() => {
+    // The following function imports components that are not P5.js visuals by using the default export
     async function importComponent() {
-      // Declare in visMetadata the other visualizations and put a path. Also set engine to something different than P5
+      // All components are places in this path
       const module = await import(
         `../../../assets/visuals/${visMetadata.path}`
       );
@@ -288,6 +293,7 @@ function VisualsWindow({ visMetadata, code, fullScreenHandle }) {
       setComponent(<CustomComponent value={paramsRef} />);
     }
 
+    // Checks engine to see if it should handle it as a P5.js visualization
     if (visMetadata.engine != "P5") {
       importComponent();
     } else {

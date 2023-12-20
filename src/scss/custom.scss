@@ -125,6 +125,13 @@ canvas {
     height: 500px;
 }
 
+.error-screen {
+    position: relative !important;
+    top: -60vh !important;
+    left: 0;
+    z-index: 200;
+}
+
 @media all and (min-width: 992px) {
     .dropdown-menu li {
         position: relative;
