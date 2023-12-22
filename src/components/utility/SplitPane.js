@@ -30,6 +30,7 @@ const SplitPane = ({ children, ...props }) => {
         xDividerPos.current = e.clientX;
     };
 
+
     useEffect(() => {
         document.addEventListener("mouseup", onMouseHoldUp);
         document.addEventListener("mousemove", onMouseHoldMove);

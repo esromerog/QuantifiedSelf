@@ -456,7 +456,7 @@ input.vis-name-input::placeholder {
 
 .separator-col {
     cursor: col-resize;
-    z-index: 1;
+    z-index: 101;
 }
 
 .separator-col:hover {
@@ -464,7 +464,12 @@ input.vis-name-input::placeholder {
 }
 
 .separator-col:active {
-    background-color: #00000018;
+    background-color: #00000000;
+    color: $primary;
+    padding-left: 50vw;
+    padding-right: 50vw;
+    margin-left: -50vw;
+    margin-right: -50vw;
 }
 
 .vertical-line {

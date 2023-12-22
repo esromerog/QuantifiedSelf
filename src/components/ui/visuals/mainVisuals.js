@@ -1,13 +1,10 @@
 import React, { useEffect, useRef, useState, useContext } from "react";
 import { useSelector } from "react-redux";
+import { createRoot } from "react-dom/client";
 
-import RenderVisualizationCards from "./viscards";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
 import { allVisSources } from "../../../App";
-import {
-  useParams,
-  useNavigate,
-} from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { CodeEditor } from "./codeEditor";
 import P5Visuals from "./P5Visuals";
 import DataManagement from "./dashboard/dataManagement";
@@ -152,6 +149,8 @@ export function MainView() {
     localStorage.setItem("visuals", JSON.stringify(newData));
   }
 
+  const [popupVisuals, setPopupVisuals] = useState(false);
+
   return (
     <div className="h-100">
       <div className="d-flex justify-content-between align-items-center align-text-center mt-1">
@@ -202,6 +201,15 @@ export function MainView() {
               <i className="bi bi-trash"></i>
             </button>
           ) : null}
+          {visMetadata.engine === "P5" &&
+          <button
+            className="btn btn-link "
+            onClick={() => setPopupVisuals(!popupVisuals)}
+          >
+            <b>
+              <i className="bi bi-window" alt="full-screen"></i>
+            </b>
+          </button>}
           <button className="btn btn-link " onClick={fullScreenHandle.enter}>
             <b>
               <i className="bi bi-arrows-fullscreen" alt="full-screen"></i>
@@ -212,7 +220,7 @@ export function MainView() {
       <SplitPane className="split-pane-row">
         <SplitPaneLeft>
           {dispCode ? (
-            <CodePane visName={visName} setCode={setCode} code={code}/>
+            <CodePane visName={visName} setCode={setCode} code={code} />
           ) : (
             <DataManagementWindow
               visInfo={visMetadata}
@@ -224,9 +232,11 @@ export function MainView() {
         <Divider />
         <SplitPaneRight>
           <VisualsWindow
+            code={code}
             visMetadata={visMetadata}
             fullScreenHandle={fullScreenHandle}
-            code={code}
+            popupVisuals={popupVisuals}
+            setPopupVisuals={setPopupVisuals}
           />
         </SplitPaneRight>
       </SplitPane>
@@ -234,7 +244,7 @@ export function MainView() {
   );
 }
 
-function CodePane({code, setCode, visName}) {
+function CodePane({ code, setCode, visName }) {
   // This is the component that contains the code pane
   return (
     <div className="h-100" style={{ backgroundColor: "#1A1A1A" }}>
@@ -272,7 +282,178 @@ function DataManagementWindow({ setVisInfo, visInfo, custom }) {
   );
 }
 
-function VisualsWindow({ visMetadata, code, fullScreenHandle }) {
+function SecureVisualsWindow({ code, params }) {
+  const iframeRef = useRef(null);
+
+  const paramsRef = useRef(params);
+  paramsRef.current = params;
+
+  const errorScript = `
+  window.addEventListener("error", ({ error }) => {
+    console.log(error);
+    var display = document.getElementById("error-display");
+    display.innerText = error.message;
+  });
+  `;
+
+  const receiveValues = `
+  var data = ${JSON.stringify(params)};
+  window.addEventListener("message", (event)=>{
+    if (event.origin === "${window.location.origin}") {
+      data = JSON.parse(event.data);
+    }
+  })
+  `;
+
+  useEffect(() => {
+    if (iframeRef.current != null) {
+      iframeRef.current.contentWindow.postMessage(
+        JSON.stringify(paramsRef.current)
+      );
+    }
+  }, [params]);
+
+  useEffect(() => {
+    const source = /* html */ `
+    <html>
+    <head>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/addons/p5.sound.js"></script>
+      <style>
+        body {
+          margin: 0px;
+          padding:0px;
+          height: 100vh;
+          width: 100vw;
+        }
+        * {
+          overflow: hidden;
+        }
+      </style>
+    </head>
+    <body>
+      <div id="app"></div>
+      <span id="error-display"></span>
+      <script>${receiveValues}</script>
+      <script>${errorScript}</script>
+      <script>${code}</script>
+    </body>
+    </html>
+    `;
+    iframeRef.current.srcdoc = source;
+  }, [code]);
+
+  return (
+    <iframe
+      id="visFrame"
+      title="embedded-visualization"
+      ref={iframeRef}
+      className="h-100 w-100"
+    />
+  );
+}
+
+function PopupComponent({ params, code, children, setPopupVisuals }) {
+  const popupRef = useRef(null);
+
+  useEffect(() => {
+    // Create a new window and assign it to popupRef.current
+    popupRef.current = window.open(
+      "",
+      "_blank",
+      `width=${window.innerWidth / 2}, height=${window.innerHeight}`
+    );
+    popupRef.current.document.title = "Visualization";
+    popupRef.current.addEventListener("unload", () => setPopupVisuals(false));
+
+    const styleElement = popupRef.current.document.createElement("style");
+
+    // Set the CSS rules
+    styleElement.textContent = `
+      body {
+        margin: 0px;
+        padding:0px;
+        height: 100vh;
+        width: 100vw;
+      }
+
+      * {
+        overflow: hidden;
+      }
+  
+      div {
+        width: 100vw;
+        height: 100vh;
+      }
+      .h-100 {
+        height: 100vh;
+      }
+      .w-100 {
+        width: 100vw;
+      }
+    `;
+
+    // Append the <style> element to the <head>
+    popupRef.current.document.head.appendChild(styleElement);
+
+    var rootDiv = popupRef.current.document.createElement("div");
+    popupRef.current.document.body.appendChild(rootDiv);
+
+    const root = createRoot(rootDiv);
+    root.render(children);
+
+    // Cleanup function
+    return () => {
+      root.unmount();
+      popupRef.current.removeEventListener("unload", () => setPopupVisuals(false))
+      popupRef.current.close();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (popupRef.current != null) {
+      // Use popupRef.current instead of popupRef.current.contentWindow
+      popupRef.current.opener.postMessage(
+        JSON.stringify({ params, code }),
+        window.location.origin
+      );
+    }
+  }, [params, code]);
+}
+
+function PopupVisuals({ secureOrigin, initialCode, initialParams}) {
+  const [params, setParams] = useState(initialParams);
+  const [code, setCode] = useState(initialCode);
+
+  function receiveEvent(event) {
+    console.log(event);
+    if (event.origin === secureOrigin) {
+      let msg;
+      try {
+        msg = JSON.parse(event.data);
+      } catch (e) {
+        msg = {params, code}
+      }
+      setParams(msg.params);
+      setCode(msg.code);
+    }
+  }
+
+  useEffect(() => {
+    window.addEventListener("message", receiveEvent);
+    return () => {
+      window.removeEventListener("message", receiveEvent);
+    };
+  }, []);
+
+  return (
+    <div className="h-100 w-100">
+      <SecureVisualsWindow params={params} code={code} />
+    </div>
+  );
+}
+
+function VisualsWindow({ visMetadata, code, fullScreenHandle, popupVisuals, setPopupVisuals }) {
   // Window with the visuals. It loads and manages the React components that enter
   const params = useSelector((state) => state.params);
 
@@ -288,7 +469,6 @@ function VisualsWindow({ visMetadata, code, fullScreenHandle }) {
       const module = await import(
         `../../../assets/visuals/${visMetadata.path}`
       );
-      console.log(module);
       const CustomComponent = module.default;
       setComponent(<CustomComponent value={paramsRef} />);
     }
@@ -296,16 +476,33 @@ function VisualsWindow({ visMetadata, code, fullScreenHandle }) {
     // Checks engine to see if it should handle it as a P5.js visualization
     if (visMetadata.engine != "P5") {
       importComponent();
-    } else {
-      setComponent(<P5Visuals code={code} value={paramsRef} />);
     }
   }, [code]);
 
   return (
-    <div className="h-100 w-100">
-      <FullScreen handle={fullScreenHandle} className="w-100 h-100">
-        <div className="w-100 h-100">{params && component}</div>
-      </FullScreen>
+    <div className={`${popupVisuals ? "d-none" : "h-100 w-100"}`}>
+      {!popupVisuals && (
+        <FullScreen handle={fullScreenHandle} className="w-100 h-100">
+          <div className="w-100 h-100">
+            {params && visMetadata.engine === "P5"?(
+              <SecureVisualsWindow
+                code={code}
+                params={params}
+                popupVisuals={popupVisuals}
+              />
+            ):component}
+          </div>
+        </FullScreen>
+      )}
+      {popupVisuals && (
+        <PopupComponent params={params} code={code} setPopupVisuals={setPopupVisuals}>
+          <PopupVisuals
+            secureOrigin={window.location.origin}
+            initialCode={code}
+            initialParams={params}
+          />
+        </PopupComponent>
+      )}
     </div>
   );
 }

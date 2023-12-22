@@ -1,7 +1,7 @@
 const sonification = `
-  // delta = 4 Hz, theta = 6 Hz, alpha = 10 Hz, beta = 24 Hz, gamma = 40 Hz
+// delta = 4 Hz, theta = 6 Hz, alpha = 10 Hz, beta = 24 Hz, gamma = 40 Hz
 
-  // chose these values so that frequency ratios would map onto pitch ratios that form specific musical intervals (3:2 = perfect fifth, 5:4 = major third)
+// chose these values so that frequency ratios would map onto pitch ratios that form specific musical intervals (3:2 = perfect fifth, 5:4 = major third)
 
 delta_freq = 4;
 theta_freq = 6;
@@ -38,21 +38,26 @@ let isPlaying = false;
 
 // I've just been using mouseover to turn sound on/off but we should map to actual buttons
 
+windowResized = () => {
+  resizeCanvas(windowWidth, windowHeight);
+}
+
+
 function playOscillator() {
-  delta.amp(1 * value.current["Delta"], 0.01);
-  delta_modulator.amp(1 * value.current["Delta"], 0.01);
+  delta.amp(1 * data?.["Delta"], 0.01);
+  delta_modulator.amp(1 * data?.["Delta"], 0.01);
 
-  theta.amp(0.8 * value.current["Theta"], 0.01);
-  theta_modulator.amp(0.8 * value.current["Theta"], 0.01);
+  theta.amp(0.8 * data?.["Theta"], 0.01);
+  theta_modulator.amp(0.8 * data?.["Theta"], 0.01);
 
-  alpha.amp(0.6 * value.current["Alpha"], 0.01);
-  alpha_modulator.amp(0.6 * value.current["Alpha"], 0.01);
+  alpha.amp(0.6 * data?.["Alpha"], 0.01);
+  alpha_modulator.amp(0.6 * data?.["Alpha"], 0.01);
 
-  beta.amp(0.4*value.current["Beta"], 0.01);
-  beta_modulator.amp(0.4*value.current["Beta"], 0.01);
+  beta.amp(0.4*data?.["Beta"], 0.01);
+  beta_modulator.amp(0.4*data?.["Beta"], 0.01);
 
-  gamma.amp(0.2*value.current["Gamma"], 0.01);
-  gamma_modulator.amp(0.2*value.current["Gamma"], 0.01);
+  gamma.amp(0.2*data?.["Gamma"], 0.01);
+  gamma_modulator.amp(0.2*data?.["Gamma"], 0.01);
 
   delta.pan(1);
   theta.pan(1);
@@ -108,16 +113,15 @@ function stopOscillator() {
 
 }
 
-p.mousePressed = () => {
-    isPlaying = true;
+mousePressed = () => {
+  isPlaying = true;
+  userStartAudio();
 }
 
-p.setup = () => {
-  var cnv = p.createCanvas(
-    canvasRef.current.offsetWidth,
-    canvasRef.current.offsetHeight
-  );
-  p.noFill();
+setup = () => {
+  getAudioContext().suspend();
+  var cnv = createCanvas(windowWidth, windowHeight);
+  noFill();
 
   delta = new p5.Oscillator("sine");
   delta.amp(0); // set amplitude
@@ -171,7 +175,7 @@ p.setup = () => {
   analyzer = new p5.FFT();
 
   /*
-  playButton = p.createButton("Play");
+  playButton = createButton("Play");
   playButton.position(0, 100);
 
   playButton.mousePressed(() => {
@@ -180,39 +184,39 @@ p.setup = () => {
   */
 };
 
-p.remove = () => {
+function remove() {
   stopOscillator();
 }
 
-p.draw = () => {
-  p.background(30);
+draw = () => {
+  background(30);
 
   // analyze the waveform
   waveform = analyzer.waveform();
 
   // draw the shape of the waveform
-  p.stroke(255);
-  p.strokeWeight(10);
-  p.beginShape();
+  stroke(255);
+  strokeWeight(10);
+  beginShape();
   for (let i = 0; i < waveform.length; i++) {
-      let x = p.map(i, 0, waveform.length, 0, p.width);
-      let y = p.map(waveform[i], -1, 1, -p.height / 2, p.height / 2);
-      p.vertex(x, y + p.height / 2);
+      let x = map(i, 0, waveform.length, 0, width);
+      let y = map(waveform[i], -1, 1, -height / 2, height / 2);
+      vertex(x, y + height / 2);
   }
-  p.endShape();
+  endShape();
 
-  p.strokeWeight(1);
+  strokeWeight(1);
 
   if (!isPlaying) {
-    p.fill(0, 0, 0, 200);
-    p.rect(0, 0, p.width, p.height);
-    p.fill(255, 255, 255);
-    p.textAlign(p.CENTER);
-    p.textSize(20);
-    p.strokeWeight(0.5);
-    p.text("Click anywhere on the screen to start the sound system", p.width/2, p.height/2);
+    fill(0, 0, 0, 200);
+    rect(0, 0, width, height);
+    fill(255, 255, 255);
+    textAlign(CENTER);
+    textSize(20);
+    strokeWeight(0.5);
+    text("Click anywhere on the screen to start the sound system", width/2, height/2);
   } else {
-    p.fill(0, 0, 0, 0);
+    fill(0, 0, 0, 0);
     playOscillator();
   }
 };
