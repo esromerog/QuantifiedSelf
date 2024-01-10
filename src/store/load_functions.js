@@ -3,7 +3,7 @@ import visualsRaw from "../metadata/vis";
 // Function to retrieve the parameters from local storage
 function getParams() {
   let pathname = window.location.pathname;
-  pathname = pathname.split("/")[2]?.replace(/%20/g, " ");
+  pathname = pathname.split("/")[3]?.replace(/%20/g, " ");
   let params = visualsRaw.find(({ id }) => id == pathname)?.properties;
 
   if (params == undefined) {
@@ -21,7 +21,7 @@ function getParams() {
 // Function to load metadata (mappings) of the parameters
 export function loadMeta() {
   const params = getParams();
-  const pathname = window.location.pathname.split("/")[2]?.replace(/%20/g, " ");
+  const pathname = window.location.pathname.split("/")[3]?.replace(/%20/g, " ");
   const storedMetaData = sessionStorage.getItem(`paramsMeta/${pathname}`);
 
   if (storedMetaData) {

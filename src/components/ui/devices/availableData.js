@@ -99,7 +99,6 @@ export default function AvailableDataInformation() {
         }
         return acc; // Always return the accumulator
       }, []);
-    console.log(source);
 
     // Generate updatable DataCards as new devices become active
     const [dataCard, updateDataCard]=useState(<DataCards source={source}/>);

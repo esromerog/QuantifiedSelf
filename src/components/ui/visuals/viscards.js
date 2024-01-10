@@ -3,9 +3,9 @@ import { allVisSources } from "../../../App";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import p5logo from "../../../assets/p5logo.png";
+import { Route, Routes } from "react-router-dom";
 
-function ImageCard({ visSource }) {
-
+export function ImageCard({ visSource }) {
   // Represents a single card with the visualizations in the main menu
   const dispatch = useDispatch();
   const paramList = visSource.properties.map((property) => (
@@ -25,9 +25,10 @@ function ImageCard({ visSource }) {
       </div>
     );
   }
+
   return (
     <Link
-      to={"/visuals/" + visSource.id}
+      to={visSource.id.toString()}
       onClick={() => dispatch({ type: "params/load", payload: visSource })}
       className="card grid-item rounded-0"
       key={visSource.name}
@@ -61,19 +62,26 @@ function ImageCard({ visSource }) {
   );
 }
 
-export default function RenderVisualizationCards() {
+export function DefaultVisualizations() {
   // Renders all visualization cards
 
   const visSources = allVisSources.map((visSource) => (
     <ImageCard visSource={visSource} key={visSource.id} />
   ));
 
-  const localSources = localStorage.getItem("visuals");
+  return (
+    <div>
+        <div className="custom-grid h-100 mt-3">{visSources}</div>
+    </div>
+  );
+}
+
+export function CustomVisualization({ localSources }) {
 
   let customSources = [];
+
   if (localSources !== null) {
     const localVisSources = JSON.parse(localSources);
-    console.log(localVisSources);
     customSources = localVisSources.map((visSource) => (
       <ImageCard visSource={visSource} key={visSource.id} />
     ));
@@ -81,14 +89,7 @@ export default function RenderVisualizationCards() {
 
   return (
     <div>
-      {customSources.length > 0 ? (
-        <>
-          <h5 className="text-center">Custom</h5>
-          <div className="custom-grid h-100">{customSources}</div>
-        </>
-      ) : null}
-      <h5 className="text-center">Default</h5>
-      <div className="custom-grid h-100">{visSources}</div>
+      <div className="custom-grid h-100 mt-3">{customSources}</div>
     </div>
   );
 }

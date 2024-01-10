@@ -1,6 +1,6 @@
 import "./App.scss";
 import React, { useEffect, useState } from 'react';
-import { MainView } from "./components/ui/visuals/mainVisuals";
+import { MainView } from "./components/ui/visuals/currentVisuals";
 import { MainMenu } from "./components/ui/visuals/mainMenu";
 import visSourcesImport from './metadata/vis'
 import { DeviceSelectionWindow, DataManagementWindow } from "./components/ui/devices/mainDevices";
@@ -8,10 +8,9 @@ import { Routes, Route, Navigate, useParams, Link, NavLink } from 'react-router-
 import { RecordComponent } from "./components/ui/recording";
 import { useSelector } from "react-redux";
 import { createSelector } from 'reselect';
-import LSLReceiver from "./components/utility/lslClient";
 import { isMobile } from 'react-device-detect';
 import MobileUnavaiabilityScreen from "./components/ui/mobile";
-
+import LessonBuilder from "./components/ui/lessons/main";
 
 // Some improvements that I need to make (after env):
 // Maybe have the user put his license information in here (?) Otherwise do they access Cortex through our account (?)
@@ -83,8 +82,10 @@ function DesktopApp() {
       <div className="hv-100">
         <Routes>
           <Route path="/devices" element={<DeviceSelectionWindow />} />
-          <Route path="/visuals" element={<MainMenu />} />
-          <Route path="/visuals/:visID" element={<MainView />} />
+          <Route path="/lessons" element={<LessonBuilder />} />
+          <Route path="/visuals/*" element={<MainMenu />} />
+          <Route path="/visuals/custom/:visID" element={<MainView />} />
+          <Route path="/visuals/default/:visID" element={<MainView />} />
           <Route path="/" element={<Navigate to="devices" />} />
         </Routes>
       </div>

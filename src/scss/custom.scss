@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;600;800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Lato:wght@100;200;300;400;700;800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined");
 
 // Purple - 7749F8; Green - 4AB69B; Yellow - F6C651
 
@@ -228,6 +229,32 @@ canvas {
 .styled-navbar .btn:hover:active {
     background: #7749F8;
     color: #ffffff;
+}
+
+.styled-navbar .btn-smaller {
+    margin-left: 1rem;
+    margin-right: 1rem;
+    color: #1A1A1A;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    text-decoration: none;
+    transition: all 0.5s;
+}
+
+.styled-navbar .btn-smaller:hover {
+    background-color: #7749F8;
+    color: #ffffff;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before,
+.ProseMirror h1.is-editor-empty:first-child::before {
+    content: attr(data-placeholder);
+    float: left;
+    color: #adb5bd;
+    pointer-events: none;
+    height: 0;
 }
 
 
@@ -470,6 +497,26 @@ input.vis-name-input::placeholder {
     padding-right: 50vw;
     margin-left: -50vw;
     margin-right: -50vw;
+}
+
+.material-icon {
+    padding: 0;
+    margin: 0;
+    font-weight: 300;
+    color: green !important;
+}
+
+
+.inline-menu {
+    background-color: #FFFFFF;
+    box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.07);
+    padding: 0.4rem;
+    border-radius: 0.25rem;
+}
+
+.inline-menu button {
+    background: none;
+    border: none;
 }
 
 .vertical-line {

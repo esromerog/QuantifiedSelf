@@ -1,12 +1,11 @@
-import React, { useEffect, useRef, useState, useContext } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import { createRoot } from "react-dom/client";
 
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
 import { allVisSources } from "../../../App";
 import { useParams, useNavigate } from "react-router-dom";
 import { CodeEditor } from "./codeEditor";
-import P5Visuals from "./P5Visuals";
+
 import DataManagement from "./dashboard/dataManagement";
 import SplitPane, {
   SplitPaneLeft,
@@ -14,22 +13,25 @@ import SplitPane, {
   Divider,
 } from "../../utility/SplitPane";
 import downloadCode from "../../utility/codeDownload";
+import { PopupComponent } from "./popup";
+import { P5PopupVisuals } from "./P5Code/p5popup";
+import { P5iFrame } from "./P5Code/p5iframe";
+
+function getVisMeta(visID) {
+  let result = allVisSources.find(({ id }) => id == visID);
+  if (typeof result === "undefined") {
+    const customVis = JSON.parse(localStorage.getItem("visuals"));
+    result = customVis.find((x) => x.id == visID);
+  }
+  return result;
+}
 
 export function MainView() {
   // This function bridges the left pane (code editor/parameters) with the visualization
 
   const { visID } = useParams();
 
-  function getVisMeta() {
-    let result = allVisSources.find(({ id }) => id == visID);
-    if (typeof result === "undefined") {
-      const customVis = JSON.parse(localStorage.getItem("visuals"));
-      result = customVis.find((x) => x.id == visID);
-    }
-    return result;
-  }
-
-  const [visMetadata, setVisMetadata] = useState(getVisMeta());
+  const [visMetadata, setVisMetadata] = useState(getVisMeta(visID));
 
   const [visName, setVisName] = useState(visMetadata?.name);
 
@@ -38,7 +40,6 @@ export function MainView() {
 
   // Load the visualizations from the local storage
   const [dispCode, setDispCode] = useState(false);
-
   const [code, _setCode] = useState("");
 
   function getCode() {
@@ -91,7 +92,7 @@ export function MainView() {
     localStorage.setItem("visuals", JSON.stringify(savedData));
     localStorage.setItem(`visuals/${newID}`, code);
     // Navigate in the browser to the new ID
-    navigate(`/visuals/${newID}`);
+    navigate(`/visuals/custom/${newID}`);
     setCustom(true);
     setVisMetadata(newMeta);
     setStartCustomizing(true);
@@ -105,9 +106,15 @@ export function MainView() {
       document.title,
       window.location.href
     );
-    window.addEventListener("popstate", () => {
-      navigate("/visuals", { replace: true });
-    });
+    if (custom) {
+      window.addEventListener("popstate", () => {
+        navigate("/visuals/custom", { replace: true });
+      });
+    } else {
+      window.addEventListener("popstate", () => {
+        navigate("/visuals/default", { replace: true });
+      });
+    }
   }, [visMetadata]);
 
   function nameVis(e) {
@@ -139,7 +146,7 @@ export function MainView() {
     if (!window.confirm("Do you really want to delete the current vis?")) {
       return;
     }
-    navigate("/visuals", { replace: true });
+    navigate("/visuals/default", { replace: true });
     localStorage.removeItem(`visuals/${visID}`);
 
     const prevData = JSON.parse(localStorage.getItem("visuals"));
@@ -201,15 +208,16 @@ export function MainView() {
               <i className="bi bi-trash"></i>
             </button>
           ) : null}
-          {visMetadata.engine === "P5" &&
-          <button
-            className="btn btn-link "
-            onClick={() => setPopupVisuals(!popupVisuals)}
-          >
-            <b>
-              <i className="bi bi-window" alt="full-screen"></i>
-            </b>
-          </button>}
+          {visMetadata.engine === "P5" && (
+            <button
+              className="btn btn-link "
+              onClick={() => setPopupVisuals(!popupVisuals)}
+            >
+              <b>
+                <i className="bi bi-window" alt="full-screen"></i>
+              </b>
+            </button>
+          )}
           <button className="btn btn-link " onClick={fullScreenHandle.enter}>
             <b>
               <i className="bi bi-arrows-fullscreen" alt="full-screen"></i>
@@ -243,6 +251,9 @@ export function MainView() {
     </div>
   );
 }
+
+
+
 
 function CodePane({ code, setCode, visName }) {
   // This is the component that contains the code pane
@@ -282,178 +293,13 @@ function DataManagementWindow({ setVisInfo, visInfo, custom }) {
   );
 }
 
-function SecureVisualsWindow({ code, params }) {
-  const iframeRef = useRef(null);
-
-  const paramsRef = useRef(params);
-  paramsRef.current = params;
-
-  const errorScript = `
-  window.addEventListener("error", ({ error }) => {
-    console.log(error);
-    var display = document.getElementById("error-display");
-    display.innerText = error.message;
-  });
-  `;
-
-  const receiveValues = `
-  var data = ${JSON.stringify(params)};
-  window.addEventListener("message", (event)=>{
-    if (event.origin === "${window.location.origin}") {
-      data = JSON.parse(event.data);
-    }
-  })
-  `;
-
-  useEffect(() => {
-    if (iframeRef.current != null) {
-      iframeRef.current.contentWindow.postMessage(
-        JSON.stringify(paramsRef.current)
-      );
-    }
-  }, [params]);
-
-  useEffect(() => {
-    const source = /* html */ `
-    <html>
-    <head>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
-      <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/addons/p5.sound.js"></script>
-      <style>
-        body {
-          margin: 0px;
-          padding:0px;
-          height: 100vh;
-          width: 100vw;
-        }
-        * {
-          overflow: hidden;
-        }
-      </style>
-    </head>
-    <body>
-      <div id="app"></div>
-      <span id="error-display"></span>
-      <script>${receiveValues}</script>
-      <script>${errorScript}</script>
-      <script>${code}</script>
-    </body>
-    </html>
-    `;
-    iframeRef.current.srcdoc = source;
-  }, [code]);
-
-  return (
-    <iframe
-      id="visFrame"
-      title="embedded-visualization"
-      ref={iframeRef}
-      className="h-100 w-100"
-    />
-  );
-}
-
-function PopupComponent({ params, code, children, setPopupVisuals }) {
-  const popupRef = useRef(null);
-
-  useEffect(() => {
-    // Create a new window and assign it to popupRef.current
-    popupRef.current = window.open(
-      "",
-      "_blank",
-      `width=${window.innerWidth / 2}, height=${window.innerHeight}`
-    );
-    popupRef.current.document.title = "Visualization";
-    popupRef.current.addEventListener("unload", () => setPopupVisuals(false));
-
-    const styleElement = popupRef.current.document.createElement("style");
-
-    // Set the CSS rules
-    styleElement.textContent = `
-      body {
-        margin: 0px;
-        padding:0px;
-        height: 100vh;
-        width: 100vw;
-      }
-
-      * {
-        overflow: hidden;
-      }
-  
-      div {
-        width: 100vw;
-        height: 100vh;
-      }
-      .h-100 {
-        height: 100vh;
-      }
-      .w-100 {
-        width: 100vw;
-      }
-    `;
-
-    // Append the <style> element to the <head>
-    popupRef.current.document.head.appendChild(styleElement);
-
-    var rootDiv = popupRef.current.document.createElement("div");
-    popupRef.current.document.body.appendChild(rootDiv);
-
-    const root = createRoot(rootDiv);
-    root.render(children);
-
-    // Cleanup function
-    return () => {
-      root.unmount();
-      popupRef.current.removeEventListener("unload", () => setPopupVisuals(false))
-      popupRef.current.close();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (popupRef.current != null) {
-      // Use popupRef.current instead of popupRef.current.contentWindow
-      popupRef.current.opener.postMessage(
-        JSON.stringify({ params, code }),
-        window.location.origin
-      );
-    }
-  }, [params, code]);
-}
-
-function PopupVisuals({ secureOrigin, initialCode, initialParams}) {
-  const [params, setParams] = useState(initialParams);
-  const [code, setCode] = useState(initialCode);
-
-  function receiveEvent(event) {
-    console.log(event);
-    if (event.origin === secureOrigin) {
-      let msg;
-      try {
-        msg = JSON.parse(event.data);
-      } catch (e) {
-        msg = {params, code}
-      }
-      setParams(msg.params);
-      setCode(msg.code);
-    }
-  }
-
-  useEffect(() => {
-    window.addEventListener("message", receiveEvent);
-    return () => {
-      window.removeEventListener("message", receiveEvent);
-    };
-  }, []);
-
-  return (
-    <div className="h-100 w-100">
-      <SecureVisualsWindow params={params} code={code} />
-    </div>
-  );
-}
-
-function VisualsWindow({ visMetadata, code, fullScreenHandle, popupVisuals, setPopupVisuals }) {
+function VisualsWindow({
+  visMetadata,
+  code,
+  fullScreenHandle,
+  popupVisuals,
+  setPopupVisuals,
+}) {
   // Window with the visuals. It loads and manages the React components that enter
   const params = useSelector((state) => state.params);
 
@@ -484,19 +330,25 @@ function VisualsWindow({ visMetadata, code, fullScreenHandle, popupVisuals, setP
       {!popupVisuals && (
         <FullScreen handle={fullScreenHandle} className="w-100 h-100">
           <div className="w-100 h-100">
-            {params && visMetadata.engine === "P5"?(
-              <SecureVisualsWindow
+            {params && visMetadata.engine === "P5" ? (
+              <P5iFrame
                 code={code}
                 params={params}
                 popupVisuals={popupVisuals}
               />
-            ):component}
+            ) : (
+              component
+            )}
           </div>
         </FullScreen>
       )}
       {popupVisuals && (
-        <PopupComponent params={params} code={code} setPopupVisuals={setPopupVisuals}>
-          <PopupVisuals
+        <PopupComponent
+          params={params}
+          code={code}
+          setPopupVisuals={setPopupVisuals}
+        >
+          <P5PopupVisuals
             secureOrigin={window.location.origin}
             initialCode={code}
             initialParams={params}

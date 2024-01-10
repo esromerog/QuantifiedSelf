@@ -150,7 +150,6 @@ Star.prototype.setPosition = function (target) {
     let deltaY = target - ypos;
     ypos += deltaY * easing;
     this.position = createVector(window.innerWidth / 2, ypos);
-    console.log(this.position);
 };
 
 // mountain functions

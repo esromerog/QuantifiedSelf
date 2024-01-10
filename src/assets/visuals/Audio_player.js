@@ -31,7 +31,6 @@ const AudioPlayerWithFilter = ({value}) => {
 
     // THE ALPHA AUDIO
     loadSound(alphaUrl, context, (buffer) => {
-      console.log("Alpha loaded");
       const alphaSource = context.createBufferSource();
       alphaSource.buffer = buffer;
       // Create a BiquadbassNode for the bandpass filter
@@ -105,7 +104,6 @@ function loadSound(url, context, callback) {
 
   // Decode asynchronously
   request.onload = function () {
-    console.log(request.response)
     context.decodeAudioData(request.response, function (buffer) {
       callback(buffer);
     }, Error);

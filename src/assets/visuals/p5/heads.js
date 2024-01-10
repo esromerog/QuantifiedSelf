@@ -50,7 +50,6 @@ draw = () => {
     }
     if (touching) {
         const currTime = new Date();
-        console.log(currTime - startTime);
         score = Math.round((currTime-startTime)/100);
     } else {
         total_score += score;

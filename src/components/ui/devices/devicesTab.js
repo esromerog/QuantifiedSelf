@@ -1,177 +1,97 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from "react";
 
-import devicesRaw from '../../../metadata/devices';
-import { useDispatch, useSelector } from 'react-redux';
-import { EmotivConnection } from './stream_functions/emotiv';
+import devicesRaw from "../../../metadata/devices";
+import { useSelector } from "react-redux";
 
-import { Modal } from 'react-bootstrap';
-import { ModalDataInformation } from './availableData';
-
-function EmotivDeviceButton({ data, name, handleShow }) {
-
-    return (
-        <div className='card rounded-0 mb-2 mt-1'>
-            <button className="card-body btn btn-link text-decoration-none text-start" onClick={() => handleShow(name)}>
-                <h5 className="card-title g-0 m-0">{name}</h5>
-                <small className='g-0 m-0'>{data.heading}</small>
-            </button>
-        </div>
-    );
-}
-
-
-function FileDeviceButton({ data, name, handleShow }) {
-
-    const streamObject = window.recordings[name];
-
-    const playing = useSelector(state => state.deviceMeta[name].playing);
-    const looping = useSelector(state => state.deviceMeta[name].looping);
-
-    function startStreaming() {
-        streamObject.startPlayback();
-    }
-
-    function pauseStreaming() {
-        streamObject.pausePlayback();
-    }
-
-    function loopStreaming() {
-        streamObject.loopPlayback();
-    }
-
-    function restartStreaming() {
-        streamObject.restartPlayback();
-    }
-
-    return (
-        <div>
-            <div className='row card-margin'>
-                <div className='card rounded-0 mb-2 mt-1 col-8'>
-                    <button className="card-body btn btn-link text-decoration-none text-start" onClick={() => handleShow(name)}>
-                        <h5 className="card-title g-0 m-0">{name}</h5>
-                        <small className='g-0 m-0'>{data.heading}</small>
-                    </button>
-                </div>
-                <div className='card rounded-0 mb-2 mt-1 col-4'>
-                    <div className="card-body d-flex align-items-center justify-content-center">
-                        <button className='btn btn-link' onClick={restartStreaming}><i className="bi bi-rewind" /></button>
-                        {playing ?
-                            <button className='btn btn-link'><i className="bi bi-pause" onClick={pauseStreaming} /></button>
-                            : <button className='btn btn-link'><i className="bi bi-play" onClick={startStreaming} /></button>}
-                        <button className='btn btn-link'><i className={`bi bi-arrow-repeat ${looping ? 'text-primary' : ''}`} onClick={loopStreaming} /></button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-}
+import { GenericDeviceButton, FileDeviceButton } from "./Buttons/buttons";
+import { DeviceConnection } from "./stream_functions/connection_modal";
 
 function DeviceList({ data, name, handleShow, uploaded }) {
-    const deviceButton = {
-        "EMOTIV": <EmotivDeviceButton data={data} name={name} handleShow={handleShow} />,
-        "Muse": <EmotivDeviceButton data={data} name={name} handleShow={handleShow} />,
-        "Upload": <FileDeviceButton data={data} name={name} handleShow={handleShow} />,
-        "LSL": <EmotivDeviceButton data={data} name={name} handleShow={handleShow} />
-    }
+  let key = data.heading;
+  if (key.includes("LSL")) {
+    key = "LSL";
+  }
 
-    let key = data.heading;
+  if (uploaded) {
+    key = "Upload";
+  }
 
-    if (key.includes("LSL")) {
-        key = "LSL"
-    }
+  const buttonComponent =
+    key === "Upload" ? (
+      <FileDeviceButton data={data} name={name} handleShow={handleShow} />
+    ) : (
+      <GenericDeviceButton data={data} name={name} handleShow={handleShow} />
+    );
 
-    if (uploaded) {
-        key = "Upload"
-    }
-
-    return (
-        <div key={name} className='button-list'>
-            {deviceButton[key]}
-        </div>
-    )
-
+  return (
+    <div key={name} className="button-list">
+      {buttonComponent}
+    </div>
+  );
 }
 
 export default function RenderDevices() {
-    const [show, setShow] = useState(false);
-    const [currId, setCurrId] = useState("");
+  const [show, setShow] = useState(false);
+  const [currId, setCurrId] = useState("");
 
-    function handleShow(data) {
-        setShow(true);
-        setCurrId(data);
-    };
+  function handleShow(data) {
+    setShow(true);
+    setCurrId(data);
+  }
 
-    const handleClose = () => setShow(false);
+  const handleClose = () => setShow(false);
 
-    const deviceMeta = useSelector(state => state.deviceMeta)
+  const deviceMeta = useSelector((state) => state.deviceMeta);
 
-    const deviceButtonList = Object.keys(deviceMeta)?.map((id) => {
-        const currDev = deviceMeta[id];
-        let data = devicesRaw.find(({ heading }) => currDev.device === heading);
-        // Here I could add another option to get data from the store in case it doesn't find it
+  const deviceButtonList = Object.keys(deviceMeta)?.map((id) => {
+    const currDev = deviceMeta[id];
+    let data = devicesRaw.find(({ heading }) => currDev.device === heading);
+    // Here I could add another option to get data from the store in case it doesn't find it
 
-        if (data == undefined) {
-            const defaultData = devicesRaw.find(({ heading }) => currDev?.info?.name === heading);
-            if (defaultData) {
-                data = defaultData;
-            } else {
-                data = {
-                    "heading": (currDev?.info?.name != undefined) ? "LSL - " + currDev?.info?.name : "LSL",
-                    "description": "This is a custom LSL stream. LSL devices can have very different properties",
-                    "type": currDev?.info?.type || "custom",
-                    "sampling_rate": currDev?.info?.nominal_srate,
-                }
-            }
-        }
-
-        console.log(data);
-
-        const uploaded = "playing" in deviceMeta[id];
-
-        return (
-            <DeviceList data={data} name={id} handleShow={handleShow} key={id} uploaded={uploaded} />
-        )
-    });
-
-    const deviceModal = {
-        "EMOTIV": <EmotivDeviceModal show={show} handleClose={handleClose} />,
-        "Muse": <></>,
-        "LSL Device": <></>
+    if (data == undefined) {
+      const defaultData = devicesRaw.find(
+        ({ heading }) => currDev?.info?.name === heading
+      );
+      if (defaultData) {
+        data = defaultData;
+      } else {
+        data = {
+          heading:
+            currDev?.info?.name != undefined
+              ? "LSL - " + currDev?.info?.name
+              : "LSL",
+          description:
+            "This is a custom LSL stream. LSL devices can have very different properties",
+          type: currDev?.info?.type || "custom",
+          sampling_rate: currDev?.info?.nominal_srate,
+        };
+      }
     }
 
-    function getDeviceModal(id) {
-        return (
-            deviceModal[deviceMeta[id]?.device]
-        )
-    }
+    const uploaded = "playing" in deviceMeta[id];
 
     return (
-        <div>
-            {deviceButtonList}
-            {getDeviceModal(currId)}
-        </div>
+      <DeviceList
+        data={data}
+        name={id}
+        handleShow={handleShow}
+        key={id}
+        uploaded={uploaded}
+      />
     );
-}
+  });
 
+  const deviceName = deviceMeta?.[currId]?.device;
 
-function EmotivDeviceModal({ show, handleClose }) {
-    // Modal to view the Emotiv Headset
-    const device = devicesRaw.find(({ heading }) => heading === "EMOTIV");
-    const source = ["EMOTIV"];
-
-    return (
-        <Modal show={show} onHide={handleClose} centered size="lg">
-            <Modal.Header closeButton>
-                <Modal.Title>{device.heading}</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                {device.description}
-                <div className='mt-3'>
-                    <h5>Available data streams</h5>
-                    <p>This device can stream the following data to a visualization. Hover to learn more.</p>
-                    <ModalDataInformation source={source} popupInfo={[device]} groupData={true} />
-                </div>
-            </Modal.Body>
-        </Modal>
-    )
+  return (
+    <div>
+      {deviceButtonList}
+      <DeviceConnection
+        show={show}
+        handleClose={handleClose}
+        deviceID={currId}
+        deviceName={deviceName}
+      />
+    </div>
+  );
 }

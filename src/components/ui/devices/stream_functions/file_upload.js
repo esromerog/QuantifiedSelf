@@ -22,7 +22,6 @@ export function FileUploader({ show, handleClose }) {
 
     const dispatch = useDispatch();
     const prevRecordIDs = useSelector(getDataIDs);
-    console.log(prevRecordIDs);
     const [recordingDevice, setRecordingDevice] = useState("");
     const [successText, setSuccessText] = useState("");
     const [id, setID] = useState(()=>{
@@ -42,7 +41,6 @@ export function FileUploader({ show, handleClose }) {
 
         const form = e.currentTarget;
         const [file] = await form.files;
-        console.log(file);
 
         // If I were working with a server, I could post the files to a URL
         // The current solution is to save them into session storage
