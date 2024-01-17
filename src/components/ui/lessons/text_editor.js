@@ -7,10 +7,11 @@ import {
 } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
-import P5Extension from "./p5_extension";
+import P5Extension, { getVisMeta } from "./p5_extension";
 import Placeholder from "@tiptap/extension-placeholder";
 import Document from "@tiptap/extension-document";
 import DeviceExtension from "./connectivity";
+import p5logo from "../../../assets/p5logobw.png";
 
 const CustomDocument = Document.extend({
   content: "heading block*",
@@ -33,12 +34,7 @@ const extensions = [
 ];
 
 const content = `
-<h1>
-  It'll always have a heading …
-</h1>
-<p>
-  … if you pass a custom document. That’s the beauty of having full control over the schema.
-</p>
+<h1>Custom title</h1><p></p><p>This is a sample lesson</p><device-connection device="EMOTIV"></device-connection><p5-visualization visid="flower"></p5-visualization>
 `;
 
 function TipTap() {
@@ -48,7 +44,7 @@ function TipTap() {
   });
 
   if (editor) {
-    console.log(editor.getJSON());
+    editor.setEditable(true);
   }
 
   return (
@@ -57,7 +53,9 @@ function TipTap() {
       <BubbleMenu editor={editor}>
         <InlineMenuWithLink editor={editor} />
       </BubbleMenu>
-      <FloatingMenu editor={editor}>
+      <FloatingMenu
+        editor={editor}
+      >
         <NewLineMenu editor={editor} />
       </FloatingMenu>
     </>
@@ -76,40 +74,48 @@ function InlineMenu({ editor, setIsAddingLink }) {
         disabled={!editor.can().chain().focus().toggleBold().run()}
         className={editor.isActive("bold") ? "is-active" : ""}
       >
-        <span className="material-symbols-outlined material-icons">format_bold</span>
+        <span className="material-symbols-outlined inline-icon">
+          format_bold
+        </span>
       </button>
       <button
         onClick={() => editor.chain().focus().toggleItalic().run()}
         disabled={!editor.can().chain().focus().toggleItalic().run()}
         className={editor.isActive("italic") ? "is-active" : ""}
       >
-        <span className="material-symbols-outlined material-icons">format_italic</span>
+        <span className="material-symbols-outlined inline-icon">
+          format_italic
+        </span>
       </button>
       <button
         onClick={() => editor.chain().focus().toggleStrike().run()}
         disabled={!editor.can().chain().focus().toggleStrike().run()}
         className={editor.isActive("strike") ? "is-active" : ""}
       >
-        <span className="material-symbols-outlined material-icons">format_strikethrough</span>
+        <span className="material-symbols-outlined inline-icon">
+          format_strikethrough
+        </span>
       </button>
       <button
         onClick={() => editor.chain().focus().toggleCode().run()}
         disabled={!editor.can().chain().focus().toggleCode().run()}
         className={editor.isActive("code") ? "is-active" : ""}
       >
-        <span className="material-symbols-outlined material-icons">code</span>
+        <span className="material-symbols-outlined inline-icon">code</span>
       </button>
       <button
         onClick={() => editor.chain().focus().toggleBulletList().run()}
         className={editor.isActive("bulletList") ? "is-active" : ""}
       >
-        <span className="material-symbols-outlined material-icons">format_list_bulleted</span>
+        <span className="material-symbols-outlined inline-icon">
+          format_list_bulleted
+        </span>
       </button>
       <button
         onClick={() => setIsAddingLink(true)}
         className={editor.isActive("link") ? "is-active" : ""}
       >
-        <span className="material-symbols-outlined material-icons">link</span>
+        <span className="material-symbols-outlined inline-icon">link</span>
       </button>
     </div>
   );
@@ -164,61 +170,92 @@ function NewLineMenu({ editor }) {
 
   const [isAddingP5Link, setIsAddingP5Link] = useState(false);
 
+  const deviceList = ["EMOTIV", "Muse"];
+
   return (
-    <div className="dropdown">
+    <>
       <a
         className="btn btn-link"
         type="button"
         data-bs-toggle="dropdown"
         aria-expanded="false"
+        onClick={() => setIsAddingP5Link(false)}
       >
-        <span className="material-symbols-outlined material-icons">add_circle</span>
+        <i className="bi bi-plus h5"></i>
       </a>
-      {!isAddingP5Link ? (
+      <div className="dropdown">
         <ul className="dropdown-menu">
-          <li>
-            <button
-              onClick={() =>
-                editor.chain().focus().toggleHeading({ level: 1 }).run()
-              }
-              className="dropdown-item"
-            >
-              <span className="material-symbols-outlined material-icons">title</span> H1
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={() =>
-                editor.chain().focus().toggleHeading({ level: 2 }).run()
-              }
-              className="dropdown-item"
-            >
-              <span className="material-symbols-outlined material-icons">subheader</span> H1
-            </button>
-          </li>
-          <li>
-            <button
-              onClick={() => setIsAddingP5Link(true)}
-              className="dropdown-item"
-            >
-              P5 Visualization
-            </button>
-          </li>
-          <li>
-            <button onClick={() => addDevice(editor)} className="dropdown-item">
-              Device
-            </button>
-          </li>
+          {isAddingP5Link ? (
+            <GetVisIDFromLink editor={editor} setter={setIsAddingP5Link} />
+          ) : (
+            <>
+              <li>
+                <button
+                  onClick={() =>
+                    editor.chain().focus().toggleHeading({ level: 1 }).run()
+                  }
+                  className="dropdown-item"
+                >
+                  Title
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={() =>
+                    editor.chain().focus().toggleHeading({ level: 2 }).run()
+                  }
+                  className="dropdown-item"
+                >
+                  Subtitle
+                </button>
+              </li>
+              <li>
+                <button
+                  onClick={(event) => {
+                    setIsAddingP5Link(true);
+                    event.stopPropagation();
+                  }}
+                  className="dropdown-item"
+                >
+                  P5 Visual
+                </button>
+              </li>
+              <li>
+                <button
+                  type="button"
+                  className="dropdown-item"
+                  data-bs-toggle="dropdown-submenu"
+                  data-bs-target="#nested-dropdown"
+                  aria-expanded="false"
+                >
+                  Devices
+                </button>
+                <ul
+                  className="submenu-right dropdown-menu"
+                  id="nested-dropdown"
+                >
+                  {deviceList.map((deviceName) => (
+                    <li key={deviceName}>
+                      <button
+                        className="dropdown-item"
+                        onClick={() => addDevice(editor, deviceName)}
+                      >
+                        {deviceName}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            </>
+          )}
         </ul>
-      ) : (
-        <GetVisIDFromLink editor={editor} setter={setIsAddingP5Link} />
-      )}
-    </div>
+      </div>
+    </>
   );
 }
 
-function addDevice(editor) {
-  editor.commands.insertContent(`<device-connection device='EMOTIV' />`);
+function addDevice(editor, device) {
+  editor.commands.insertContent(`<device-connection device=${device} />`);
 }
 
 function extractVisID(input) {
@@ -245,6 +282,10 @@ function GetVisIDFromLink({ editor, setter }) {
         onKeyDown={(event) => {
           if (event.key === "Enter") {
             const visID = extractVisID(event.target.value);
+            if (!getVisMeta(visID)) {
+              setter(false);
+              return;
+            }
             console.log(visID);
             editor.commands.insertContent(
               `<p5-visualization visID=${visID} />`

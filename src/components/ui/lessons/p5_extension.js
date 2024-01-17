@@ -4,6 +4,7 @@ import { P5iFrame } from "../visuals/P5Code/p5iframe";
 import { useDispatch, useSelector } from "react-redux";
 import React, { useRef, useEffect, useState } from "react";
 import { allVisSources } from "../../../App";
+import DataManagement from "../visuals/dashboard/dataManagement";
 
 // To insert it into the actual editor
 // this.editor.chain().insertContentAt(this.editor.state.selection.head, { type: this.type.name }).focus().run()
@@ -25,7 +26,7 @@ const P5Extension = Node.create({
     return ReactNodeViewRenderer(P5LessonVisualsTipTap);
   },
   renderHTML({ HTMLAttributes }) {
-    return ["react-component", mergeAttributes(HTMLAttributes)];
+    return ["p5-visualization", mergeAttributes(HTMLAttributes)];
   },
   parseHTML() {
     return [
@@ -38,7 +39,7 @@ const P5Extension = Node.create({
 
 export default P5Extension;
 
-function _getVisMeta(visID) {
+export function getVisMeta(visID) {
   let result = allVisSources.find(({ id }) => id == visID);
   if (typeof result === "undefined") {
     const customVis = JSON.parse(localStorage.getItem("visuals"));
@@ -78,16 +79,18 @@ function LoadP5LessonVisuals({ visMetadata }) {
     setCode(getCode());
   }, []);
 
-  return (
-    <NodeViewWrapper>
-      <P5iFrame params={params} code={code} />
-    </NodeViewWrapper>
-  );
+  return <P5iFrame params={params} code={code} />;
 }
 
 function P5LessonVisualsTipTap(props) {
-  const visMetadata = _getVisMeta(props.node.attrs.visID);
+  const [visMetadata, setVisMetadata] = useState(
+    getVisMeta(props.node.attrs.visID)
+  );
   const dispatch = useDispatch();
+
+  if (visMetadata == undefined) {
+    return;
+  }
 
   useEffect(() => {
     dispatch({ type: "params/load", payload: visMetadata });
@@ -95,18 +98,15 @@ function P5LessonVisualsTipTap(props) {
 
   return (
     <NodeViewWrapper>
-      <LoadP5LessonVisuals visMetadata={visMetadata} />
+      <DataManagement
+        visInfo={visMetadata}
+        custom={false}
+        setVisInfo={setVisMetadata}
+      />
+      <div className="mb-n5" />
+      <div className="p5-container-lessons">
+        <LoadP5LessonVisuals visMetadata={visMetadata} />
+      </div>
     </NodeViewWrapper>
   );
-}
-
-export function P5LessonVisuals({ visID }) {
-  const visMetadata = _getVisMeta(visID);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch({ type: "params/load", payload: visMetadata });
-  }, []);
-
-  return <LoadP5LessonVisuals visMetadata={visMetadata} />;
 }

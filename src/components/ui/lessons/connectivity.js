@@ -25,7 +25,7 @@ const DeviceExtension = Node.create({
     return ReactNodeViewRenderer(RenderDeviceButton);
   },
   renderHTML({ HTMLAttributes }) {
-    return ["react-component", mergeAttributes(HTMLAttributes)];
+    return ["device-connection", mergeAttributes(HTMLAttributes)];
   },
   parseHTML() {
     return [
