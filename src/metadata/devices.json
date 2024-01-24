@@ -46,6 +46,36 @@
         { "name": "AF7", "description": "EEG activity from the left frontal lobe.", "type": "Raw EEG channels"},
         { "name": "AF8", "description": "EEG activity from the right temporal lobe", "type": "Raw EEG channels"}
       ]
+    },
+    {
+      "heading": "Face",
+      "short_description": "This sensor allows you to capture video of your face and detect specific movements and getures",
+      "description": "This sensor allows you to capture video of your face and detect specific movements and gestures",
+      "type": "Video",
+      "sampling_rate": 15,
+      "data": [
+        { "name": "Facial Movements", "description": "Different Facial Movements", "type": "Face Landmark"}
+      ]
+    },
+    {
+      "heading": "Video Heart Rate",
+      "short_description": "This sensor allows you to measure yout heart rate from a video input",
+      "description": "This sensor allows you to measure yout heart rate from a video input",
+      "type": "Video",
+      "sampling_rate": 15,
+      "data": [
+        { "name": "Heart rate", "description": "Heart rate estimated from changes in the color of your face", "type": "Heart"}
+      ]
+    },
+    {
+      "heading": "Audio Volume",
+      "short_description": "This sensor allows you to measure the volume (Root Mean Square) of audio from the microphone",
+      "description": "This sensor allows you to measure the volume (Root Mean Square) of audio from the microphone",
+      "type": "Audio",
+      "sampling_rate": 15,
+      "data": [
+        { "name": "Volume", "description": "The Root Mean Square of the values of the signal", "type": "Audio Feature"}
+      ]
     }
 ]
 
