@@ -11,7 +11,7 @@ import P5Extension, { getVisMeta } from "./p5_extension";
 import Placeholder from "@tiptap/extension-placeholder";
 import Document from "@tiptap/extension-document";
 import DeviceExtension from "./connectivity";
-import p5logo from "../../../assets/p5logobw.png";
+//import p5logo from "../../../assets/p5logobw.png";
 
 const CustomDocument = Document.extend({
   content: "heading block*",
