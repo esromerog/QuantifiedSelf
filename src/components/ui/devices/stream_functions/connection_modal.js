@@ -8,6 +8,7 @@ import { connectMuse } from "./muse";
 import { connectEmotiv } from "./emotiv";
 import { connectFace } from './face';
 import { connectVHeartRate } from './vheartrate';
+import { connectAudioRMS } from './rms';
 import { connectLSL } from "./lsl";
 
 const connectionText = {
@@ -31,7 +32,8 @@ const deviceConnectionFunctions = {
   LSL: connectLSL,
   EMOTIV: connectEmotiv,
   Face: connectFace,
-  VideoHeartRate: connectVHeartRate
+  VideoHeartRate: connectVHeartRate,
+  AudioVolume: connectAudioRMS
 };
 
 export function DeviceConnection({ show, handleClose, deviceName, deviceID }) {
