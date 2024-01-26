@@ -119,6 +119,14 @@ export function DeviceSelectionWindow() {
               <li>
                 <a
                   className="dropdown-item"
+                  onClick={() => handleShow("VideoHeartRate")}
+                >
+                  Video Heart Rate
+                </a>
+              </li>
+              <li>
+                <a
+                  className="dropdown-item"
                   onClick={() => handleShow("Upload")}
                 >
                   Upload a file

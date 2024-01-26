@@ -58,7 +58,7 @@
       ]
     },
     {
-      "heading": "Video Heart Rate",
+      "heading": "VideoHeartRate",
       "short_description": "This sensor allows you to measure yout heart rate from a video input",
       "description": "This sensor allows you to measure yout heart rate from a video input",
       "type": "Video",
@@ -68,7 +68,7 @@
       ]
     },
     {
-      "heading": "Audio Volume",
+      "heading": "AudioVolume",
       "short_description": "This sensor allows you to measure the volume (Root Mean Square) of audio from the microphone",
       "description": "This sensor allows you to measure the volume (Root Mean Square) of audio from the microphone",
       "type": "Audio",
