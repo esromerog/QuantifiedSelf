@@ -6,6 +6,9 @@ import { ModalDataInformation } from "../availableData";
 import devicesRaw from "../../../../metadata/devices.json";
 import { connectMuse } from "./muse";
 import { connectEmotiv } from "./emotiv";
+import { connectFace } from './face';
+import { connectVHeartRate } from './vheartrate';
+import { connectAudioRMS } from './rms';
 import { connectLSL } from "./lsl";
 
 const connectionText = {
@@ -28,6 +31,9 @@ const deviceConnectionFunctions = {
   Muse: connectMuse,
   LSL: connectLSL,
   EMOTIV: connectEmotiv,
+  Face: connectFace,
+  VideoHeartRate: connectVHeartRate,
+  AudioVolume: connectAudioRMS
 };
 
 export function DeviceConnection({ show, handleClose, deviceName, deviceID }) {
