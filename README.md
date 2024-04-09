@@ -1,3 +1,6 @@
+This repository will be deprecated in favor of the new version found at [You-Quantified](https://github.com/esromerog/You-Quantified), which includes a back-end and an improved user experience.
+
+
 # Creative Representation of the Quantified Self
 This project aims to promote data literacy through the creative representation of the Quantified Self. It's meant to serve as a learning resource for students seeking to understand, play around, collect and visualize their physiological signals.
 
