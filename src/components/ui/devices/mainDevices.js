@@ -135,11 +135,20 @@ export function DeviceSelectionWindow() {
               <li>
                 <a
                   className="dropdown-item"
+                  onClick={() => handleShow("FaceSync")}
+                >
+                  Face Synchronicity
+                </a>
+              </li>
+              <li>
+                <a
+                  className="dropdown-item"
                   onClick={() => handleShow("Upload")}
                 >
                   Upload a file
                 </a>
               </li>
+              
               {pressingAlt ? (
                 <li>
                   <a
