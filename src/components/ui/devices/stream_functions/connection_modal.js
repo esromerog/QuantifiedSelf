@@ -7,6 +7,7 @@ import devicesRaw from "../../../../metadata/devices.json";
 import { connectMuse } from "./muse";
 import { connectEmotiv } from "./emotiv";
 import { connectFace } from './face';
+import { connectFaceSync } from './faceSync';
 import { connectVHeartRate } from './vheartrate';
 import { connectAudioRMS } from './rms';
 import { connectLSL } from "./lsl";
@@ -33,7 +34,8 @@ const deviceConnectionFunctions = {
   EMOTIV: connectEmotiv,
   Face: connectFace,
   VideoHeartRate: connectVHeartRate,
-  AudioVolume: connectAudioRMS
+  AudioVolume: connectAudioRMS,
+  FaceSync: connectFaceSync
 };
 
 export function DeviceConnection({ show, handleClose, deviceName, deviceID }) {

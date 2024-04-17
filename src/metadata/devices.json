@@ -76,6 +76,16 @@
       "data": [
         { "name": "Volume", "description": "The Root Mean Square of the values of the signal", "type": "Audio Feature"}
       ]
+    },
+    {
+      "heading": "FaceSync",
+      "short_description": "This sensor allows you to measure the synchronicity of facial expressions",
+      "description": "This sensor allows you to measure the synchronicity of facial expressions",
+      "type": "Video",
+      "sampling_rate": 15,
+      "data": [
+        { "name": "Facial Synchronicity", "description": "Syncrhonicity between facial expressions", "type": "Syncrhonicity"}
+      ]
     }
 ]
 
